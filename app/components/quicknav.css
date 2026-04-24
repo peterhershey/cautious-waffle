@@ -1,0 +1,151 @@
+/* QuickNav — fixed top-left hamburger + click-to-open frosted panel
+   listing every portfolio / prototype / case-study route. Rendered by
+   the top-level layout so it's consistent across all pages. */
+
+.quicknav {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 100;
+  font-family: var(--wipu-mono, var(--font-mono, ui-monospace, monospace));
+}
+
+/* Trigger — always faintly visible, brightens on hover. Uses
+   difference-blend so it reads on any background. */
+.quicknav-trigger {
+  all: unset;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  color: #fff;
+  mix-blend-mode: difference;
+  opacity: 0.55;
+  transition: background 160ms ease, opacity 160ms ease;
+}
+.quicknav-trigger:hover,
+.quicknav[data-open="true"] .quicknav-trigger,
+.quicknav-trigger:focus-visible {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.08);
+}
+.quicknav-trigger:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 2px;
+}
+
+.quicknav-burger {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 16px;
+}
+.quicknav-burger span {
+  display: block;
+  height: 1.5px;
+  background: currentColor;
+  border-radius: 1px;
+  transition: transform 180ms ease, opacity 180ms ease;
+}
+.quicknav[data-open="true"] .quicknav-burger span:nth-child(1) {
+  transform: translateY(5.5px) rotate(45deg);
+}
+.quicknav[data-open="true"] .quicknav-burger span:nth-child(2) {
+  opacity: 0;
+}
+.quicknav[data-open="true"] .quicknav-burger span:nth-child(3) {
+  transform: translateY(-5.5px) rotate(-45deg);
+}
+
+/* Panel — frosted glass, readable on dark or light backgrounds.
+   Two-layer approach: a clearly-visible tinted surface + a blur
+   backdrop-filter for real frosted texture when content sits behind. */
+.quicknav-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 272px;
+  padding: 14px 16px 16px;
+  background: linear-gradient(
+      180deg,
+      rgba(32, 32, 38, 0.78),
+      rgba(18, 18, 22, 0.82)
+    );
+  color: #f2efe6;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 16px;
+  backdrop-filter: blur(32px) saturate(1.6);
+  -webkit-backdrop-filter: blur(32px) saturate(1.6);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.08) inset,
+    0 20px 50px rgba(0, 0, 0, 0.5),
+    0 4px 14px rgba(0, 0, 0, 0.35);
+  isolation: isolate;
+  opacity: 0;
+  transform: translateY(-6px);
+  pointer-events: none;
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+.quicknav[data-open="true"] .quicknav-panel {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* Group header — small, all caps */
+.quicknav-group + .quicknav-group {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.12);
+}
+.quicknav-group-head {
+  font-size: 8.5px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(242, 239, 230, 0.4);
+  margin-bottom: 6px;
+}
+
+.quicknav-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.quicknav-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px;
+  margin: 0 -8px;
+  border-radius: 6px;
+  font-size: 13px;
+  letter-spacing: 0.01em;
+  color: rgba(242, 239, 230, 0.85);
+  text-decoration: none;
+  transition: color 140ms ease, background 140ms ease;
+}
+.quicknav-link:hover {
+  color: #f2efe6;
+  background: rgba(255, 255, 255, 0.06);
+}
+.quicknav-link[data-active="true"] {
+  color: #f2d06a;
+}
+.quicknav-link-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.35;
+  flex: 0 0 auto;
+}
+.quicknav-link[data-active="true"] .quicknav-link-dot {
+  opacity: 1;
+}

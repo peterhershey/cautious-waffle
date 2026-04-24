@@ -1,0 +1,242 @@
+/* whatispeterupto — FigJam annotation + decoration layer
+   Dashed arrows, highlighter marks, washi tape, pins, stamps, brackets.
+   All classes consume existing theme tokens — no new colors introduced. */
+
+/* ═══════════════════════════════════════════════════════════════════
+   1. DASHED ARROW (SVG)
+   <svg class="wipu-anno-arrow" data-tone="…"> with a <path class="line"/>
+   and optional <path class="head"/>. Solid head, dashed body.
+   ═══════════════════════════════════════════════════════════════════ */
+.wipu-anno-arrow {
+  position: absolute;
+  pointer-events: none;
+  overflow: visible;
+}
+.wipu-anno-arrow .line {
+  stroke: var(--wipu-ink-faint);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 6;
+  stroke-linecap: round;
+  fill: none;
+  animation: wipu-anno-arrow-march 2.2s linear infinite;
+}
+@keyframes wipu-anno-arrow-march {
+  from { stroke-dashoffset: 0; }
+  to   { stroke-dashoffset: -10; }
+}
+.wipu-anno-arrow.is-solid .line { animation: none; }
+@media (prefers-reduced-motion: reduce) {
+  .wipu-anno-arrow .line { animation: none; }
+}
+.wipu-anno-arrow .head {
+  stroke: var(--wipu-ink-faint);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
+.wipu-anno-arrow[data-tone="emph"]       .line,
+.wipu-anno-arrow[data-tone="emph"]       .head { stroke: var(--wipu-emph); }
+.wipu-anno-arrow[data-tone="terracotta"] .line,
+.wipu-anno-arrow[data-tone="terracotta"] .head { stroke: var(--wipu-terracotta); }
+.wipu-anno-arrow[data-tone="mustard"]    .line,
+.wipu-anno-arrow[data-tone="mustard"]    .head { stroke: var(--wipu-mustard); }
+.wipu-anno-arrow[data-tone="mint"]       .line,
+.wipu-anno-arrow[data-tone="mint"]       .head { stroke: var(--wipu-mint); }
+.wipu-anno-arrow[data-tone="rose"]       .line,
+.wipu-anno-arrow[data-tone="rose"]       .head { stroke: var(--wipu-rose); }
+
+/* Solid variant — continuous line instead of dashed. */
+.wipu-anno-arrow.is-solid .line { stroke-dasharray: none; }
+
+/* Heavier variant for headline moments. */
+.wipu-anno-arrow.is-heavy .line,
+.wipu-anno-arrow.is-heavy .head { stroke-width: 2.25; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   2. HIGHLIGHTER MARK
+   <span class="wipu-anno-mark"> inline highlighter pass.
+   Semi-transparent band behind text. Clones per line.
+   ═══════════════════════════════════════════════════════════════════ */
+.wipu-anno-mark {
+  background: color-mix(in srgb, var(--wipu-mustard) 55%, transparent);
+  padding: 0.06em 0.18em;
+  margin: 0 -0.06em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  border-radius: 1px;
+  transform: skew(-2deg);
+  display: inline-block;
+}
+.wipu-anno-mark[data-tone="mint"]       { background: color-mix(in srgb, var(--wipu-mint)       55%, transparent); }
+.wipu-anno-mark[data-tone="terracotta"] { background: color-mix(in srgb, var(--wipu-terracotta) 45%, transparent); }
+.wipu-anno-mark[data-tone="rose"]       { background: color-mix(in srgb, var(--wipu-rose)       45%, transparent); }
+.wipu-anno-mark[data-tone="emph"]       { background: color-mix(in srgb, var(--wipu-emph)       35%, transparent); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   3. WASHI TAPE
+   A small rotated strip, meant to be positioned over artifact corners
+   ("holding" a polaroid to the board). Diagonal stripe pattern.
+   ═══════════════════════════════════════════════════════════════════ */
+.wipu-anno-tape {
+  display: inline-block;
+  width: 96px;
+  height: 24px;
+  background-color: var(--wipu-mustard);
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent 0 6px,
+    color-mix(in srgb, #000 18%, transparent) 6px 8px
+  );
+  transform: rotate(-6deg);
+  box-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.08),
+    0 4px 10px rgba(0, 0, 0, 0.18);
+  /* Soft irregular torn edges via inset gradient */
+  -webkit-mask-image: linear-gradient(90deg,
+    rgba(0,0,0,0.85) 0 4px,
+    rgba(0,0,0,1) 4px calc(100% - 4px),
+    rgba(0,0,0,0.85) calc(100% - 4px) 100%);
+          mask-image: linear-gradient(90deg,
+    rgba(0,0,0,0.85) 0 4px,
+    rgba(0,0,0,1) 4px calc(100% - 4px),
+    rgba(0,0,0,0.85) calc(100% - 4px) 100%);
+  opacity: 0.88;
+}
+.wipu-anno-tape[data-tone="mint"]       { background-color: var(--wipu-mint); }
+.wipu-anno-tape[data-tone="terracotta"] { background-color: var(--wipu-terracotta); }
+.wipu-anno-tape[data-tone="rose"]       { background-color: var(--wipu-rose); }
+.wipu-anno-tape[data-tone="navy"]       { background-color: var(--wipu-navy); }
+.wipu-anno-tape[data-tone="neutral"] {
+  background-color: color-mix(in srgb, var(--wipu-ink-dim) 40%, transparent);
+}
+
+.wipu-anno-tape.is-wide { width: 140px; }
+.wipu-anno-tape.is-narrow { width: 64px; }
+.wipu-anno-tape.is-tilt-right { transform: rotate(8deg); }
+.wipu-anno-tape.is-tilt-flat { transform: rotate(0deg); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   4. PUSH PIN
+   Small radial-gradient circle with a glint. Place on top of a sticky
+   note or polaroid to suggest it's pinned to a corkboard.
+   ═══════════════════════════════════════════════════════════════════ */
+.wipu-anno-pin {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 32%,
+      color-mix(in srgb, #fff 35%, var(--wipu-terracotta)) 0%,
+      var(--wipu-terracotta) 45%,
+      color-mix(in srgb, #000 45%, var(--wipu-terracotta)) 100%);
+  box-shadow:
+    0 2px 3px rgba(0, 0, 0, 0.45),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+}
+.wipu-anno-pin[data-tone="mint"]    { background: radial-gradient(circle at 32% 32%, color-mix(in srgb, #fff 35%, var(--wipu-mint)) 0%, var(--wipu-mint) 45%, color-mix(in srgb, #000 45%, var(--wipu-mint)) 100%); }
+.wipu-anno-pin[data-tone="mustard"] { background: radial-gradient(circle at 32% 32%, color-mix(in srgb, #fff 35%, var(--wipu-mustard)) 0%, var(--wipu-mustard) 45%, color-mix(in srgb, #000 45%, var(--wipu-mustard)) 100%); }
+.wipu-anno-pin[data-tone="rose"]    { background: radial-gradient(circle at 32% 32%, color-mix(in srgb, #fff 35%, var(--wipu-rose)) 0%, var(--wipu-rose) 45%, color-mix(in srgb, #000 45%, var(--wipu-rose)) 100%); }
+.wipu-anno-pin[data-tone="navy"]    { background: radial-gradient(circle at 32% 32%, color-mix(in srgb, #fff 35%, var(--wipu-navy)) 0%, var(--wipu-navy) 45%, color-mix(in srgb, #000 45%, var(--wipu-navy)) 100%); }
+
+.wipu-anno-pin.is-lg { width: 20px; height: 20px; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   5. STAMP — rotated rubber-stamp badge (text in a border)
+   ═══════════════════════════════════════════════════════════════════ */
+.wipu-anno-stamp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 18px;
+  border: 2px solid currentColor;
+  border-radius: 6px;
+  font-family: var(--wipu-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--wipu-terracotta);
+  transform: rotate(-8deg);
+  opacity: 0.82;
+  white-space: nowrap;
+}
+.wipu-anno-stamp[data-tone="mint"]    { color: var(--wipu-mint); }
+.wipu-anno-stamp[data-tone="mustard"] { color: var(--wipu-mustard); }
+.wipu-anno-stamp[data-tone="rose"]    { color: var(--wipu-rose); }
+.wipu-anno-stamp[data-tone="navy"]    { color: var(--wipu-navy); }
+.wipu-anno-stamp[data-tone="ink"]     { color: var(--wipu-ink); }
+
+.wipu-anno-stamp.is-round { border-radius: 999px; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   6. SCRIBBLE — hand-drawn asterisk / star (SVG). Styling only;
+   structure inline. Typically 28×28.
+   ═══════════════════════════════════════════════════════════════════ */
+.wipu-anno-scribble {
+  display: inline-block;
+  color: var(--wipu-ink);
+  opacity: 0.8;
+}
+.wipu-anno-scribble path,
+.wipu-anno-scribble line {
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  fill: none;
+}
+.wipu-anno-scribble[data-tone="emph"]       { color: var(--wipu-emph); opacity: 1; }
+.wipu-anno-scribble[data-tone="terracotta"] { color: var(--wipu-terracotta); opacity: 1; }
+.wipu-anno-scribble[data-tone="mustard"]    { color: var(--wipu-mustard); opacity: 1; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   7. MARKER CIRCLE — rough hand-drawn ellipse (SVG).
+   Wrap around a target word: <span class="wipu-anno-circle-wrap">…</span>
+   with absolute <svg class="wipu-anno-circle"/> inside.
+   ═══════════════════════════════════════════════════════════════════ */
+.wipu-anno-circle-wrap {
+  position: relative;
+  display: inline-block;
+  padding: 0 4px;
+}
+.wipu-anno-circle {
+  position: absolute;
+  inset: -4px -6px;
+  width: calc(100% + 12px);
+  height: calc(100% + 8px);
+  pointer-events: none;
+}
+.wipu-anno-circle path {
+  stroke: var(--wipu-emph);
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  fill: none;
+}
+.wipu-anno-circle[data-tone="terracotta"] path { stroke: var(--wipu-terracotta); }
+.wipu-anno-circle[data-tone="mustard"]    path { stroke: var(--wipu-mustard); }
+.wipu-anno-circle[data-tone="mint"]       path { stroke: var(--wipu-mint); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   8. ANNOTATION LABEL — italic caption + arrow glyph
+   <span class="wipu-anno-label">↖ tap to speak</span>
+   ═══════════════════════════════════════════════════════════════════ */
+.wipu-anno-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--wipu-mono);
+  font-size: 11px;
+  font-style: italic;
+  color: var(--wipu-ink-dim);
+  letter-spacing: -0.005em;
+}
+.wipu-anno-label .glyph {
+  font-style: normal;
+  font-weight: 500;
+  color: var(--wipu-emph);
+}
+.wipu-anno-label[data-tone="ink"]        { color: var(--wipu-ink); }
+.wipu-anno-label[data-tone="terracotta"] .glyph { color: var(--wipu-terracotta); }
+.wipu-anno-label[data-tone="mint"]       .glyph { color: var(--wipu-mint); }
+.wipu-anno-label[data-tone="mustard"]    .glyph { color: var(--wipu-mustard); }

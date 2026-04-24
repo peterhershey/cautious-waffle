@@ -1,0 +1,499 @@
+/* Sample presentation — shows one of each template with lorem ipsum */
+
+/* Soft scroll-snap scoped to this route only — html rule is dropped
+   when the CSS unloads on navigation. Snaps at each slide boundary and
+   at each timeline stop. */
+html {
+  scroll-snap-type: y mandatory;
+}
+
+.wipu-sample-root {
+  background: var(--wipu-bg);
+  color: var(--wipu-ink);
+}
+
+.wipu-sample-slide {
+  min-height: 100svh;
+  padding: 96px 48px 48px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  border-bottom: 1px dashed var(--wipu-rule);
+  scroll-snap-align: start;
+  scroll-snap-stop: normal;
+}
+
+.wipu-sample-slide-label {
+  position: absolute;
+  top: 40px;
+  left: 48px;
+  font-family: var(--wipu-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--wipu-ink-dim);
+}
+.wipu-sample-slide-label strong {
+  color: var(--wipu-mustard);
+  font-weight: 500;
+  margin-right: 6px;
+}
+
+.wipu-sample-inner {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* Intro — handled by Template 01 (.wipu-tpl-intro) in templates.css */
+
+/* Quote slide */
+.wipu-sample-quote {
+  text-align: center;
+  font-size: clamp(28px, 4vw, 56px);
+  font-weight: 500;
+  font-style: italic;
+  line-height: 1.2;
+  color: var(--wipu-ink);
+  max-width: 20ch;
+  margin: 0 auto;
+}
+.wipu-sample-quote-attr {
+  display: block;
+  margin-top: 24px;
+  font-size: 14px;
+  font-style: normal;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--wipu-ink-dim);
+}
+
+/* Informational */
+.wipu-sample-info-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  gap: 48px;
+  align-items: start;
+}
+.wipu-sample-info-title {
+  font-size: clamp(28px, 3.5vw, 48px);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  margin: 0 0 16px;
+}
+.wipu-sample-info-kicker {
+  font-style: italic;
+  color: var(--wipu-ink-dim);
+  font-size: 16px;
+  margin: 0;
+}
+.wipu-sample-info-body {
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--wipu-ink);
+}
+.wipu-sample-info-body p { margin: 0 0 14px; }
+.wipu-sample-info-body p:last-child { margin: 0; }
+
+/* Three-up — handled by Template 04 (.wipu-tpl-threeup) in templates.css */
+
+/* Timeline — scroll-pinned horizontal pan.
+   Vertical scroll translates to horizontal progression through stops.
+   Each stop = one 100svh of scroll. After the last stop, scroll
+   releases to the next slide. */
+.wipu-sample-tl {
+  position: relative;
+  width: 100%;
+  height: 500svh; /* STOPS.length (5) * 100svh — keep in sync with JS */
+  border-bottom: 1px dashed var(--wipu-rule);
+}
+
+/* Invisible snap markers — one per stop. If scroll-snap is enabled on
+   html, these catch snapping. Harmless otherwise. */
+.wipu-sample-tl-snap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 100svh;
+  pointer-events: none;
+  scroll-snap-align: start;
+  scroll-snap-stop: normal;
+}
+
+.wipu-sample-tl-pin {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  width: 100%;
+  overflow: hidden;
+  background: var(--wipu-bg);
+}
+
+.wipu-sample-tl-track {
+  display: flex;
+  flex-wrap: nowrap;
+  width: 500%; /* STOPS.length * 100% */
+  height: 100%;
+  will-change: transform;
+  transition: transform 80ms linear;
+}
+
+.wipu-sample-tl-stop {
+  flex: 0 0 calc(100% / 5);
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 48px 160px;
+}
+
+.wipu-sample-tl-figure {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  max-height: 100%;
+  max-width: 100%;
+  transition: transform 480ms cubic-bezier(0.2, 0.6, 0.2, 1),
+    opacity 480ms ease;
+  transform: scale(0.97);
+  opacity: 0.82;
+}
+.wipu-sample-tl-stop.is-active .wipu-sample-tl-figure {
+  transform: scale(1);
+  opacity: 1;
+}
+
+/* Wide-format placeholder image */
+.wipu-sample-tl-image {
+  width: min(1080px, 78vw);
+  aspect-ratio: 16 / 10;
+  max-height: 60svh;
+  border-radius: 18px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+  user-select: none;
+}
+.wipu-sample-tl-image::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 255, 255, 0.1) 0%,
+    transparent 65%
+  );
+}
+.wipu-sample-tl-image[data-tint="terracotta"] {
+  background: linear-gradient(135deg, #7a2e15 0%, #1f1410 100%);
+}
+.wipu-sample-tl-image[data-tint="mint"] {
+  background: linear-gradient(135deg, #0f3a28 0%, #101b18 100%);
+}
+.wipu-sample-tl-image[data-tint="mustard"] {
+  background: linear-gradient(135deg, #5a4410 0%, #1e1c12 100%);
+}
+.wipu-sample-tl-image[data-tint="rose"] {
+  background: linear-gradient(135deg, #3e1c20 0%, #1a1010 100%);
+}
+.wipu-sample-tl-image[data-tint="navy"] {
+  background: linear-gradient(135deg, #132060 0%, #0c0f1e 100%);
+}
+
+.wipu-sample-tl-stop-caption {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+}
+.wipu-sample-tl-stop-label {
+  font-family: var(--wipu-mono);
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--wipu-ink);
+}
+.wipu-sample-tl-stop-date {
+  font-family: var(--wipu-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--wipu-ink-faint);
+}
+
+/* Progress rail at the bottom of the pin */
+.wipu-sample-tl-progress {
+  position: absolute;
+  bottom: 72px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(880px, 84vw);
+  pointer-events: none;
+  z-index: 5;
+}
+.wipu-sample-tl-rail {
+  position: relative;
+  width: 100%;
+  height: 2px;
+  background: var(--wipu-rule-strong);
+  border-radius: 2px;
+}
+.wipu-sample-tl-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0%;
+  background: var(--wipu-ink);
+  border-radius: 2px;
+  will-change: width;
+  transition: width 80ms linear;
+}
+
+.wipu-sample-tl-tick {
+  position: absolute;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  transform: translate(-50%, -50%);
+}
+.wipu-sample-tl-tick-dot {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: var(--wipu-bg);
+  border: 2px solid var(--wipu-rule-strong);
+  box-shadow: 0 0 0 4px var(--wipu-bg);
+  transition: background 220ms ease, border-color 220ms ease,
+    transform 220ms cubic-bezier(0.2, 0.6, 0.2, 1);
+}
+.wipu-sample-tl-tick.is-reached .wipu-sample-tl-tick-dot {
+  background: var(--wipu-ink);
+  border-color: var(--wipu-ink);
+}
+.wipu-sample-tl-tick.is-active .wipu-sample-tl-tick-dot {
+  background: var(--wipu-navy);
+  border-color: var(--wipu-navy);
+  transform: scale(1.15);
+  box-shadow: 0 0 0 4px var(--wipu-bg),
+    0 0 0 8px color-mix(in srgb, var(--wipu-navy) 22%, transparent);
+}
+.wipu-sample-tl-tick-label {
+  position: absolute;
+  top: calc(100% + 14px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--wipu-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--wipu-ink-faint);
+  white-space: nowrap;
+  transition: color 220ms ease;
+}
+.wipu-sample-tl-tick.is-active .wipu-sample-tl-tick-label {
+  color: var(--wipu-ink);
+}
+
+/* Fallback: reduced motion or narrow viewport → vertical stack */
+@media (max-width: 820px), (prefers-reduced-motion: reduce) {
+  .wipu-sample-tl {
+    height: auto;
+  }
+  .wipu-sample-tl-pin {
+    position: relative;
+    height: auto;
+    overflow: visible;
+  }
+  .wipu-sample-tl-track {
+    flex-direction: column;
+    width: 100%;
+    height: auto;
+    transform: none !important;
+    transition: none;
+  }
+  .wipu-sample-tl-stop {
+    flex: 0 0 auto;
+    width: 100%;
+    padding: 48px 24px;
+  }
+  .wipu-sample-tl-figure {
+    transform: none;
+    opacity: 1;
+  }
+  .wipu-sample-tl-progress { display: none; }
+}
+
+/* Design explorations */
+.wipu-sample-explore {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: 180px;
+  gap: 16px;
+}
+.wipu-sample-explore-tile {
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+}
+.wipu-sample-explore-tile[data-tint="terracotta"] {
+  background: linear-gradient(135deg, #7a2e15 0%, #1f1410 100%);
+}
+.wipu-sample-explore-tile[data-tint="mint"] {
+  background: linear-gradient(135deg, #0f3a28 0%, #101b18 100%);
+}
+.wipu-sample-explore-tile[data-tint="mustard"] {
+  background: linear-gradient(135deg, #5a4410 0%, #1e1c12 100%);
+}
+.wipu-sample-explore-tile[data-tint="rose"] {
+  background: linear-gradient(135deg, #3e1c20 0%, #1a1010 100%);
+}
+.wipu-sample-explore-tile[data-tint="navy"] {
+  background: linear-gradient(135deg, #132060 0%, #0c0f1e 100%);
+}
+
+/* Hero metric */
+.wipu-sample-heroMetric {
+  text-align: center;
+}
+.wipu-sample-heroMetric-n {
+  font-size: clamp(120px, 18vw, 280px);
+  font-weight: 300;
+  letter-spacing: -0.04em;
+  line-height: 0.9;
+  color: var(--wipu-terracotta);
+  display: block;
+  margin-bottom: 24px;
+}
+.wipu-sample-heroMetric-lbl {
+  font-size: 18px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--wipu-ink);
+  margin-bottom: 16px;
+}
+.wipu-sample-heroMetric-note {
+  max-width: 50ch;
+  margin: 24px auto 0;
+  font-size: 14px;
+  color: var(--wipu-ink-dim);
+  line-height: 1.55;
+}
+
+/* Metrics collection */
+.wipu-sample-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+  text-align: left;
+}
+.wipu-sample-metrics-title {
+  grid-column: 1 / -1;
+  font-size: clamp(24px, 3vw, 40px);
+  font-weight: 500;
+  margin: 0 0 24px;
+}
+.wipu-sample-metric-n {
+  font-size: clamp(72px, 10vw, 140px);
+  font-weight: 300;
+  letter-spacing: -0.03em;
+  line-height: 0.9;
+  display: block;
+  margin-bottom: 12px;
+}
+.wipu-sample-metric-n[data-tone="terracotta"] { color: var(--wipu-terracotta); }
+.wipu-sample-metric-n[data-tone="mint"] { color: var(--wipu-mint); }
+.wipu-sample-metric-n[data-tone="mustard"] { color: var(--wipu-mustard); }
+.wipu-sample-metric-lbl {
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--wipu-ink-dim);
+  line-height: 1.4;
+}
+
+/* Prototype — wrapper around the real /prototypes/<slug> page via iframe */
+.wipu-sample-proto-frame {
+  width: min(1400px, 94vw);
+  height: min(calc(100svh - 180px), 860px);
+  margin: 0 auto;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid var(--wipu-rule);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+  background: var(--wipu-bg-elev);
+}
+.wipu-sample-proto-iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+/* Archive gallery */
+.wipu-sample-archive {
+  text-align: center;
+}
+.wipu-sample-archive-trigger {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 28px;
+  background: none;
+  border: 1px dashed var(--wipu-rule-strong);
+  border-radius: 12px;
+  color: var(--wipu-ink);
+  cursor: pointer;
+  font-family: var(--wipu-mono);
+  transition: transform 220ms ease, border-color 220ms ease;
+}
+.wipu-sample-archive-trigger:hover {
+  transform: translateY(-4px);
+  border-color: var(--wipu-mustard);
+}
+.wipu-sample-archive-icon {
+  font-size: 56px;
+}
+.wipu-sample-archive-lbl {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--wipu-ink-dim);
+}
+.wipu-sample-archive-caption {
+  margin-top: 32px;
+  font-size: 13px;
+  color: var(--wipu-ink-faint);
+}
+
+/* Back link */
+.wipu-sample-back {
+  display: block;
+  text-align: center;
+  padding: 48px 24px 64px;
+  font-family: var(--wipu-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--wipu-ink-dim);
+  text-decoration: none;
+}
+.wipu-sample-back:hover { color: var(--wipu-ink); }
+
+@media (max-width: 900px) {
+  .wipu-sample-info-grid,
+  .wipu-sample-metrics,
+  .wipu-sample-explore {
+    grid-template-columns: 1fr;
+  }
+}

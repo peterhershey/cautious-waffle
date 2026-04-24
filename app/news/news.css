@@ -1,0 +1,830 @@
+.news-root {
+  --paper: #fafaf7;
+  --ink: #111;
+  --ink-soft: #2a2a2a;
+  --muted: #6b6a65;
+  --rule: #d9d7d0;
+  --rule-strong: #a8a5a0;
+  --accent: #a3132a;
+
+  background: var(--paper);
+  color: var(--ink);
+  min-height: 100vh;
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+.news-root a { color: inherit; text-decoration: none; }
+.news-root a:hover { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+
+.news-serif {
+  font-family: var(--font-serif), Georgia, serif;
+  font-optical-sizing: auto;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.news-kicker {
+  font-family: var(--font-sans), system-ui, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.news-kicker.accent { color: var(--accent); }
+
+.news-meta { font-size: 12px; color: var(--muted); letter-spacing: 0.02em; }
+.news-dek { font-size: 15px; line-height: 1.45; color: var(--ink-soft); font-weight: 400; }
+.news-rule { border-top: 1px solid var(--rule); }
+.news-rule-strong { border-top: 2px solid var(--ink); }
+
+.news-section-label {
+  font-family: var(--font-sans), system-ui, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.news-wordmark {
+  font-family: var(--font-serif), Georgia, serif;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.news-bullets { list-style: none; padding: 0; margin: 6px 0 0 0; }
+.news-bullets li {
+  position: relative;
+  padding-left: 14px;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  margin-top: 6px;
+}
+.news-bullets li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 10px;
+  width: 8px;
+  height: 1px;
+  background: var(--rule-strong);
+}
+
+.news-sub {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--rule);
+  display: grid;
+  gap: 10px;
+}
+
+.news-live-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  margin-right: 6px;
+  vertical-align: 1px;
+  animation: news-pulse 1.6s ease-in-out infinite;
+}
+@keyframes news-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+.news-nav-strip {
+  display: flex;
+  gap: 18px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 10px 0;
+  font-size: 13px;
+  letter-spacing: 0.01em;
+}
+.news-nav-strip::-webkit-scrollbar { display: none; }
+.news-nav-strip a { white-space: nowrap; color: var(--ink); }
+.news-nav-strip a.accent { color: var(--accent); }
+
+.news-image { width: 100%; display: block; border-radius: 1px; }
+.news-image.ratio-wide { aspect-ratio: 16 / 10; }
+.news-image.ratio-portrait { aspect-ratio: 4 / 5; }
+.news-image.ratio-square { aspect-ratio: 1 / 1; }
+.news-image.ratio-avatar {
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  width: 52px;
+  height: 52px;
+}
+
+.news-container { max-width: 1240px; margin: 0 auto; padding: 0 20px; }
+@media (min-width: 900px) { .news-container { padding: 0 32px; } }
+
+.era-layout { display: block; }
+.era-main { min-width: 0; }
+
+/* ════════════════════════════════════════════════════════════════════════
+   ERA · 1996 — Table-Layout Web
+   ════════════════════════════════════════════════════════════════════════ */
+.news-era[data-era="1996"] {
+  --paper: #ffffff;
+  --ink: #000000;
+  --ink-soft: #111;
+  --muted: #555;
+  --rule: #808080;
+  --rule-strong: #444;
+  --accent: #0033aa;
+  background-color: #808588;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(0,0,0,0.06) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.06) 0 1px, transparent 1px 3px);
+  font-family: "Times New Roman", Times, serif;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+/* Blinking NEW! badge on the lead story of every band + hero lede */
+@keyframes era1996-blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+.news-era[data-era="1996"] .band-lead article > h2.news-serif::before,
+.news-era[data-era="1996"] .hero-lede article > h2.news-serif::before,
+.news-era[data-era="1996"] .hf-main article > h2.news-serif::before {
+  content: "NEW!";
+  display: inline-block;
+  margin-right: 6px;
+  padding: 1px 4px;
+  font: 700 10px/1 Verdana, Arial, sans-serif;
+  color: #cc0000;
+  background: #ffff00;
+  border: 1px solid #cc0000;
+  vertical-align: 3px;
+  animation: era1996-blink 1s steps(2, end) infinite;
+}
+/* "Click here" affordance appended to lede byline */
+.news-era[data-era="1996"] .hero-lede article > p.news-meta::after,
+.news-era[data-era="1996"] .hf-main article > p.news-meta::after,
+.news-era[data-era="1996"] .band-lead article > p.news-meta::after {
+  content: " · Click here for the full story »";
+  color: #0033aa;
+  text-decoration: underline;
+  font-style: normal;
+}
+.news-era[data-era="1996"] a { color: var(--accent); text-decoration: underline; }
+.news-era[data-era="1996"] a:visited { color: #551a8b; }
+
+.news-era[data-era="1996"] .era1996-topbar {
+  background: #000066;
+  color: #fff;
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 11px;
+  padding: 4px 12px;
+  text-align: right;
+  border-bottom: 1px solid #000;
+}
+.news-era[data-era="1996"] .era1996-topbar a { color: #ffff66; padding: 0 6px; }
+
+.news-era[data-era="1996"] .era-layout {
+  display: grid;
+  grid-template-columns: 175px 1fr;
+  max-width: 900px;
+  margin: 0 auto;
+  background: #ffffff;
+  border: 1px solid #808080;
+}
+
+.news-era[data-era="1996"] .left-rail {
+  padding: 10px 8px;
+  border-right: 1px solid #888;
+  font-family: "Times New Roman", Times, serif;
+  font-size: 12.5px;
+  line-height: 1.35;
+  text-align: center;
+  background: #eeeeee;
+}
+.news-era[data-era="1996"] .left-rail hr {
+  border: 0;
+  border-top: 1px solid #a0a0a0;
+  margin: 10px 12px;
+}
+.news-era[data-era="1996"] .left-rail .rail-block { padding: 0 4px; }
+.news-era[data-era="1996"] .left-rail .rail-thumb {
+  display: inline-block;
+  width: 120px;
+  border: 1px solid #707070;
+  padding: 3px;
+  background: #fff;
+}
+.news-era[data-era="1996"] .left-rail .rail-thumb-inner {
+  width: 100%;
+  height: 70px;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      #888 0 1px,
+      #bbb 1px 3px
+    ),
+    #aaa;
+  border: 1px solid #606060;
+}
+.news-era[data-era="1996"] .left-rail .rail-thumb-caption {
+  margin-top: 4px;
+  background: #003366;
+  color: #fff;
+  padding: 2px 0;
+  font-size: 11px;
+  line-height: 1.2;
+  font-family: Verdana, Arial, sans-serif;
+  font-weight: 700;
+}
+.news-era[data-era="1996"] .left-rail .rail-badge {
+  display: inline-block;
+  padding: 10px 18px;
+  background: linear-gradient(to bottom, #ffffcc, #e8e8a8);
+  border: 1px solid #999;
+  font-family: "Times New Roman", Times, serif;
+  font-size: 12px;
+  color: #333;
+}
+.news-era[data-era="1996"] .left-rail .sq {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: #003366;
+  margin-right: 4px;
+  vertical-align: 1px;
+}
+
+.news-era[data-era="1996"] .era1996-masthead {
+  padding: 10px 8px 6px;
+  text-align: center;
+  border-bottom: 1px solid #666;
+}
+.news-era[data-era="1996"] .era1996-wordmark {
+  font-family: "Old English Text MT", "UnifrakturMaguntia", "Times New Roman", serif;
+  font-size: 40px;
+  font-weight: 700;
+  color: #000;
+  letter-spacing: 0;
+  line-height: 1;
+}
+.news-era[data-era="1996"] .era1996-tagline {
+  font-family: "Times New Roman", Times, serif;
+  font-size: 12px;
+  color: #444;
+  margin-top: 6px;
+}
+.news-era[data-era="1996"] .era1996-nav {
+  margin-top: 8px;
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  font-family: Verdana, Arial, sans-serif;
+}
+.news-era[data-era="1996"] .era1996-select {
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 12px;
+  padding: 2px;
+  border: 1px solid #7a7a7a;
+  background: #fff;
+}
+.news-era[data-era="1996"] .era1996-go {
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 12px;
+  padding: 1px 10px;
+  background: #d4d0c8;
+  border: 2px outset #fff;
+  cursor: pointer;
+}
+
+.news-era[data-era="1996"] .era-main { padding: 0 10px 20px; }
+.news-era[data-era="1996"] .news-container {
+  max-width: none !important;
+  padding: 0 !important;
+}
+
+/* Collapse ALL module grids to a single column in 1996 */
+.news-era[data-era="1996"] .hero-grid,
+.news-era[data-era="1996"] .band-grid,
+.news-era[data-era="1996"] .hf-grid,
+.news-era[data-era="1996"] .hb-grid,
+.news-era[data-era="1996"] .bi-grid,
+.news-era[data-era="1996"] .news-row {
+  display: block !important;
+  grid-template-columns: none !important;
+}
+
+.news-era[data-era="1996"] .hero-secondary,
+.news-era[data-era="1996"] .hero-lede,
+.news-era[data-era="1996"] .hero-opinions,
+.news-era[data-era="1996"] .hf-main,
+.news-era[data-era="1996"] .hf-side,
+.news-era[data-era="1996"] .hf-rail,
+.news-era[data-era="1996"] .band-lead,
+.news-era[data-era="1996"] .band-secondaries,
+.news-era[data-era="1996"] .band-tail {
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 0 16px 0 !important;
+}
+
+/* Section label: blue banner across the column */
+.news-era[data-era="1996"] .section-band,
+.news-era[data-era="1996"] .hero-row,
+.news-era[data-era="1996"] .hero-feature,
+.news-era[data-era="1996"] .live-updates {
+  border-top: 0 !important;
+  padding-top: 6px !important;
+  padding-bottom: 12px !important;
+  margin-top: 10px !important;
+}
+.news-era[data-era="1996"] .band-head {
+  background: linear-gradient(to right, #2c5aa0 0%, #2c5aa0 55%, #bdc7e0 55%, #f0f0f0 100%);
+  padding: 3px 10px !important;
+  margin: 0 0 10px 0 !important;
+  border-bottom: 1px solid #1a3d70;
+}
+.news-era[data-era="1996"] .band-head .news-section-label {
+  background: transparent !important;
+  color: #fff !important;
+  font-family: Verdana, Arial, sans-serif !important;
+  text-transform: none !important;
+  letter-spacing: 0.02em !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  padding: 0 !important;
+}
+.news-era[data-era="1996"] .band-head a,
+.news-era[data-era="1996"] .band-head .news-meta {
+  color: #444 !important;
+  font-family: Verdana, Arial, sans-serif !important;
+  font-size: 11px !important;
+}
+
+/* StoryCard: text-wrap image to the right */
+.news-era[data-era="1996"] article { overflow: hidden; padding-bottom: 10px; border-bottom: 1px dotted #999; margin-bottom: 10px; }
+.news-era[data-era="1996"] article > .news-image {
+  float: right;
+  width: 180px !important;
+  aspect-ratio: 4 / 3 !important;
+  margin: 2px 0 6px 12px !important;
+  border: 1px solid #606060 !important;
+  border-radius: 0 !important;
+  filter: saturate(0.72) contrast(0.92);
+}
+.news-era[data-era="1996"] .news-serif {
+  font-family: "Times New Roman", Times, serif !important;
+  font-weight: 700 !important;
+  letter-spacing: 0 !important;
+  font-style: normal !important;
+}
+.news-era[data-era="1996"] .news-serif.italic,
+.news-era[data-era="1996"] em { font-style: italic !important; }
+.news-era[data-era="1996"] article h2.news-serif { font-size: 18px !important; line-height: 1.2 !important; margin: 0 !important; }
+.news-era[data-era="1996"] article h2.news-serif[style*="44px"],
+.news-era[data-era="1996"] article h2.news-serif[style*="clamp(30px"] {
+  font-size: 22px !important;
+}
+.news-era[data-era="1996"] .news-dek {
+  font-family: "Times New Roman", Times, serif !important;
+  font-size: 14px !important;
+  color: #000 !important;
+}
+.news-era[data-era="1996"] .news-meta {
+  font-family: "Times New Roman", Times, serif !important;
+  font-size: 12px !important;
+  font-style: italic;
+  color: #444 !important;
+}
+.news-era[data-era="1996"] .news-kicker {
+  font-family: Verdana, Arial, sans-serif !important;
+  color: #cc0000 !important;
+  font-size: 10px !important;
+  letter-spacing: 0.04em !important;
+}
+.news-era[data-era="1996"] .news-bullets li {
+  font-family: "Times New Roman", Times, serif !important;
+  font-size: 13px !important;
+  padding-left: 14px !important;
+}
+.news-era[data-era="1996"] .news-bullets li::before {
+  content: "■";
+  background: transparent !important;
+  width: auto !important;
+  height: auto !important;
+  top: -2px !important;
+  left: 0 !important;
+  color: #003366;
+  font-size: 9px;
+}
+
+/* Hero breaking: kill the dark panel, use a red-bordered alert box */
+.news-era[data-era="1996"] .hero-breaking {
+  background: #ffffff !important;
+  color: #000 !important;
+  margin: 10px 0 !important;
+  padding: 6px !important;
+  border: 2px solid #cc0000 !important;
+}
+.news-era[data-era="1996"] .hero-breaking * { color: #000 !important; }
+.news-era[data-era="1996"] .hero-breaking h1 {
+  font-size: 22px !important;
+  line-height: 1.15 !important;
+}
+.news-era[data-era="1996"] .hero-breaking .hb-updates,
+.news-era[data-era="1996"] .hero-breaking .hb-updates * {
+  border-color: #888 !important;
+}
+
+/* Band investigation: neutralize dark panel */
+.news-era[data-era="1996"] .bi-image { max-width: 240px; }
+.news-era[data-era="1996"] [style*="#171717"],
+.news-era[data-era="1996"] [style*="#13151a"] { background: #fff !important; color: #000 !important; }
+
+/* Ticker strip: simple yellow band, more "emergency alert" */
+.news-era[data-era="1996"] .ticker-strip {
+  background: #ffff66 !important;
+  color: #000 !important;
+  border: 1px solid #998800 !important;
+  margin: 8px 0 !important;
+  padding: 4px 8px !important;
+  font-family: Verdana, Arial, sans-serif !important;
+  font-size: 11px !important;
+}
+.news-era[data-era="1996"] .ticker-strip span:first-child {
+  background: #cc0000 !important;
+  color: #fff !important;
+}
+
+/* Live updates: strip the timeline treatment */
+.news-era[data-era="1996"] .live-updates ol {
+  border-left: 0 !important;
+  padding-left: 0 !important;
+}
+.news-era[data-era="1996"] .live-updates li {
+  border-top: 1px dotted #999 !important;
+  padding: 6px 0 !important;
+}
+.news-era[data-era="1996"] .live-updates li > span[aria-hidden] { display: none !important; }
+
+/* Briefs: column-count instead of grid */
+.news-era[data-era="1996"] .news-container > section[style*="auto-fill"],
+.news-era[data-era="1996"] .news-container > section[style*="minmax(220px"] {}
+.news-era[data-era="1996"] section > div[style*="auto-fill"] {
+  display: block !important;
+  column-count: 2 !important;
+  column-gap: 18px !important;
+}
+
+.news-era[data-era="1996"] .news-footer {
+  background: #eeeeee;
+  padding: 8px !important;
+  border-top: 1px solid #666 !important;
+  font-family: Verdana, Arial, sans-serif !important;
+  font-size: 10px !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   ERA · 2004 — Early Digital
+   ════════════════════════════════════════════════════════════════════════ */
+.news-era[data-era="2004"] {
+  --paper: #f4f1e4;
+  --ink: #0a0a0a;
+  --ink-soft: #1b1b1b;
+  --muted: #4a4a4a;
+  --rule: #8c8c8c;
+  --rule-strong: #333;
+  --accent: #0033aa;
+  font-family: "Times New Roman", Times, serif;
+  background: var(--paper);
+}
+.news-era[data-era="2004"] .era-layout { max-width: 980px; margin: 0 auto; background: #fff; border-left: 1px solid #bbb; border-right: 1px solid #bbb; }
+.news-era[data-era="2004"] .era2004-visitor-bar {
+  background: #ffffcc;
+  border-bottom: 1px solid #b8b8b8;
+  padding: 4px 12px;
+  font-family: "Times New Roman", Times, serif;
+  font-size: 12px;
+  text-align: center;
+}
+.news-era[data-era="2004"] .era2004-masthead {
+  padding: 14px 20px 10px;
+  border-bottom: 2px solid #003366;
+  text-align: center;
+  background: #fff;
+}
+.news-era[data-era="2004"] .era2004-date {
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 11px;
+  color: #555;
+  text-align: left;
+  margin-bottom: 8px;
+}
+.news-era[data-era="2004"] .era2004-wordmark {
+  font-family: "Times New Roman", Times, serif !important;
+  font-size: 54px !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.5px !important;
+}
+.news-era[data-era="2004"] .era2004-tagline {
+  font-family: "Times New Roman", Times, serif !important;
+  font-size: 14px;
+  color: #555;
+}
+.news-era[data-era="2004"] .era2004-nav {
+  background: #003366;
+  color: #fff;
+  padding: 5px 12px;
+  margin-top: 10px;
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 11px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+.news-era[data-era="2004"] .era2004-nav a { color: #fff; text-decoration: none; }
+.news-era[data-era="2004"] .era2004-nav a:hover { text-decoration: underline; }
+.news-era[data-era="2004"] .era2004-nav a.accent { color: #ffcc33; }
+
+.news-era[data-era="2004"] .news-container { max-width: 980px; padding: 0 16px; background: #fff; }
+
+/* 2004: force grids to 2-column max (main + right aside); collapse 3-col to 2-col */
+.news-era[data-era="2004"] .hero-grid {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 18px !important;
+}
+@media (min-width: 720px) {
+  .news-era[data-era="2004"] .hero-grid { grid-template-columns: 2.2fr 1fr !important; }
+  .news-era[data-era="2004"] .hero-secondary { order: 2 !important; border: none !important; padding: 0 !important; }
+  .news-era[data-era="2004"] .hero-lede { order: 1 !important; grid-row: span 2; }
+  .news-era[data-era="2004"] .hero-opinions { order: 3 !important; grid-column: 2 !important; border: none !important; padding-top: 14px !important; border-top: 1px solid var(--rule) !important; }
+}
+
+.news-era[data-era="2004"] .band-grid {
+  display: grid !important;
+  grid-template-columns: 2fr 1fr !important;
+  gap: 20px !important;
+}
+.news-era[data-era="2004"] .band-tail {
+  grid-column: 1 / -1 !important;
+  border-top: 1px dotted #888 !important;
+  padding-top: 10px !important;
+  border-left: none !important;
+  padding-left: 0 !important;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.news-era[data-era="2004"] .news-serif,
+.news-era[data-era="2004"] .news-wordmark {
+  font-family: "Times New Roman", Times, serif !important;
+  font-weight: 700 !important;
+  letter-spacing: 0 !important;
+  font-style: normal !important;
+}
+.news-era[data-era="2004"] .news-serif.italic,
+.news-era[data-era="2004"] em { font-style: italic !important; }
+.news-era[data-era="2004"] .news-kicker,
+.news-era[data-era="2004"] .news-section-label,
+.news-era[data-era="2004"] .news-meta {
+  font-family: Verdana, Arial, sans-serif !important;
+  text-transform: none;
+  letter-spacing: 0.02em !important;
+}
+.news-era[data-era="2004"] .news-section-label {
+  background: #003366 !important;
+  color: #fff !important;
+  padding: 3px 9px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  display: inline-block;
+}
+.news-era[data-era="2004"] a { color: var(--accent); text-decoration: underline; }
+.news-era[data-era="2004"] a:visited { color: #551a8b; }
+.news-era[data-era="2004"] .news-image {
+  filter: saturate(0.78) contrast(0.95);
+  border: 1px solid #7a7a7a;
+  border-radius: 0 !important;
+}
+.news-era[data-era="2004"] .news-image.ratio-wide { aspect-ratio: 4 / 3 !important; }
+.news-era[data-era="2004"] .section-band { border-top: 3px double #333 !important; }
+.news-era[data-era="2004"] .hero-breaking {
+  background: #fff !important;
+  color: #000 !important;
+  border: 3px solid #cc0000 !important;
+  padding: 10px !important;
+  margin: 10px 0 !important;
+}
+.news-era[data-era="2004"] .hero-breaking * { color: #000 !important; }
+
+/* 2004: orange RSS square before every section-label banner */
+.news-era[data-era="2004"] .news-section-label::before {
+  content: "";
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 7px;
+  background: #ff7f00;
+  border: 1px solid #b85c00;
+  vertical-align: -1px;
+}
+/* 2004: Email · Print · Discuss line appended to every byline */
+.news-era[data-era="2004"] article p.news-meta::after {
+  content: "  |  E-MAIL  |  PRINT  |  DISCUSS (14)  |  REPRINTS";
+  color: #0033aa;
+  text-decoration: none;
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+}
+/* 2004: article bottom "Page A1" style dateline */
+.news-era[data-era="2004"] article {
+  border-bottom: 1px solid #d6d2c4;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   ERA · 2014 — Responsive Era
+   ════════════════════════════════════════════════════════════════════════ */
+.news-era[data-era="2014"] {
+  --paper: #ffffff;
+  --ink: #222;
+  --ink-soft: #333;
+  --muted: #777;
+  --rule: #e4e4e4;
+  --rule-strong: #c0c0c0;
+  --accent: #c8102e;
+  background: var(--paper);
+}
+.news-era[data-era="2014"] .era-layout { max-width: 1140px; margin: 0 auto; }
+.news-era[data-era="2014"] .era2014-masthead {
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 6px;
+}
+.news-era[data-era="2014"] .era2014-topbar {
+  display: flex;
+  justify-content: space-between;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 11px;
+  color: #888;
+  padding: 8px 20px;
+  border-bottom: 1px solid var(--rule);
+}
+.news-era[data-era="2014"] .era2014-topbar a { color: var(--accent); }
+.news-era[data-era="2014"] .era2014-wordmark {
+  font-family: Georgia, "Times New Roman", serif !important;
+  text-align: center;
+  font-size: 56px !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.5px !important;
+  padding: 18px 0 4px;
+}
+.news-era[data-era="2014"] .era2014-tagline {
+  text-align: center;
+  font-family: Georgia, serif;
+  font-style: italic;
+  color: #777;
+  font-size: 14px;
+  margin-bottom: 14px;
+}
+.news-era[data-era="2014"] .era2014-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  padding: 10px 12px;
+  border-top: 1px solid var(--rule);
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.news-era[data-era="2014"] .era2014-nav a.accent { color: var(--accent); }
+
+.news-era[data-era="2014"] .news-container { max-width: 1140px; padding: 0 20px; }
+.news-era[data-era="2014"] .news-serif,
+.news-era[data-era="2014"] .news-wordmark {
+  font-family: Georgia, "Times New Roman", serif !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.005em !important;
+}
+.news-era[data-era="2014"] .news-kicker,
+.news-era[data-era="2014"] .news-section-label,
+.news-era[data-era="2014"] .news-meta {
+  font-family: "Helvetica Neue", Arial, sans-serif !important;
+}
+.news-era[data-era="2014"] .news-image { border-radius: 2px; }
+.news-era[data-era="2014"] .news-image.ratio-avatar { border-radius: 50%; }
+.news-era[data-era="2014"] .section-band { border-top: 3px solid #111 !important; }
+
+/* 2014: hero becomes a big image-on-top lede with secondaries below in 2-col; no 3-col rail */
+.news-era[data-era="2014"] .hero-grid {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 20px !important;
+}
+@media (min-width: 900px) {
+  .news-era[data-era="2014"] .hero-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  .news-era[data-era="2014"] .hero-lede {
+    grid-column: 1 / -1 !important;
+    order: 1 !important;
+  }
+  .news-era[data-era="2014"] .hero-secondary {
+    order: 2 !important;
+    border: none !important;
+    padding: 0 !important;
+  }
+  .news-era[data-era="2014"] .hero-opinions {
+    order: 3 !important;
+    border: none !important;
+    padding: 0 !important;
+    border-top: 3px solid #111 !important;
+    padding-top: 16px !important;
+    grid-column: 1 / -1 !important;
+  }
+}
+.news-era[data-era="2014"] .band-grid {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 24px !important;
+}
+@media (min-width: 700px) {
+  .news-era[data-era="2014"] .band-grid { grid-template-columns: 1.6fr 1fr !important; }
+  .news-era[data-era="2014"] .band-tail {
+    grid-column: 1 / -1 !important;
+    border-top: 1px solid var(--rule) !important;
+    padding-top: 14px !important;
+    border-left: none !important;
+    padding-left: 0 !important;
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+  }
+}
+
+/* 2014 hero-breaking keeps dark bg but slightly less designed */
+.news-era[data-era="2014"] .hero-breaking {
+  border-radius: 2px !important;
+}
+
+/* 2014: share/engagement pills under every byline */
+.news-era[data-era="2014"] article p.news-meta::after {
+  content: "  ·  ✦ SHARE  ✎ COMMENT  ☆ SAVE";
+  color: #c8102e;
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  margin-left: 6px;
+}
+/* 2014: "FEATURED" prefix before the hero kicker */
+.news-era[data-era="2014"] .hero-lede article > .news-kicker::before,
+.news-era[data-era="2014"] .hf-main article > .news-kicker::before {
+  content: "FEATURED · ";
+  color: #c8102e;
+  font-weight: 700;
+}
+/* 2014: inline "MEMBER EXCLUSIVE" pill on investigation panels */
+.news-era[data-era="2014"] .bi-body h2::before {
+  content: "MEMBER EXCLUSIVE";
+  display: inline-block;
+  margin-right: 10px;
+  padding: 3px 8px;
+  font: 700 10px/1 "Helvetica Neue", Arial, sans-serif;
+  letter-spacing: 0.12em;
+  background: #c8102e;
+  color: #fff;
+  border-radius: 2px;
+  vertical-align: 6px;
+}
+/* 2014: soft card shadow around story cards */
+.news-era[data-era="2014"] .band-lead article,
+.news-era[data-era="2014"] .hero-lede article,
+.news-era[data-era="2014"] .hf-main article {
+  padding: 0;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   ERA · 2026 — Today: hint of AI assistant availability
+   ════════════════════════════════════════════════════════════════════════ */
+.news-era[data-era="2026"] .news-nav-strip a.accent {
+  position: relative;
+}
+.news-era[data-era="2026"] .news-nav-strip a.accent::before {
+  content: "◆";
+  margin-right: 4px;
+  background: linear-gradient(90deg, #a3132a, #4e3cff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-size: 10px;
+  vertical-align: 1px;
+}

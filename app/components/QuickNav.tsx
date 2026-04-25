@@ -10,34 +10,15 @@ type NavGroup = { group: string; items: NavItem[] };
 
 const LINKS: NavGroup[] = [
   {
-    group: "Portfolio",
-    items: [
-      { label: "whatispeterup.to", href: "/whatispeterupto" },
-      { label: "Templates catalog", href: "/whatispeterupto/templates" },
-      { label: "Templates sample", href: "/whatispeterupto/templates/sample" },
-      { label: "Design system", href: "/whatispeterupto/design-system" },
-    ],
-  },
-  {
-    group: "Case studies",
-    items: [
-      {
-        label: "Teaching Gemini to See",
-        href: "/whatispeterupto/case-studies/teaching-gemini-to-see",
-      },
-    ],
-  },
-  {
     group: "Prototypes",
     items: [
-      { label: "All prototypes", href: "/prototypes" },
       { label: "Voice chat", href: "/prototypes/voice-chat" },
       { label: "Video generation", href: "/prototypes/video-generation" },
     ],
   },
 ];
 
-export function QuickNav() {
+export function QuickNav({ inline = false }: { inline?: boolean }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -66,6 +47,7 @@ export function QuickNav() {
       ref={rootRef}
       className="quicknav"
       data-open={open ? "true" : "false"}
+      data-inline={inline ? "true" : undefined}
     >
       <button
         type="button"

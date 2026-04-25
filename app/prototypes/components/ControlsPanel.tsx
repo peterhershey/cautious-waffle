@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { QuickNav } from "@/app/components/QuickNav";
 import type { Prototype, Scenario } from "@/lib/prototypes";
 
 type ControlsPanelProps = {
@@ -31,7 +32,10 @@ export function ControlsPanel({
   return (
     <aside className="proto-panel">
       <div className="proto-panel-section">
-        <span className="proto-panel-kicker">Prototype</span>
+        <div className="proto-panel-kicker-row">
+          <QuickNav inline />
+          <span className="proto-panel-kicker">Prototype</span>
+        </div>
         <h1 className="proto-panel-title">{prototype.title}</h1>
         <div className="proto-panel-meta">
           <span>{prototype.year}</span>

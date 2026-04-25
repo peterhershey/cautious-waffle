@@ -3,27 +3,35 @@
    the top-level layout so it's consistent across all pages. */
 
 .quicknav {
+  /* Default fixed mode (used outside the prototype panel). */
   position: fixed;
   top: 12px;
   left: 12px;
   z-index: 100;
   font-family: var(--wipu-mono, var(--font-mono, ui-monospace, monospace));
 }
+.quicknav[data-inline="true"] {
+  /* Inline mode — sits in normal flow alongside the kicker. */
+  position: relative;
+  top: auto;
+  left: auto;
+  display: inline-flex;
+  align-items: center;
+  z-index: 50;
+}
 
-/* Trigger — always faintly visible, brightens on hover. Uses
-   difference-blend so it reads on any background. */
+/* Trigger — compact, kicker-height. */
 .quicknav-trigger {
   all: unset;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 999px;
-  color: #fff;
-  mix-blend-mode: difference;
-  opacity: 0.55;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  color: var(--proto-ink, #f2efe6);
+  opacity: 0.75;
   transition: background 160ms ease, opacity 160ms ease;
 }
 .quicknav-trigger:hover,
@@ -69,16 +77,10 @@
   left: 0;
   min-width: 272px;
   padding: 14px 16px 16px;
-  background: linear-gradient(
-      180deg,
-      rgba(32, 32, 38, 0.78),
-      rgba(18, 18, 22, 0.82)
-    );
+  background: #1a1a1f;
   color: #f2efe6;
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 16px;
-  backdrop-filter: blur(32px) saturate(1.6);
-  -webkit-backdrop-filter: blur(32px) saturate(1.6);
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.08) inset,
     0 20px 50px rgba(0, 0, 0, 0.5),

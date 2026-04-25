@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Google_Sans, IBM_Plex_Mono } from "next/font/google";
-import { QuickNav } from "../components/QuickNav";
 import "./theme.css";
 
 const googleSans = Google_Sans({
@@ -28,7 +27,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0..1,0&display=block"
       />
       <div className={`${googleSans.variable} ${plexMono.variable} proto-root`}>
-        <QuickNav />
         {children}
       </div>
     </>

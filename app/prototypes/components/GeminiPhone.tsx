@@ -7,12 +7,17 @@ export type Platform = "ios" | "android";
 type GeminiPhoneProps = {
   children: ReactNode;
   platform?: Platform;
+  onLabelClick?: () => void;
 };
 
 export const PhoneScreenContext = createContext<HTMLDivElement | null>(null);
 export const PhonePlatformContext = createContext<Platform>("ios");
 
-export function GeminiPhone({ children, platform = "ios" }: GeminiPhoneProps) {
+export function GeminiPhone({
+  children,
+  platform = "ios",
+  onLabelClick,
+}: GeminiPhoneProps) {
   const [screenEl, setScreenEl] = useState<HTMLDivElement | null>(null);
 
   return (
@@ -44,7 +49,18 @@ export function GeminiPhone({ children, platform = "ios" }: GeminiPhoneProps) {
                 menu
               </span>
             </button>
-            <span className="proto-phone-header-chip">Peter Labs</span>
+            {onLabelClick ? (
+              <button
+                type="button"
+                className="proto-phone-header-chip"
+                onClick={onLabelClick}
+                aria-label="Open prototype controls"
+              >
+                Peter Labs
+              </button>
+            ) : (
+              <span className="proto-phone-header-chip">Peter Labs</span>
+            )}
             <button type="button" aria-label="New chat" className="gemini-icon-btn">
               <span className="proto-icon" style={{ fontSize: "calc(22 * var(--u, 1px))" }} aria-hidden>
                 edit_square

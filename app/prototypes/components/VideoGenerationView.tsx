@@ -168,6 +168,21 @@ export function VideoGenerationView({ prototype }: { prototype: Prototype }) {
   const openShare = useCallback(() => setShareOpen(true), []);
   const dismissShare = useCallback(() => setShareOpen(false), []);
 
+  // Mobile presentation: phone fills the viewport; the Peter Labs chip
+  // toggles a fullscreen controls overlay.
+  const [isMobile, setIsMobile] = useState(false);
+  const [controlsOpen, setControlsOpen] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia("(max-width: 720px)");
+    setIsMobile(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+  const openControls = useCallback(() => setControlsOpen(true), []);
+  const closeControls = useCallback(() => setControlsOpen(false), []);
+
   // Clear settings sheet if advanced experiment or image goes away.
   useEffect(() => {
     if (!experiments.imageInAdvanced || !attachedImage) {
@@ -193,14 +208,22 @@ export function VideoGenerationView({ prototype }: { prototype: Prototype }) {
     }
   }, [experiments.imageIn, experiments.imageInAdvanced, attachedImage]);
 
+  const prevStepRef = useRef<VideoGenStep>(step);
   useEffect(() => {
+    const prev = prevStepRef.current;
     if (step === "welcome") {
       setChipActive(false);
       setGreetingTop(false);
     } else if (step === "tool-selected" || step === "typing") {
       setGreetingTop(true);
+      // Autoplay transitions tools-open → tool-selected without going through
+      // selectVideoTool, so activate the Video chip here too.
+      if (prev === "tools-open" && step === "tool-selected") {
+        setChipActive(true);
+      }
     }
     // tools-open / sent / ready: preserve existing greeting position
+    prevStepRef.current = step;
   }, [step]);
 
   const chipVisible =
@@ -299,6 +322,8 @@ export function VideoGenerationView({ prototype }: { prototype: Prototype }) {
         onPlay={play}
         onPause={pause}
         onRestart={restart}
+        mobileOpen={controlsOpen}
+        onMobileClose={closeControls}
       >
         <FlowTimeline currentStep={step} onJump={jumpToPhase} />
         <ExperimentsPanel
@@ -311,7 +336,10 @@ export function VideoGenerationView({ prototype }: { prototype: Prototype }) {
         data-theme={theme}
       >
         <div className="proto-phone-column">
-        <GeminiPhone platform={platform}>
+        <GeminiPhone
+          platform={platform}
+          onLabelClick={isMobile ? openControls : undefined}
+        >
           <div className="gemini-screen-stack">
             <div className="gemini-content-area" onClick={dismissInput}>
               <AnimatePresence mode="wait">

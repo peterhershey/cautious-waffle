@@ -3382,3 +3382,123 @@ button.gemini-tool-media-item:hover {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ---- Mobile presentation: phone fills the viewport, controls become a
+   full-screen overlay triggered from the Peter Labs chip. ---- */
+.proto-panel-close {
+  display: none;
+}
+
+@media (max-width: 720px) {
+  .proto-stage {
+    display: block;
+    padding: 0;
+    height: 100vh;
+    height: 100svh;
+    overflow: hidden;
+  }
+
+  /* The phone fills the viewport — no body chrome, no padding, no radii. */
+  .proto-phone-stage {
+    height: 100%;
+    width: 100%;
+  }
+  .proto-phone-column {
+    width: 100%;
+    height: 100%;
+    gap: 0;
+    max-width: none;
+  }
+  .proto-phone[data-platform="ios"],
+  .proto-phone[data-platform="android"],
+  .proto-phone {
+    width: 100vw;
+    height: 100vh;
+    height: 100svh;
+    max-width: none;
+    max-height: none;
+    aspect-ratio: auto;
+    border-radius: 0;
+    padding: 0;
+    background: var(--gem-surface);
+    box-shadow: none;
+    overflow: hidden;
+  }
+  .proto-gemini[data-theme="dark"] .proto-phone {
+    background: var(--gem-surface);
+  }
+  .proto-phone[data-platform="ios"] .gemini-phone-screen,
+  .proto-phone[data-platform="android"] .gemini-phone-screen {
+    border-radius: 0;
+    height: 100%;
+  }
+
+  /* Hide all the simulated device chrome — it isn't a phone-in-a-phone now. */
+  .gemini-statusbar,
+  .gemini-device-island,
+  .gemini-device-punch,
+  .gemini-home-indicator {
+    display: none;
+  }
+
+  /* Top-right desktop toggles are hidden — they live inside the controls
+     overlay on mobile. */
+  .proto-phone-toggles {
+    display: none;
+  }
+
+  /* Controls panel becomes a full-screen overlay, hidden by default. */
+  .proto-panel {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: var(--proto-bg);
+    color: var(--proto-ink);
+    padding: 24px 22px 32px;
+    overflow-y: auto;
+    max-height: 100vh;
+    max-height: 100svh;
+    gap: 24px;
+    display: none;
+  }
+  .proto-panel[data-mobile-open="true"] {
+    display: flex;
+  }
+  .proto-panel-close {
+    position: sticky;
+    top: 0;
+    align-self: flex-end;
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(242, 239, 230, 0.18);
+    background: transparent;
+    color: var(--proto-ink);
+    border-radius: 999px;
+    cursor: pointer;
+    margin: 0 0 -36px 0;
+    z-index: 1;
+  }
+  .proto-panel-close-x {
+    font-size: 16px;
+    line-height: 1;
+  }
+  .proto-panel-close:hover {
+    background: rgba(242, 239, 230, 0.08);
+  }
+
+  /* The QuickNav inline trigger sits awkwardly in the mobile overlay and
+     duplicates Peter Labs as the entry point — hide it. */
+  .proto-panel-kicker-row .quicknav {
+    display: none;
+  }
+
+  /* Make the Peter Labs chip read as tappable. */
+  button.proto-phone-header-chip {
+    cursor: pointer;
+    border: none;
+    font: inherit;
+  }
+}

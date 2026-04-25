@@ -14,6 +14,8 @@ type ControlsPanelProps = {
   onPause: () => void;
   onRestart: () => void;
   children?: ReactNode;
+  mobileOpen?: boolean;
+  onMobileClose?: () => void;
 };
 
 export function ControlsPanel({
@@ -25,12 +27,29 @@ export function ControlsPanel({
   onPause,
   onRestart,
   children,
+  mobileOpen,
+  onMobileClose,
 }: ControlsPanelProps) {
   const isPlaying = status === "playing";
   const playLabel = status === "ended" ? "Replay" : isPlaying ? "Playing" : "Play";
 
   return (
-    <aside className="proto-panel">
+    <aside
+      className="proto-panel"
+      data-mobile-open={mobileOpen ? "true" : undefined}
+    >
+      {onMobileClose ? (
+        <button
+          type="button"
+          className="proto-panel-close"
+          aria-label="Close controls"
+          onClick={onMobileClose}
+        >
+          <span className="proto-panel-close-x" aria-hidden>
+            ✕
+          </span>
+        </button>
+      ) : null}
       <div className="proto-panel-section">
         <div className="proto-panel-kicker-row">
           <QuickNav inline />

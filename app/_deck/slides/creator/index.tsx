@@ -8,8 +8,15 @@ import { TILES, type Tile } from "./tiles";
 type OverlayState = "closed" | "opening" | "open" | "closing";
 
 const SLIDE_ID = "creator";
-const OPEN_MS = 800;
 const CLOSE_MS = 500;
+
+function readSlideActive(): boolean {
+  if (typeof document === "undefined") return false;
+  return (
+    document.querySelector<HTMLElement>(`[data-slide-id="${SLIDE_ID}"]`)?.dataset
+      .active === "true"
+  );
+}
 
 /* ── Magnetic drift constants ─────────────────────────────────────── */
 const DRIFT_MAX_PX = 3; // ceiling for drift offset, applied uniformly to all images
@@ -22,31 +29,29 @@ const FPS_SAMPLE_SIZE = 30;
 const FPS_THRESHOLD = 28; // drop magnetic drift below this
 
 export function CreatorSlide() {
-  const { activeIndex, setImmersive } = useDeck();
+  const { setImmersive } = useDeck();
   const [state, setState] = useState<OverlayState>("closed");
-  const [folderDrawn, setFolderDrawn] = useState(false);
+  const [isActive, setIsActive] = useState(readSlideActive);
+  const [folderDrawn, setFolderDrawn] = useState(readSlideActive);
 
   const overlayRef = useRef<HTMLDivElement | null>(null);
   const tileRefs = useRef<(HTMLDivElement | null)[]>([]); // outer tile wrappers
   const tileInnerRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const isActive =
-    activeIndex >= 0 && typeof window !== "undefined"
-      ? document
-          .querySelector<HTMLElement>(`[data-slide-id="${SLIDE_ID}"]`)
-          ?.dataset.active === "true"
-      : false;
 
-  // Draw the folder once the slide becomes active
+  // Subscribe to data-active changes via MutationObserver. Updates flow through
+  // the observer callback (not the effect body), so no synchronous setState
+  // happens during render.
   useEffect(() => {
     const el = document.querySelector<HTMLElement>(
       `[data-slide-id="${SLIDE_ID}"]`,
     );
     if (!el) return;
     const obs = new MutationObserver(() => {
-      if (el.dataset.active === "true") setFolderDrawn(true);
+      const active = el.dataset.active === "true";
+      setIsActive(active);
+      if (active) setFolderDrawn(true);
     });
     obs.observe(el, { attributes: true, attributeFilter: ["data-active"] });
-    if (el.dataset.active === "true") setFolderDrawn(true);
     return () => obs.disconnect();
   }, []);
 
@@ -81,13 +86,19 @@ export function CreatorSlide() {
     return () => document.removeEventListener("keydown", onKey, true);
   }, [state, close]);
 
-  // If the user navigates away from the creator slide, auto-close overlay
+  // If the user navigates away from the creator slide, auto-close overlay.
+  // Edge-triggered: only fires on the active→inactive transition.
+  const prevActiveRef = useRef(isActive);
   useEffect(() => {
-    if (!isActive && (state === "open" || state === "opening")) {
+    const wasActive = prevActiveRef.current;
+    prevActiveRef.current = isActive;
+    if (!wasActive || isActive) return;
+    if (state === "open" || state === "opening") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- one-shot transition reset, not a cascading render
       setState("closed");
       setImmersive(false);
     }
-  }, [activeIndex, isActive, state, setImmersive]);
+  }, [isActive, state, setImmersive]);
 
   /* ── Tidal Scroll: IntersectionObserver reveal ──────────────────── */
   useEffect(() => {

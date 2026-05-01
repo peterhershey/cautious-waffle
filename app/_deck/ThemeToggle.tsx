@@ -1,16 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+
+function readInitialTheme(): "dark" | "light" {
+  if (typeof document === "undefined") return "dark";
+  const root = document.querySelector<HTMLElement>(".wipu-root");
+  return (root?.dataset.theme as "dark" | "light") ?? "dark";
+}
 
 export function ThemeToggle() {
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    const root = document.querySelector<HTMLElement>(".wipu-root");
-    setTheme((root?.dataset.theme as "dark" | "light") ?? "dark");
-    setMounted(true);
-  }, []);
+  const [theme, setTheme] = useState<"dark" | "light">(readInitialTheme);
 
   const toggle = () => {
     const next = theme === "dark" ? "light" : "dark";
@@ -29,8 +28,8 @@ export function ThemeToggle() {
       onClick={toggle}
       aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
     >
-      <span aria-hidden>{mounted && theme === "dark" ? "◐" : "◑"}</span>
-      <span>{mounted ? (theme === "dark" ? "Dark" : "Light") : "Theme"}</span>
+      <span aria-hidden>{theme === "dark" ? "◐" : "◑"}</span>
+      <span>{theme === "dark" ? "Dark" : "Light"}</span>
     </button>
   );
 }

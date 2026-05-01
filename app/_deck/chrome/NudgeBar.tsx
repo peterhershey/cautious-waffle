@@ -9,12 +9,16 @@ export function NudgeBar() {
   const { activeIndex, total, lastNavKeyAt } = useDeck();
   const [shown, setShown] = useState(false);
 
-  // Reset & re-arm idle timer on slide change or nav-key
+  // Re-arm idle timer on slide change or nav-key. Reset flows through cleanup,
+  // and because the next effect run won't fire setShown(true) until the timer
+  // expires, the "shown" state naturally becomes false on every dep change.
   useEffect(() => {
-    setShown(false);
     if (activeIndex >= total - 1) return;
     const t = window.setTimeout(() => setShown(true), IDLE_MS);
-    return () => window.clearTimeout(t);
+    return () => {
+      window.clearTimeout(t);
+      setShown(false);
+    };
   }, [activeIndex, total, lastNavKeyAt]);
 
   // Hide on mousemove (any movement = user is active)

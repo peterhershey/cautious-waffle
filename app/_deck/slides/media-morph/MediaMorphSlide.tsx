@@ -125,11 +125,15 @@ export function MediaMorphSlide({
   const layersA = useRef<(HTMLDivElement | null)[]>([]);
   const layersB = useRef<(HTMLDivElement | null)[]>([]);
 
+  // Post-mount shuffle. Initial render uses the deterministic first-N slice
+  // (set as initial state above) so SSR/CSR markup matches; once mounted, we
+  // randomize the picks. One-shot effect, not a cascading-render hazard.
   useEffect(() => {
     if (media.length < pickCount) return;
     const shuffled = [...media]
       .sort(() => Math.random() - 0.5)
       .slice(0, pickCount);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-shot post-hydration randomization
     setPicked(shuffled);
   }, [media, pickCount]);
 
@@ -144,13 +148,16 @@ export function MediaMorphSlide({
       el.style.height = `${r.height}%`;
     };
 
+    const layersASnap = layersA.current;
+    const layersBSnap = layersB.current;
+
     if (reduce) {
       applyRect(refA.current, rectAt("A", 0));
       applyRect(refB.current, rectAt("B", 0));
-      layersA.current.forEach((el, i) => {
+      layersASnap.forEach((el, i) => {
         if (el) el.style.opacity = i === 0 ? "1" : "0";
       });
-      layersB.current.forEach((el, i) => {
+      layersBSnap.forEach((el, i) => {
         if (el) el.style.opacity = i === 0 ? "1" : "0";
       });
       return;
@@ -191,8 +198,8 @@ export function MediaMorphSlide({
           el.style.opacity = dist >= 1 ? "0" : String(smoothstep(1 - dist));
         }
       };
-      updateLayers(layersA.current);
-      updateLayers(layersB.current);
+      updateLayers(layersASnap);
+      updateLayers(layersBSnap);
 
       raf = requestAnimationFrame(tick);
     };
@@ -200,15 +207,12 @@ export function MediaMorphSlide({
     return () => cancelAnimationFrame(raf);
   }, [phaseMs]);
 
-  const renderLayer = (
+  const renderLayerContent = (
     box: "A" | "B",
     i: number,
-    refs: (HTMLDivElement | null)[],
+    setRef: (el: HTMLDivElement | null) => void,
   ) => {
     const c = contentAt(box, i, pickCount);
-    const setRef = (el: HTMLDivElement | null) => {
-      refs[i] = el;
-    };
     if (c.kind === "media") {
       const item = picked[c.idx];
       if (!item) {
@@ -253,18 +257,28 @@ export function MediaMorphSlide({
       title={title}
       subtitle={subtitle}
     >
+      {/* eslint-disable react-hooks/refs -- callback refs into layersA/B
+          arrays. The closures only read .current at ref-attach time, never
+          during render, but the lint rule can't statically prove that. */}
       <div className="wipu-morph">
         <div ref={refA} className="wipu-morph-box" aria-hidden>
-          {Array.from({ length: MORPH_CYCLE }, (_, i) =>
-            renderLayer("A", i, layersA.current),
-          )}
+          {Array.from({ length: MORPH_CYCLE }, (_, i) => {
+            const setRef = (el: HTMLDivElement | null) => {
+              layersA.current[i] = el;
+            };
+            return renderLayerContent("A", i, setRef);
+          })}
         </div>
         <div ref={refB} className="wipu-morph-box" aria-hidden>
-          {Array.from({ length: MORPH_CYCLE }, (_, i) =>
-            renderLayer("B", i, layersB.current),
-          )}
+          {Array.from({ length: MORPH_CYCLE }, (_, i) => {
+            const setRef = (el: HTMLDivElement | null) => {
+              layersB.current[i] = el;
+            };
+            return renderLayerContent("B", i, setRef);
+          })}
         </div>
       </div>
+      {/* eslint-enable react-hooks/refs */}
     </TextImageSlide>
   );
 }

@@ -142,7 +142,9 @@ export function GoalTemplate({
   }, []);
 
   /* After paths are written to the DOM, capture each path's total length
-     for the draw-on animation (stroke-dasharray = length). */
+     for the draw-on animation (stroke-dasharray = length). Canonical
+     measure-then-paint pattern; setState here drives the *next* paint, not
+     a render cascade. */
   useLayoutEffect(() => {
     if (annotations.length === 0) return;
     const lens: Record<number, number> = {};
@@ -154,6 +156,7 @@ export function GoalTemplate({
         /* path not yet laid out */
       }
     });
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- DOM measurement → paint
     setPathLengths(lens);
   }, [computed, annotations]);
 
@@ -214,6 +217,7 @@ export function GoalTemplate({
       const t = window.setTimeout(() => setMarkersOn(true), 750);
       return () => window.clearTimeout(t);
     }
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-shot reset on step change
     setMarkersOn(false);
   }, [step]);
 

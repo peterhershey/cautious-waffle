@@ -5,6 +5,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
 } from "react";
@@ -55,10 +56,9 @@ function prefersReducedMotion(): boolean {
 export function Deck() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const slideRefs = useRef<(HTMLElement | null)[]>([]);
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [activeIndex, setActiveIndex] = useState(readHashIndex);
   const [immersive, setImmersive] = useState(false);
   const [lastNavKeyAt, setLastNavKeyAt] = useState(0);
-  const initializedRef = useRef(false);
 
   const goTo = useCallback((index: number) => {
     const container = containerRef.current;
@@ -75,15 +75,17 @@ export function Deck() {
   const prev = useCallback(() => goTo(activeIndex - 1), [activeIndex, goTo]);
   const bumpNavKey = useCallback(() => setLastNavKeyAt(Date.now()), []);
 
-  useEffect(() => {
+  // Sync the scroll position to the hash-derived initial slide before paint.
+  // activeIndex is already initialized from the hash via lazy state; this just
+  // moves the scroll container to match.
+  useLayoutEffect(() => {
     const container = containerRef.current;
-    if (!container) return;
-    const initial = readHashIndex();
-    if (initial > 0) {
-      container.scrollTo({ top: initial * container.clientHeight, behavior: "auto" });
-      setActiveIndex(initial);
-    }
-    initializedRef.current = true;
+    if (!container || activeIndex === 0) return;
+    container.scrollTo({
+      top: activeIndex * container.clientHeight,
+      behavior: "auto",
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- one-shot mount sync only
   }, []);
 
   useEffect(() => {
@@ -114,7 +116,6 @@ export function Deck() {
   }, []);
 
   useEffect(() => {
-    if (!initializedRef.current) return;
     const id = SLIDES[activeIndex]?.id;
     if (!id) return;
     const nextHash = `${HASH_PREFIX}${id}`;

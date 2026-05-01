@@ -19,9 +19,20 @@ import {
   useMemo,
   useRef,
   useState,
+  useSyncExternalStore,
   type ReactElement,
   type ReactNode,
 } from "react";
+
+function subscribeMounted() {
+  return () => {};
+}
+function getMountedClient(): boolean {
+  return true;
+}
+function getMountedServer(): boolean {
+  return false;
+}
 
 export type EmojiHeadlineTemplateProps = {
   /** Row of emoji shown above the headline. Order matters. */
@@ -124,12 +135,12 @@ export function EmojiHeadlineTemplate({
   /* Walk-based per-character markup only happens after mount. SSR and the
      first client render emit the title verbatim — guarantees identical
      markup on both sides (no hydration mismatch). */
-  const [mounted, setMounted] = useState(false);
+  const mounted = useSyncExternalStore(
+    subscribeMounted,
+    getMountedClient,
+    getMountedServer,
+  );
   const wrapRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   /* IntersectionObserver retrigger — restart typing each time the slide
      returns to centerline. Mirrors StrokeHeroMetric's replay-on-revisit

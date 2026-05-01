@@ -8,8 +8,15 @@ import { VelocityCursor } from "./VelocityCursor";
 type OverlayState = "closed" | "opening" | "open" | "closing";
 
 const SLIDE_ID = "field-notes";
-const OPEN_MS = 800;
 const CLOSE_MS = 500;
+
+function readSlideActive(): boolean {
+  if (typeof document === "undefined") return false;
+  return (
+    document.querySelector<HTMLElement>(`[data-slide-id="${SLIDE_ID}"]`)?.dataset
+      .active === "true"
+  );
+}
 
 /* ── Magnetic drift constants ─────────────────────────────────────── */
 const DRIFT_MAX_PX = 3; // ceiling for drift offset, applied uniformly to all images
@@ -24,18 +31,27 @@ const FPS_THRESHOLD = 28; // drop magnetic drift below this
 const SCROLL_END_TOLERANCE = 8;
 
 export function FieldNotesSlide() {
-  const { activeIndex, setImmersive, next, prev, bumpNavKey } = useDeck();
+  const { setImmersive, next, prev, bumpNavKey } = useDeck();
   const [state, setState] = useState<OverlayState>("closed");
+  const [isActive, setIsActive] = useState(readSlideActive);
 
   const overlayRef = useRef<HTMLDivElement | null>(null);
   const tileRefs = useRef<(HTMLDivElement | null)[]>([]); // outer tile wrappers
   const tileInnerRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const isActive =
-    activeIndex >= 0 && typeof window !== "undefined"
-      ? document
-          .querySelector<HTMLElement>(`[data-slide-id="${SLIDE_ID}"]`)
-          ?.dataset.active === "true"
-      : false;
+
+  // Track data-active via MutationObserver so isActive is a real subscription,
+  // not a synchronous DOM read during render.
+  useEffect(() => {
+    const el = document.querySelector<HTMLElement>(
+      `[data-slide-id="${SLIDE_ID}"]`,
+    );
+    if (!el) return;
+    const obs = new MutationObserver(() => {
+      setIsActive(el.dataset.active === "true");
+    });
+    obs.observe(el, { attributes: true, attributeFilter: ["data-active"] });
+    return () => obs.disconnect();
+  }, []);
 
   const open = useCallback(() => {
     if (state !== "closed") return;
@@ -145,13 +161,19 @@ export function FieldNotesSlide() {
     return () => document.removeEventListener("keydown", onKey, true);
   }, [state, close, next, prev, bumpNavKey]);
 
-  // If the user navigates away from the field-notes slide, auto-close overlay
+  // If the user navigates away from the field-notes slide, auto-close overlay.
+  // Edge-triggered: only fires on the active→inactive transition.
+  const prevActiveRef = useRef(isActive);
   useEffect(() => {
-    if (!isActive && (state === "open" || state === "opening")) {
+    const wasActive = prevActiveRef.current;
+    prevActiveRef.current = isActive;
+    if (!wasActive || isActive) return;
+    if (state === "open" || state === "opening") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- one-shot transition reset, not a cascading render
       setState("closed");
       setImmersive(false);
     }
-  }, [activeIndex, isActive, state, setImmersive]);
+  }, [isActive, state, setImmersive]);
 
   /* ── Tidal Scroll: IntersectionObserver reveal ──────────────────── */
   useEffect(() => {

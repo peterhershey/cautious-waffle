@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useSyncExternalStore } from "react";
 
 /* ── Cursor tuning ───────────────────────────────────────────────────
    All of these are knobs to dial in feel. Speeds are CSS px / ms.    */
@@ -19,19 +19,30 @@ const MARCH_RATE = 0.0044;       // px / ms — dash march speed (independent of
 
 type Sample = { x: number; y: number; t: number };
 
+function subscribeResize(cb: () => void) {
+  window.addEventListener("resize", cb);
+  return () => window.removeEventListener("resize", cb);
+}
+
+let viewportSnapshot: { w: number; h: number } | null = null;
+function getViewport(): { w: number; h: number } {
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  if (!viewportSnapshot || viewportSnapshot.w !== w || viewportSnapshot.h !== h) {
+    viewportSnapshot = { w, h };
+  }
+  return viewportSnapshot;
+}
+function getServerViewport(): { w: number; h: number } | null {
+  return null;
+}
+
 export function VelocityCursor() {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const dotRef = useRef<SVGCircleElement | null>(null);
   const lineRef = useRef<SVGPathElement | null>(null);
   const headRef = useRef<SVGPathElement | null>(null);
-  const [vp, setVp] = useState<{ w: number; h: number } | null>(null);
-
-  useEffect(() => {
-    setVp({ w: window.innerWidth, h: window.innerHeight });
-    const onResize = () => setVp({ w: window.innerWidth, h: window.innerHeight });
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, []);
+  const vp = useSyncExternalStore(subscribeResize, getViewport, getServerViewport);
 
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;

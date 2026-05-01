@@ -7,7 +7,7 @@ import "../_deck/styles/board.css";
 import "../_deck/styles/annotations.css";
 import "../_deck/templates/templates.css";
 import "../_deck/chrome/chrome.css";
-import "../templates/sample/sample.css";
+import "./_shared/sample.css";
 import "./[id]/case-study.css";
 
 const plexMono = IBM_Plex_Mono({

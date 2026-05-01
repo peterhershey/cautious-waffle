@@ -15,7 +15,7 @@ import { EmojiHeadlineTemplate } from "../../../_deck/templates/EmojiHeadlineTem
 import {
   TimelineSample,
   type TimelineStop,
-} from "../../../templates/sample/TimelineSample";
+} from "../../_shared/TimelineSample";
 import type { CaseStudyDeckEntry } from "../CaseStudyDeck";
 
 const TIMELINE_STOPS: TimelineStop[] = [

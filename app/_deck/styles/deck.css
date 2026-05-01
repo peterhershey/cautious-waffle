@@ -1,0 +1,230 @@
+/* whatispeterupto — slide deck engine + chrome
+   Phase 1: engine, navigation, bottom bar. Visuals intentionally plain. */
+
+/* ───────── Shared idle-zoom keyframe ─────────
+   Used by image tiles across the archive and slide clusters to add
+   very subtle breathing motion while the user scrolls. */
+@keyframes wipu-idle-zoom {
+  from { transform: scale(1); }
+  to   { transform: scale(1.04); }
+}
+
+/* ───────── Deck container ───────── */
+
+.wipu-deck {
+  height: 100svh;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.wipu-deck::-webkit-scrollbar { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .wipu-deck { scroll-behavior: auto; }
+}
+
+.wipu-slide {
+  height: 100svh;
+  width: 100%;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: clamp(24px, 5vw, 96px);
+}
+
+/* ───────── Placeholder slide content ───────── */
+
+.wipu-slide-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  text-align: center;
+  color: var(--wipu-ink);
+}
+.wipu-slide-placeholder-num {
+  font-family: var(--wipu-mono);
+  font-size: clamp(14px, 1.4vw, 16px);
+  color: var(--wipu-ink-faint);
+  letter-spacing: 0.24em;
+}
+.wipu-slide-placeholder-title {
+  font-family: var(--wipu-mono);
+  font-weight: 500;
+  font-size: clamp(28px, 5vw, 56px);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  max-width: 16ch;
+}
+.wipu-slide-placeholder-hint {
+  font-family: var(--wipu-mono);
+  font-size: clamp(12px, 1vw, 13px);
+  color: var(--wipu-ink-dim);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.wipu-slide-placeholder-links {
+  margin-top: 28px;
+  display: flex;
+  gap: 16px;
+}
+.wipu-slide-placeholder-link {
+  font-family: var(--wipu-mono);
+  font-size: 14px;
+  color: var(--wipu-ink);
+  padding: 10px 18px;
+  border: 1px solid var(--wipu-rule-strong);
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background-color 180ms ease, border-color 180ms ease;
+}
+.wipu-slide-placeholder-link:hover {
+  background: var(--wipu-bg-elev);
+  border-color: var(--wipu-ink-dim);
+}
+
+/* Slide 1 (Hero) — uses Template 01 (Intro). Styles live in
+   templates/components/templates.css under the .wipu-tpl-intro namespace. */
+
+/* ───────── Slide 2: Qualifications / Career ───────── */
+
+.wipu-quals {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: clamp(40px, 6vh, 72px);
+  max-width: min(960px, 90vw);
+  margin: 0 auto;
+  color: var(--wipu-ink);
+  font-family: var(--wipu-mono);
+}
+.wipu-quals-blocks {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(28px, 4vh, 48px);
+  width: 100%;
+}
+.wipu-quals-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.wipu-quals-eyebrow {
+  font-size: clamp(12px, 1.05vw, 14px);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--wipu-ink-faint);
+  font-weight: 500;
+}
+.wipu-quals-title {
+  font-size: clamp(28px, 4.2vw, 52px);
+  font-weight: 500;
+  line-height: 1.08;
+  letter-spacing: -0.012em;
+  color: var(--wipu-ink);
+}
+.wipu-quals-org {
+  font-size: clamp(16px, 1.6vw, 22px);
+  color: var(--wipu-ink-dim);
+  letter-spacing: -0.004em;
+}
+.wipu-quals-path {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 12px;
+  row-gap: 6px;
+  font-size: clamp(13px, 1.2vw, 16px);
+  color: var(--wipu-ink);
+  letter-spacing: 0;
+  padding-top: 6px;
+  border-top: 1px solid var(--wipu-rule);
+  width: 100%;
+}
+.wipu-quals-arrow {
+  color: var(--wipu-ink-faint);
+  font-size: 1em;
+}
+
+/* ───────── Slide 4: AI-native (mirrors slide 2's typographic rhythm) ───────── */
+
+.wipu-ainative {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: clamp(40px, 6vh, 72px);
+  max-width: min(1000px, 90vw);
+  margin: 0 auto;
+  color: var(--wipu-ink);
+  font-family: var(--wipu-mono);
+}
+
+.wipu-ainative-blocks {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(28px, 4vh, 48px);
+  width: 100%;
+}
+
+.wipu-ainative-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.wipu-ainative-eyebrow {
+  font-size: clamp(12px, 1.05vw, 14px);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--wipu-ink-faint);
+  font-weight: 500;
+}
+
+.wipu-ainative-title {
+  font-size: clamp(24px, 3.6vw, 44px);
+  font-weight: 500;
+  line-height: 1.14;
+  letter-spacing: -0.012em;
+  color: var(--wipu-ink);
+}
+
+.wipu-ainative-title--md {
+  font-size: clamp(16px, 1.7vw, 22px);
+  color: var(--wipu-ink-dim);
+  letter-spacing: -0.004em;
+  font-weight: 400;
+  line-height: 1.45;
+}
+
+.wipu-ainative-title--sm {
+  font-size: clamp(13px, 1.2vw, 16px);
+  color: var(--wipu-ink-faint);
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+.wipu-ainative-tagline {
+  display: flex;
+  align-items: baseline;
+  padding-top: 6px;
+  border-top: 1px solid var(--wipu-rule);
+  width: 100%;
+}
+.wipu-ainative-tagline p {
+  margin: 0;
+  font-size: clamp(13px, 1.2vw, 16px);
+  color: var(--wipu-ink);
+  letter-spacing: 0;
+}
+.wipu-ainative-arrow {
+  color: var(--wipu-ink-faint);
+  margin: 0 4px;
+}
+

@@ -1,0 +1,1012 @@
+/* Shared template styles. One namespace per template.
+   Production slides AND the sample/preview pages all consume these
+   classes, so editing here updates every surface that uses the template. */
+
+/* ───────── Template 01 — Intro / Closing ───────── */
+
+.wipu-tpl-intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  text-align: center;
+  color: var(--wipu-ink);
+}
+.wipu-tpl-intro-emoji {
+  font-size: clamp(64px, 9vw, 120px);
+  line-height: 1;
+  filter: saturate(1.05);
+}
+.wipu-tpl-intro-headline {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-family: var(--wipu-mono);
+  font-weight: 500;
+}
+.wipu-tpl-intro-greeting {
+  font-size: clamp(20px, 2.4vw, 30px);
+  color: var(--wipu-ink-dim);
+  letter-spacing: 0;
+  font-weight: 400;
+}
+.wipu-tpl-intro-name {
+  font-size: clamp(44px, 7vw, 96px);
+  letter-spacing: -0.015em;
+  line-height: 1;
+}
+.wipu-tpl-intro-note {
+  margin: 6px 0 0;
+  font-family: var(--wipu-mono);
+  font-size: clamp(12px, 1.1vw, 14px);
+  color: var(--wipu-ink-faint);
+  letter-spacing: 0.04em;
+}
+
+/* ───────── Template 04 — Three-Up ─────────
+   Three parallel blocks side-by-side. Each block has a placeholder
+   image area on top, text below (eyebrow + title + body). Text sits
+   directly on the slide background — no card frame. */
+
+.wipu-tpl-threeup {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(28px, 4vw, 56px);
+  width: 100%;
+  max-width: min(1280px, 92vw);
+  margin: 0 auto;
+}
+.wipu-tpl-threeup-block {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+.wipu-tpl-threeup-image {
+  background: var(--wipu-bg-elev);
+  border-radius: 18px;
+  aspect-ratio: 4 / 3;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+}
+.wipu-tpl-threeup-image img,
+.wipu-tpl-threeup-image video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.wipu-tpl-threeup-eyebrow {
+  font-family: var(--wipu-mono);
+  font-size: 12px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--wipu-ink-faint);
+  font-weight: 500;
+  margin-top: 6px;
+}
+.wipu-tpl-threeup-title {
+  font-family: var(--wipu-mono);
+  font-size: clamp(18px, 1.9vw, 24px);
+  font-weight: 500;
+  line-height: 1.22;
+  letter-spacing: -0.01em;
+  margin: 0;
+  color: var(--wipu-ink);
+}
+.wipu-tpl-threeup-body {
+  font-family: var(--wipu-mono);
+  font-size: clamp(13px, 1.1vw, 15px);
+  line-height: 1.55;
+  color: var(--wipu-ink-dim);
+  margin: 0;
+}
+
+@media (max-width: 760px) {
+  .wipu-tpl-threeup {
+    grid-template-columns: 1fr;
+    gap: clamp(22px, 4vh, 32px);
+  }
+}
+
+/* ───────── Template 06 — Media + Text ─────────
+   Two-column split: media on the left, text on the right. The media
+   well is a fixed aspect ratio so swapping a screenshot for a video
+   doesn't reflow the layout. Wraps to a single column on phones. */
+
+.wipu-tpl-mediatext {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(28px, 4vw, 64px);
+  align-items: center;
+  width: 100%;
+  max-width: min(1200px, 92vw);
+  margin: 0 auto;
+  text-align: left;
+}
+
+.wipu-tpl-mediatext-media {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background: var(--wipu-bg-elev);
+  border: 1px solid var(--wipu-rule);
+  border-radius: var(--wipu-frame-radius);
+  overflow: hidden;
+}
+.wipu-tpl-mediatext-media img,
+.wipu-tpl-mediatext-media video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Slideshow: stack images and crossfade between them. */
+.wipu-tpl-mediatext-media .wipu-tpl-mediatext-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 700ms ease;
+}
+.wipu-tpl-mediatext-media .wipu-tpl-mediatext-slide[data-active="true"] {
+  opacity: 1;
+}
+
+/* Flip the order so the media well sits on the right. */
+.wipu-tpl-mediatext[data-media-side="right"] .wipu-tpl-mediatext-media {
+  order: 2;
+}
+.wipu-tpl-mediatext[data-media-side="right"] .wipu-tpl-mediatext-text {
+  order: 1;
+}
+
+.wipu-tpl-mediatext-eyebrow {
+  font-family: var(--wipu-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--wipu-ink-faint);
+  margin-bottom: 14px;
+}
+.wipu-tpl-mediatext-title {
+  font-family: var(--wipu-mono);
+  font-size: clamp(26px, 3.2vw, 44px);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--wipu-ink);
+  margin: 0 0 18px;
+  max-width: 18ch;
+}
+.wipu-tpl-mediatext-body {
+  font-size: clamp(14px, 1.2vw, 17px);
+  line-height: 1.55;
+  color: var(--wipu-ink-dim);
+  max-width: 36ch;
+}
+.wipu-tpl-mediatext-body p {
+  margin: 0 0 12px;
+}
+.wipu-tpl-mediatext-body p:last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 760px) {
+  .wipu-tpl-mediatext {
+    grid-template-columns: 1fr;
+    gap: clamp(20px, 3vh, 32px);
+  }
+  .wipu-tpl-mediatext-media {
+    aspect-ratio: 16 / 10;
+  }
+}
+
+/* ───────── Template 14 — Goal Statement ─────────
+   Central goal sentence with up to four corner annotation cards
+   connected by orthogonal dashed leader lines (SVG, viewBox-based so
+   paths stretch with the container). */
+
+.wipu-tpl-goal {
+  position: relative;
+  width: 100%;
+  height: min(700px, 78svh);
+  font-family: var(--wipu-mono);
+  color: var(--wipu-mustard);
+}
+
+.wipu-tpl-goal-eyebrow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-size: 12px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--wipu-mustard);
+}
+
+.wipu-tpl-goal-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  color: var(--wipu-mustard);
+  opacity: 0.85;
+}
+
+/* Once the leader has finished drawing on, swap the single solid dash
+   used for the draw-on for a true dotted pattern, and march the dots
+   toward the arrowhead at the word. The arrowhead itself is anchored
+   at the end of the path (markerEnd) so it stays put while the dots
+   flow into it — barber-pole / zebra effect. */
+.wipu-tpl-goal[data-marker="on"] .wipu-tpl-goal-svg path {
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-dasharray: 0 7 !important;
+  animation: wipu-tpl-goal-zebra 0.9s linear infinite;
+}
+@keyframes wipu-tpl-goal-zebra {
+  from { stroke-dashoffset: 0; }
+  to { stroke-dashoffset: -14; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wipu-tpl-goal[data-marker="on"] .wipu-tpl-goal-svg path {
+    animation: none;
+  }
+}
+
+.wipu-tpl-goal-statement {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  width: min(960px, 86%);
+}
+.wipu-tpl-goal-emoji {
+  font-size: clamp(28px, 3vw, 40px);
+  line-height: 1.1;
+  flex: 0 0 auto;
+}
+.wipu-tpl-goal-text {
+  margin: 0;
+  font-family: var(--wipu-mono);
+  font-size: clamp(22px, 2.6vw, 36px);
+  line-height: 1.3;
+  font-weight: 400;
+  color: var(--wipu-ink-dim);
+}
+.wipu-tpl-goal-text strong {
+  color: var(--wipu-ink);
+  font-weight: 600;
+}
+
+.wipu-tpl-goal-card {
+  position: absolute;
+  background: var(--wipu-bg-elev);
+  color: var(--wipu-ink);
+  font-family: var(--wipu-mono);
+  font-size: clamp(11px, 0.95vw, 13px);
+  line-height: 1.55;
+  letter-spacing: 0.02em;
+  padding: 16px 20px;
+  width: clamp(220px, 22vw, 320px);
+  border-radius: 4px;
+}
+
+.wipu-tpl-goal-card-tl { top: 6%; left: 4%; }
+.wipu-tpl-goal-card-tr { top: 6%; right: 4%; }
+.wipu-tpl-goal-card-bl { bottom: 6%; left: 4%; }
+.wipu-tpl-goal-card-br { bottom: 6%; right: 4%; }
+
+@media (max-width: 760px) {
+  .wipu-tpl-goal {
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding-top: 24px;
+  }
+  .wipu-tpl-goal-svg { display: none; }
+  .wipu-tpl-goal-eyebrow { position: static; }
+  .wipu-tpl-goal-statement {
+    position: static;
+    transform: none;
+    width: 100%;
+  }
+  .wipu-tpl-goal-card {
+    position: static;
+    width: 100%;
+  }
+}
+
+/* ───────── Callout — Goal-style annotation ─────────
+   Stand-alone primitive that mirrors the goal template's annotation
+   voice: a small bg-elev card plus a mustard, zebra-dotted Manhattan
+   leader line ending in an arrowhead. Drop into any slide that needs
+   the same "look here" call-out outside the goal template itself. */
+
+.wipu-anno-callout {
+  position: absolute;
+  background: var(--wipu-bg-elev);
+  color: var(--wipu-ink);
+  font-family: var(--wipu-mono);
+  font-size: clamp(11px, 0.95vw, 13px);
+  line-height: 1.55;
+  letter-spacing: 0.02em;
+  padding: 16px 20px;
+  border-radius: 4px;
+  z-index: 2;
+}
+
+.wipu-anno-callout-svg {
+  position: absolute;
+  pointer-events: none;
+  color: var(--wipu-mustard);
+  opacity: 0.85;
+  z-index: 2;
+}
+.wipu-anno-callout-svg path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-dasharray: 0 7;
+  animation: wipu-anno-callout-zebra 0.9s linear infinite;
+}
+@keyframes wipu-anno-callout-zebra {
+  from { stroke-dashoffset: 0; }
+  to { stroke-dashoffset: -14; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wipu-anno-callout-svg path { animation: none; }
+}
+
+/* ───────── Template 15 — Emoji Headline ─────────
+   Centered emoji row over a single mono headline. Default text reads
+   dim; <strong> brightens. Compact vertical rhythm — meant to feel
+   like a single beat, not a content slide. */
+
+.wipu-tpl-emojihead {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(24px, 3vw, 40px);
+  text-align: center;
+  width: 100%;
+}
+.wipu-tpl-emojihead-row {
+  display: flex;
+  align-items: center;
+  gap: clamp(18px, 2.4vw, 32px);
+  font-size: clamp(44px, 5.5vw, 80px);
+  line-height: 1;
+  filter: saturate(1.05);
+}
+.wipu-tpl-emojihead-emoji {
+  display: inline-block;
+  line-height: 1;
+}
+.wipu-tpl-emojihead-title {
+  margin: 0;
+  font-family: var(--wipu-mono);
+  font-size: clamp(22px, 2.6vw, 36px);
+  font-weight: 400;
+  line-height: 1.3;
+  letter-spacing: -0.005em;
+  color: var(--wipu-ink-dim);
+  max-width: 24ch;
+}
+.wipu-tpl-emojihead-title strong {
+  color: var(--wipu-ink);
+  font-weight: 600;
+}
+
+/* Small secondary line below the headline. Hidden until typing completes,
+   then fades up. data-visible is toggled by the template once revealed
+   reaches the total character count. */
+.wipu-tpl-emojihead-note {
+  margin: 0;
+  font-family: var(--wipu-mono);
+  font-size: clamp(12px, 1.1vw, 14px);
+  letter-spacing: 0.04em;
+  color: var(--wipu-ink-faint);
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 520ms ease-out, transform 520ms ease-out;
+  transition-delay: 220ms;
+}
+.wipu-tpl-emojihead-note[data-visible] {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Screen-reader copy of the headline — typing tree is aria-hidden, so
+   this carries the readable text. */
+.wipu-tpl-emojihead-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Per-character spans. Hidden chars take layout space (visibility, not
+   display) so the headline never reflows as it types on. */
+.wipu-tpl-emojihead-ch {
+  visibility: hidden;
+}
+.wipu-tpl-emojihead-ch[data-visible] {
+  visibility: visible;
+}
+
+/* Caret. Blinks at terminal-cadence and steps through the brand palette
+   so each blink can land on a different tone. The bar is `currentColor`
+   so the color animation drives both the glyph color and the bar fill. */
+.wipu-tpl-emojihead-cursor {
+  display: inline-block;
+  width: 0.16ch;
+  height: 1em;
+  margin: 0 0.08em;
+  vertical-align: -0.12em;
+  background: currentColor;
+  color: var(--wipu-terracotta);
+  animation:
+    wipu-tpl-emojihead-cursor-blink 1s steps(1, end) infinite,
+    wipu-tpl-emojihead-cursor-cycle 6s steps(5, end) infinite;
+}
+
+@keyframes wipu-tpl-emojihead-cursor-blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes wipu-tpl-emojihead-cursor-cycle {
+  0% {
+    color: var(--wipu-terracotta);
+  }
+  20% {
+    color: var(--wipu-mustard);
+  }
+  40% {
+    color: var(--wipu-mint);
+  }
+  60% {
+    color: var(--wipu-rose);
+  }
+  80% {
+    color: var(--wipu-navy);
+  }
+  100% {
+    color: var(--wipu-terracotta);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wipu-tpl-emojihead-ch {
+    visibility: visible;
+  }
+  .wipu-tpl-emojihead-cursor {
+    animation: wipu-tpl-emojihead-cursor-blink 1s steps(1, end) infinite;
+  }
+}
+
+/* ───────── Template 02 — Quote ───────── */
+
+.wipu-tpl-quote {
+  text-align: center;
+  font-size: clamp(22px, 2.6vw, 36px);
+  font-weight: 500;
+  font-style: italic;
+  line-height: 1.3;
+  color: var(--wipu-ink);
+  max-width: 28ch;
+  margin: 0 auto;
+}
+.wipu-tpl-quote-attr {
+  display: block;
+  margin-top: 24px;
+  font-size: 14px;
+  font-style: normal;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--wipu-ink-dim);
+}
+
+/* ───────── Chapter header ─────────
+   Quiet section break: small passport stamp + eyebrow + city + date.
+   Reuses the .wipu-case-stamp-* draw animation from board.css; the
+   overrides below take the floating absolutely-positioned stamp and
+   pull it inline-flow at a smaller, lower-key scale. */
+
+.wipu-tpl-chapter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(18px, 2.4vh, 28px);
+  width: 100%;
+  text-align: center;
+}
+/* Float the stamp near the centered title — close enough to read as
+   part of the chapter beat, far enough off-axis to not sit behind the
+   text. Higher specificity than `.wipu-case-stamp-*` in board.css
+   (chained on `.wipu-tpl-chapter`) so it actually wins. Each chapter
+   takes a different brand color via `currentColor` on the stamp SVG. */
+.wipu-tpl-chapter .wipu-tpl-chapter-stamp {
+  position: absolute;
+  width: clamp(140px, 15vw, 200px);
+  opacity: 0.78;
+  z-index: 0;
+  --stamp-rot: -4deg;
+}
+.wipu-tpl-chapter .wipu-tpl-chapter-stamp-nyc {
+  top: clamp(140px, 24vh, 280px);
+  right: clamp(120px, 18vw, 320px);
+  bottom: auto;
+  left: auto;
+  color: var(--wipu-terracotta);
+  --stamp-rot: 16deg;
+}
+.wipu-tpl-chapter .wipu-tpl-chapter-stamp-zurich {
+  top: clamp(140px, 24vh, 280px);
+  left: clamp(120px, 18vw, 320px);
+  bottom: auto;
+  right: auto;
+  color: var(--wipu-navy);
+  --stamp-rot: -18deg;
+}
+.wipu-tpl-chapter .wipu-tpl-chapter-stamp-mxcity {
+  bottom: clamp(140px, 22vh, 260px);
+  right: clamp(120px, 18vw, 320px);
+  top: auto;
+  left: auto;
+  color: var(--wipu-mustard);
+  --stamp-rot: 22deg;
+}
+.wipu-tpl-chapter-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.wipu-tpl-chapter-eyebrow {
+  font-family: var(--wipu-mono);
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  color: var(--wipu-ink-faint);
+}
+.wipu-tpl-chapter-title {
+  margin: 0;
+  font-size: clamp(28px, 3.4vw, 44px);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--wipu-ink);
+}
+.wipu-tpl-chapter-date {
+  font-family: var(--wipu-mono);
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  color: var(--wipu-ink-dim);
+}
+
+/* ───────── Metric + Quote split ───────── */
+
+.wipu-tpl-mqs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: clamp(32px, 5vw, 80px);
+  width: 100%;
+  max-width: min(1480px, 94vw);
+  margin: 0 auto;
+}
+.wipu-tpl-mqs-left {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+}
+.wipu-tpl-mqs-left .wipu-sample-heroMetric {
+  text-align: center;
+}
+.wipu-tpl-mqs-right {
+  position: relative;
+  margin: 0;
+  padding: 0 clamp(8px, 2vw, 24px);
+  color: var(--wipu-ink);
+  min-width: 0;
+}
+.wipu-tpl-mqs-quote {
+  margin: 0;
+  font-size: clamp(18px, 1.7vw, 26px);
+  font-weight: 400;
+  line-height: 1.45;
+  letter-spacing: -0.005em;
+  color: var(--wipu-ink-dim);
+}
+.wipu-tpl-mqs-quote strong {
+  color: var(--wipu-ink);
+  font-weight: 600;
+}
+.wipu-tpl-mqs-mark {
+  position: absolute;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(48px, 5vw, 72px);
+  line-height: 1;
+  color: var(--wipu-ink-faint);
+  user-select: none;
+}
+.wipu-tpl-mqs-mark-open {
+  top: -0.15em;
+  left: -0.05em;
+}
+.wipu-tpl-mqs-mark-close {
+  margin-left: 0.1em;
+  vertical-align: -0.18em;
+  position: static;
+  display: inline;
+  font-size: 0.75em;
+}
+.wipu-tpl-mqs-attr {
+  margin-top: clamp(20px, 2.5vw, 32px);
+  text-align: right;
+  font-family: var(--wipu-mono);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  color: var(--wipu-ink-dim);
+}
+@media (max-width: 1024px) {
+  .wipu-tpl-mqs {
+    grid-template-columns: 1fr;
+    gap: clamp(28px, 5vh, 48px);
+  }
+  .wipu-tpl-mqs-quote { font-size: clamp(16px, 2.2vw, 22px); }
+}
+
+/* ───────── Template 16 — Project at a Glance ─────────
+   Six-field metadata grid for opening a case study. */
+
+.wipu-tpl-glance {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(20px, 2.6vh, 32px);
+  width: 100%;
+  max-width: min(1180px, 92vw);
+  margin: 0 auto;
+}
+
+.wipu-tpl-glance-head {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.wipu-tpl-glance-eyebrow {
+  font-family: var(--wipu-mono);
+  font-size: 12px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--wipu-ink-faint);
+}
+
+.wipu-tpl-glance-title {
+  font-family: var(--wipu-mono);
+  font-size: clamp(26px, 3.4vw, 42px);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  margin: 0;
+  color: var(--wipu-ink);
+}
+
+.wipu-tpl-glance-grid {
+  display: grid;
+  gap: clamp(18px, 2vh, 28px) clamp(28px, 3.5vw, 56px);
+  margin: 0;
+}
+
+.wipu-tpl-glance-grid-primary {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.wipu-tpl-glance-grid-detail {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.wipu-tpl-glance-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-top: 1px solid var(--wipu-rule);
+  padding-top: 12px;
+  min-width: 0;
+}
+
+.wipu-tpl-glance-label {
+  font-family: var(--wipu-mono);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--wipu-ink-faint);
+  margin: 0;
+}
+
+.wipu-tpl-glance-value {
+  font-family: var(--wipu-mono);
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--wipu-ink);
+  margin: 0;
+}
+
+.wipu-tpl-glance-field[data-tier="primary"] .wipu-tpl-glance-value {
+  font-size: clamp(17px, 1.55vw, 22px);
+}
+
+.wipu-tpl-glance-field[data-tier="secondary"] .wipu-tpl-glance-value {
+  font-size: clamp(12px, 1vw, 14px);
+  color: var(--wipu-ink-dim);
+  font-weight: 400;
+  line-height: 1.45;
+}
+
+.wipu-tpl-glance-field[data-tier="secondary"] .wipu-tpl-glance-label {
+  color: var(--wipu-ink-faint);
+  opacity: 0.8;
+}
+
+.wipu-tpl-glance-aside {
+  display: block;
+  margin-top: 3px;
+  font-weight: 400;
+  font-size: 0.85em;
+  opacity: 0.7;
+}
+
+@media (max-width: 960px) {
+  .wipu-tpl-glance-grid-primary,
+  .wipu-tpl-glance-grid-detail {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 460px) {
+  .wipu-tpl-glance-grid-primary,
+  .wipu-tpl-glance-grid-detail {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Secondary / follow-on section (e.g. Visual Overlays addendum) */
+.wipu-tpl-glance-secondary {
+  border-top: 1px solid var(--wipu-rule);
+  padding-top: clamp(24px, 3vh, 40px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 2vh, 28px);
+}
+
+.wipu-tpl-glance-secondary-head {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.wipu-tpl-glance-secondary-title {
+  font-family: var(--wipu-mono);
+  font-size: clamp(20px, 2.5vw, 30px);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  margin: 0;
+  color: var(--wipu-ink);
+}
+
+.wipu-tpl-glance-secondary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(20px, 2.5vw, 36px) clamp(32px, 4vw, 64px);
+  margin: 0;
+}
+
+@media (max-width: 760px) {
+  .wipu-tpl-glance-secondary-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(16px, 2.5vw, 28px);
+  }
+}
+@media (max-width: 460px) {
+  .wipu-tpl-glance-secondary-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ───────── Template — Sticky Cards (progressive text-only three-up) ─────────
+   Text-only progressive three-up. Cards are pinned-note style: tinted,
+   slightly rotated, staggered diagonally. Each card reveals on
+   keyboard advance via the template's capture-phase listener.
+   Used for reflections, principles, constraints — any short list you
+   want absorbed one card at a time. */
+
+.wipu-tpl-sticky {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.wipu-tpl-sticky-board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(20px, 3vw, 44px);
+  width: 100%;
+  max-width: min(1180px, 92vw);
+  align-items: start;
+  padding: clamp(40px, 6vh, 80px) 0;
+}
+.wipu-tpl-sticky-card {
+  position: relative;
+  border-radius: 4px;
+  padding: clamp(22px, 2.4vw, 34px) clamp(20px, 2.2vw, 30px) clamp(20px, 2.2vw, 28px);
+  font-family: var(--wipu-mono);
+  box-shadow:
+    0 2px 4px -1px rgba(0, 0, 0, 0.18),
+    0 14px 30px -14px rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  transform: scale(0.92) translateY(14px) rotate(0deg);
+  transform-origin: 50% 0%;
+  transition:
+    opacity 460ms cubic-bezier(0.22, 0.8, 0.2, 1),
+    transform 540ms cubic-bezier(0.22, 0.8, 0.2, 1);
+  will-change: opacity, transform;
+}
+
+/* Card-specific resting positions — staggered diagonal, slight rotations
+   so the row reads like notes pinned by hand. */
+.wipu-tpl-sticky-card[data-card-idx="0"][data-revealed="true"] {
+  opacity: 1;
+  transform: rotate(-2.6deg) translateY(-14px);
+}
+.wipu-tpl-sticky-card[data-card-idx="1"][data-revealed="true"] {
+  opacity: 1;
+  transform: rotate(1.8deg) translateY(48px);
+}
+.wipu-tpl-sticky-card[data-card-idx="2"][data-revealed="true"] {
+  opacity: 1;
+  transform: rotate(-1.6deg) translateY(18px);
+}
+
+/* Linked variant — card is an <a>; reset link styles, add a soft lift on hover. */
+.wipu-tpl-sticky-card[data-link="true"] {
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition:
+    opacity 460ms cubic-bezier(0.22, 0.8, 0.2, 1),
+    transform 540ms cubic-bezier(0.22, 0.8, 0.2, 1),
+    box-shadow 220ms ease-out;
+}
+.wipu-tpl-sticky-card[data-link="true"][data-revealed="true"]:hover,
+.wipu-tpl-sticky-card[data-link="true"][data-revealed="true"]:focus-visible {
+  outline: none;
+  box-shadow:
+    0 4px 8px -2px rgba(0, 0, 0, 0.22),
+    0 22px 44px -16px rgba(0, 0, 0, 0.55);
+}
+.wipu-tpl-sticky-card[data-link="true"][data-card-idx="0"][data-revealed="true"]:hover,
+.wipu-tpl-sticky-card[data-link="true"][data-card-idx="0"][data-revealed="true"]:focus-visible {
+  transform: rotate(-2.6deg) translateY(-20px);
+}
+.wipu-tpl-sticky-card[data-link="true"][data-card-idx="1"][data-revealed="true"]:hover,
+.wipu-tpl-sticky-card[data-link="true"][data-card-idx="1"][data-revealed="true"]:focus-visible {
+  transform: rotate(1.8deg) translateY(42px);
+}
+.wipu-tpl-sticky-card[data-link="true"][data-card-idx="2"][data-revealed="true"]:hover,
+.wipu-tpl-sticky-card[data-link="true"][data-card-idx="2"][data-revealed="true"]:focus-visible {
+  transform: rotate(-1.6deg) translateY(12px);
+}
+
+/* Tints */
+.wipu-tpl-sticky-card[data-tone="terracotta"] {
+  background: var(--wipu-terracotta);
+  color: var(--wipu-terracotta-ink);
+}
+.wipu-tpl-sticky-card[data-tone="mint"] {
+  background: var(--wipu-mint);
+  color: var(--wipu-mint-ink);
+}
+.wipu-tpl-sticky-card[data-tone="mustard"] {
+  background: var(--wipu-mustard);
+  color: var(--wipu-mustard-ink);
+}
+.wipu-tpl-sticky-card[data-tone="rose"] {
+  background: var(--wipu-rose);
+  color: var(--wipu-rose-ink);
+}
+.wipu-tpl-sticky-card[data-tone="navy"] {
+  background: var(--wipu-navy);
+  color: var(--wipu-navy-ink);
+}
+
+.wipu-tpl-sticky-pin {
+  position: absolute;
+  top: -18px;
+  left: 18px;
+  font-size: 28px;
+  line-height: 1;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35));
+  pointer-events: none;
+  transform: rotate(-12deg);
+}
+
+.wipu-tpl-sticky-eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  font-weight: 500;
+  opacity: 0.72;
+  margin-bottom: 10px;
+}
+
+.wipu-tpl-sticky-title {
+  font-family: var(--wipu-mono);
+  font-size: clamp(17px, 1.85vw, 23px);
+  font-weight: 500;
+  line-height: 1.24;
+  letter-spacing: -0.01em;
+  margin: 0 0 12px 0;
+}
+
+.wipu-tpl-sticky-body {
+  font-family: var(--wipu-mono);
+  font-size: clamp(13px, 1.05vw, 15px);
+  line-height: 1.55;
+  margin: 0;
+  opacity: 0.92;
+}
+
+/* Stack on narrow screens; drop the rotations / offsets so layout is
+   readable rather than playful. */
+@media (max-width: 760px) {
+  .wipu-tpl-sticky-board {
+    grid-template-columns: 1fr;
+    gap: clamp(28px, 4vh, 44px);
+  }
+  .wipu-tpl-sticky-card[data-card-idx="0"][data-revealed="true"],
+  .wipu-tpl-sticky-card[data-card-idx="1"][data-revealed="true"],
+  .wipu-tpl-sticky-card[data-card-idx="2"][data-revealed="true"] {
+    transform: rotate(0deg) translateY(0);
+  }
+}
+
+/* Reduced motion: drop the rotations and translations from the resting
+   state too, so cards just fade in. */
+@media (prefers-reduced-motion: reduce) {
+  .wipu-tpl-sticky-card {
+    transition: opacity 200ms ease;
+    transform: none;
+  }
+  .wipu-tpl-sticky-card[data-card-idx="0"][data-revealed="true"],
+  .wipu-tpl-sticky-card[data-card-idx="1"][data-revealed="true"],
+  .wipu-tpl-sticky-card[data-card-idx="2"][data-revealed="true"] {
+    transform: none;
+  }
+}

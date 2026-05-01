@@ -1,0 +1,7 @@
+export const DEFAULT_STYLE_PROMPT = `A continuous single-line drawing of a modern software user interface (UI) wireframe. An unbroken, fluid black line forms the silhouette of the screen and seamlessly loops inward to trace simplified UI elements: panels, cards, navigation bars, search bars, buttons, user avatars represented as simple circles, data visualizations as smooth wavy curves, and structural layout regions. Pure white background, stark contrast, minimalist black monoline aesthetic. Vector art style, flat design, completely unshaded, no fills, no disconnected strokes.
+
+Critical rule — ignore all imagery inside the source: Omit every photograph, raster image, wallpaper, hero image, product shot, illustrated artwork, avatar photo, video thumbnail, and decorative graphic from the screenshot. Where such images appear, replace them with a single empty placeholder rectangle or circle outline. Do NOT trace or depict the contents of any images. Treat the screenshot as though every image were already blanked to a placeholder — the output must read as a pure wireframe diagram of UI chrome, structural layout, and component outlines only.
+
+Elegant, abstract, and highly recognizable as a UI wireframe. Professional case-study illustration, SVG line-art aesthetic.`;
+
+export const VISION_SYSTEM_PROMPT = `(Unused by the current direct pipeline. Kept for reference if the hybrid Claude-vision path is reinstated in a future phase.)`;

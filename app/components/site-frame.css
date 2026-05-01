@@ -1,0 +1,95 @@
+/* Site-wide ASCII frame. Used by every surface — deck, archive,
+   templates, case studies. The TL corner carries the page label;
+   two of the three outer corners cycle per scrambleKey. Pulses ONLY
+   during the matrix scramble triggered by a key change — otherwise
+   the art rests static. */
+
+.site-frame {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 30;
+  font-family: var(--wipu-mono, ui-monospace, "SF Mono", Menlo, Consolas, monospace);
+  font-size: 12px;
+  line-height: 1.05;
+  letter-spacing: 0;
+  color: var(--wipu-ink-faint);
+  opacity: 0.55;
+}
+
+.site-frame-corner {
+  position: absolute;
+  /* Resting state — page info is part of the frame, so it's plainly readable. */
+  transition:
+    color 600ms ease-out,
+    text-shadow 600ms ease-out;
+}
+
+.site-frame-corner > div {
+  white-space: pre;
+}
+
+.site-frame-corner > div > span {
+  display: inline-block;
+}
+
+.site-frame-corner.is-scrambling {
+  color: var(--wipu-ink);
+  text-shadow: 0 0 4px color-mix(in srgb, var(--wipu-ink) 28%, transparent);
+  transition:
+    color 80ms linear,
+    text-shadow 80ms linear;
+}
+
+.site-frame-scramble {
+  opacity: 0.85;
+}
+
+.site-frame-tl {
+  top: 22px;
+  left: 22px;
+}
+
+.site-frame-tr {
+  top: 22px;
+  right: 22px;
+  text-align: right;
+}
+
+.site-frame-br {
+  bottom: 22px;
+  right: 22px;
+  text-align: right;
+}
+
+.site-frame-bl {
+  bottom: 22px;
+  left: 22px;
+}
+
+/* Hide the frame entirely when a route signals it (e.g., prototype slides
+   take the full viewport). */
+body[data-hide-site-frame="true"] .site-frame {
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+
+@media (max-width: 640px) {
+  .site-frame {
+    font-size: 10px;
+  }
+  .site-frame-tr,
+  .site-frame-bl,
+  .site-frame-br {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-frame-corner {
+    transition: none;
+  }
+  .site-frame-corner.is-scrambling {
+    text-shadow: none;
+  }
+}

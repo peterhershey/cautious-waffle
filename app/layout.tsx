@@ -31,7 +31,7 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} ${fraunces.variable} h-full antialiased`}
     >
-      <body className="min-h-full bg-black text-neutral-100">{children}</body>
+      <body className="min-h-full">{children}</body>
     </html>
   );
 }

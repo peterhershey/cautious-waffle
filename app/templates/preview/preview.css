@@ -1,0 +1,17 @@
+/* Single-slide preview — fullscreen, no label, no back link. */
+
+.wipu-preview-root {
+  background: var(--wipu-bg);
+  color: var(--wipu-ink);
+  min-height: 100svh;
+}
+
+.wipu-preview-slide {
+  min-height: 100svh;
+  padding: 48px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+}

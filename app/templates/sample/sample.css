@@ -1,0 +1,1003 @@
+/* Sample presentation — shows one of each template with lorem ipsum */
+
+/* Soft scroll-snap scoped to this route only — html rule is dropped
+   when the CSS unloads on navigation. Snaps at each slide boundary and
+   at each timeline stop. */
+html {
+  scroll-snap-type: y mandatory;
+}
+
+.wipu-sample-root {
+  background: var(--wipu-bg);
+  color: var(--wipu-ink);
+}
+
+.wipu-sample-slide {
+  min-height: 100svh;
+  padding: 64px 48px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  border-bottom: 1px dashed var(--wipu-rule);
+  scroll-snap-align: start;
+  scroll-snap-stop: normal;
+}
+
+.wipu-sample-slide-label {
+  position: absolute;
+  top: 40px;
+  left: 48px;
+  font-family: var(--wipu-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--wipu-ink-dim);
+}
+.wipu-sample-slide-label strong {
+  color: var(--wipu-mustard);
+  font-weight: 500;
+  margin-right: 6px;
+}
+
+.wipu-sample-inner {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* Intro — handled by Template 01 (.wipu-tpl-intro) in templates.css */
+
+/* Quote slide */
+.wipu-sample-quote {
+  text-align: center;
+  font-size: clamp(28px, 4vw, 56px);
+  font-weight: 500;
+  font-style: italic;
+  line-height: 1.2;
+  color: var(--wipu-ink);
+  max-width: 20ch;
+  margin: 0 auto;
+}
+.wipu-sample-quote-attr {
+  display: block;
+  margin-top: 24px;
+  font-size: 14px;
+  font-style: normal;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--wipu-ink-dim);
+}
+
+/* Informational */
+.wipu-sample-info-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  gap: 48px;
+  align-items: start;
+}
+.wipu-sample-info-title {
+  font-size: clamp(28px, 3.5vw, 48px);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  margin: 0 0 16px;
+}
+.wipu-sample-info-kicker {
+  font-style: italic;
+  color: var(--wipu-ink-dim);
+  font-size: 16px;
+  margin: 0;
+}
+.wipu-sample-info-body {
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--wipu-ink);
+}
+.wipu-sample-info-body p { margin: 0 0 14px; }
+.wipu-sample-info-body p:last-child { margin: 0; }
+
+/* Three-up — handled by Template 04 (.wipu-tpl-threeup) in templates.css */
+
+/* Timeline — scroll-pinned horizontal pan.
+   Vertical scroll translates to horizontal progression through stops.
+   Each stop = one 100svh of scroll. After the last stop, scroll
+   releases to the next slide. */
+.wipu-sample-tl {
+  position: relative;
+  width: 100%;
+  height: 500svh; /* STOPS.length (5) * 100svh — keep in sync with JS */
+  border-bottom: 1px dashed var(--wipu-rule);
+}
+
+/* Invisible snap markers — one per stop. If scroll-snap is enabled on
+   html, these catch snapping. Harmless otherwise. */
+.wipu-sample-tl-snap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 100svh;
+  pointer-events: none;
+  scroll-snap-align: start;
+  scroll-snap-stop: normal;
+}
+
+.wipu-sample-tl-pin {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  width: 100%;
+  overflow: hidden;
+  background: var(--wipu-bg);
+}
+
+.wipu-sample-tl-track {
+  display: flex;
+  flex-wrap: nowrap;
+  width: 500%; /* STOPS.length * 100% */
+  height: 100%;
+  will-change: transform;
+  transition: transform 80ms linear;
+}
+
+.wipu-sample-tl-stop {
+  position: relative;
+  flex: 0 0 calc(100% / 5);
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 48px 160px;
+}
+
+.wipu-sample-tl-figure {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  width: min(1080px, 78vw);
+  height: 100%;
+  max-height: 100%;
+  max-width: 100%;
+  transition: transform 480ms cubic-bezier(0.2, 0.6, 0.2, 1),
+    opacity 480ms ease;
+  transform: scale(0.97);
+  opacity: 0.82;
+}
+.wipu-sample-tl-stop.is-active .wipu-sample-tl-figure {
+  transform: scale(1);
+  opacity: 1;
+}
+
+/* Wide-format placeholder image (or real img when stop.image is provided) */
+.wipu-sample-tl-image {
+  width: min(1080px, 78vw);
+  aspect-ratio: 16 / 10;
+  max-height: 60svh;
+  border-radius: 18px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+  user-select: none;
+}
+img.wipu-sample-tl-image {
+  display: block;
+  width: auto;
+  height: auto;
+  aspect-ratio: auto;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  box-shadow: none;
+}
+
+/* 2-up: side-by-side images sharing the figure slot. Each image keeps
+   its intrinsic aspect ratio and shrinks to fit; the row never overflows
+   the figure box. */
+.wipu-sample-tl-images {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  width: 100%;
+  max-width: 100%;
+  max-height: 60svh;
+}
+.wipu-sample-tl-images img.wipu-sample-tl-image {
+  flex: 1 1 0;
+  min-width: 0;
+  max-height: 60svh;
+}
+.wipu-sample-tl-image::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 255, 255, 0.1) 0%,
+    transparent 65%
+  );
+}
+.wipu-sample-tl-image[data-tint="terracotta"] {
+  background: linear-gradient(135deg, #7a2e15 0%, #1f1410 100%);
+}
+.wipu-sample-tl-image[data-tint="mint"] {
+  background: linear-gradient(135deg, #0f3a28 0%, #101b18 100%);
+}
+.wipu-sample-tl-image[data-tint="mustard"] {
+  background: linear-gradient(135deg, #5a4410 0%, #1e1c12 100%);
+}
+.wipu-sample-tl-image[data-tint="rose"] {
+  background: linear-gradient(135deg, #3e1c20 0%, #1a1010 100%);
+}
+.wipu-sample-tl-image[data-tint="navy"] {
+  background: linear-gradient(135deg, #132060 0%, #0c0f1e 100%);
+}
+
+.wipu-sample-tl-stop-caption {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+}
+
+/* Variant: titles drop low and gray. Used by per-instance className
+   (e.g. <TimelineSample className="is-low-titles" />) to scope the
+   treatment to a single timeline without affecting the others. */
+.wipu-sample-tl.is-low-titles .wipu-sample-tl-figure {
+  /* Decouple caption from figure flow so it can sit pinned lower. */
+  gap: 0;
+  /* Move the active-scale transform to the image below — a transform
+     on the figure would make it a containing block for the absolute
+     caption and pull the caption up to the figure's bottom (right
+     under the image), defeating the "low" placement. */
+  transform: none;
+}
+.wipu-sample-tl.is-low-titles .wipu-sample-tl-image,
+.wipu-sample-tl.is-low-titles .wipu-sample-tl-images {
+  transform: scale(0.97);
+  transition: transform 480ms cubic-bezier(0.2, 0.6, 0.2, 1);
+}
+.wipu-sample-tl.is-low-titles .wipu-sample-tl-stop.is-active .wipu-sample-tl-image,
+.wipu-sample-tl.is-low-titles .wipu-sample-tl-stop.is-active .wipu-sample-tl-images {
+  transform: scale(1);
+}
+.wipu-sample-tl.is-low-titles .wipu-sample-tl-stop-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  /* Sits below the image and clear of the progress rail (bottom: 72px). */
+  bottom: clamp(120px, 16svh, 160px);
+  z-index: 4;
+}
+.wipu-sample-tl.is-low-titles .wipu-sample-tl-stop-label {
+  color: var(--wipu-ink-faint);
+  font-weight: 400;
+}
+
+/* Per-stop annotations — mirrors the Goal slide: orthogonal dotted
+   leader in mustard with a barber-pole flow toward an arrowhead, and
+   an elevated borderless card. Visible only on the active stop so
+   off-screen stops don't bleed callouts into peripheral vision. */
+.wipu-sample-tl-anno-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  color: var(--wipu-mustard);
+  opacity: 0;
+  transition: opacity 380ms ease 200ms;
+  z-index: 3;
+}
+.wipu-sample-tl-stop.is-active .wipu-sample-tl-anno-svg {
+  opacity: 0.85;
+}
+
+.wipu-sample-tl-stop.is-active .wipu-sample-tl-anno-line {
+  animation: wipu-sample-tl-zebra 0.9s linear infinite;
+}
+@keyframes wipu-sample-tl-zebra {
+  from { stroke-dashoffset: 0; }
+  to { stroke-dashoffset: -14; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wipu-sample-tl-stop.is-active .wipu-sample-tl-anno-line {
+    animation: none;
+  }
+}
+
+/* CSS arrowhead at the end of each leader. A real SVG marker would
+   distort under preserveAspectRatio="none" on a tall narrow stop. */
+.wipu-sample-tl-anno-arrow {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+  color: var(--wipu-mustard);
+  opacity: 0;
+  transition: opacity 380ms ease 320ms;
+}
+.wipu-sample-tl-anno-arrow.is-down {
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 7px solid currentColor;
+}
+.wipu-sample-tl-anno-arrow.is-up {
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 7px solid currentColor;
+}
+.wipu-sample-tl-stop.is-active .wipu-sample-tl-anno-arrow {
+  opacity: 0.85;
+}
+
+.wipu-sample-tl-anno {
+  position: absolute;
+  width: clamp(220px, 22vw, 320px);
+  font-family: var(--wipu-mono);
+  font-size: clamp(11px, 0.95vw, 13px);
+  line-height: 1.55;
+  letter-spacing: 0.02em;
+  color: var(--wipu-ink);
+  background: var(--wipu-bg-elev);
+  border-radius: 4px;
+  padding: 16px 20px;
+  z-index: 4;
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: opacity 380ms ease 250ms, transform 380ms ease 250ms;
+}
+.wipu-sample-tl-stop.is-active .wipu-sample-tl-anno {
+  opacity: 1;
+  transform: translateY(0);
+}
+.wipu-sample-tl-anno-tl { top: 6%; left: 4%; }
+.wipu-sample-tl-anno-tr { top: 6%; right: 4%; }
+.wipu-sample-tl-anno-bl { bottom: 18%; left: 4%; }
+.wipu-sample-tl-anno-br { bottom: 18%; right: 4%; }
+.wipu-sample-tl-stop-label {
+  font-family: var(--wipu-mono);
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--wipu-ink);
+}
+.wipu-sample-tl-stop-date {
+  font-family: var(--wipu-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--wipu-ink-faint);
+}
+
+/* Progress rail at the bottom of the pin */
+.wipu-sample-tl-progress {
+  position: absolute;
+  bottom: 72px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(880px, 84vw);
+  pointer-events: none;
+  z-index: 5;
+}
+.wipu-sample-tl-rail {
+  position: relative;
+  width: 100%;
+  height: 2px;
+  background: var(--wipu-rule-strong);
+  border-radius: 2px;
+}
+.wipu-sample-tl-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0%;
+  background: var(--wipu-ink);
+  border-radius: 2px;
+  will-change: width;
+  transition: width 80ms linear;
+}
+
+.wipu-sample-tl-tick {
+  position: absolute;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  transform: translate(-50%, -50%);
+}
+.wipu-sample-tl-tick-dot {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: var(--wipu-bg);
+  border: 2px solid var(--wipu-rule-strong);
+  box-shadow: 0 0 0 4px var(--wipu-bg);
+  transition: background 220ms ease, border-color 220ms ease,
+    transform 220ms cubic-bezier(0.2, 0.6, 0.2, 1);
+}
+.wipu-sample-tl-tick.is-reached .wipu-sample-tl-tick-dot {
+  background: var(--wipu-ink);
+  border-color: var(--wipu-ink);
+}
+.wipu-sample-tl-tick.is-active .wipu-sample-tl-tick-dot {
+  background: var(--wipu-navy);
+  border-color: var(--wipu-navy);
+  transform: scale(1.15);
+  box-shadow: 0 0 0 4px var(--wipu-bg),
+    0 0 0 8px color-mix(in srgb, var(--wipu-navy) 22%, transparent);
+}
+.wipu-sample-tl-tick-label {
+  position: absolute;
+  top: calc(100% + 14px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--wipu-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--wipu-ink-faint);
+  white-space: nowrap;
+  transition: color 220ms ease;
+}
+.wipu-sample-tl-tick.is-active .wipu-sample-tl-tick-label {
+  color: var(--wipu-ink);
+}
+
+/* Fallback: reduced motion or narrow viewport → vertical stack */
+@media (max-width: 820px), (prefers-reduced-motion: reduce) {
+  .wipu-sample-tl {
+    height: auto;
+  }
+  .wipu-sample-tl-pin {
+    position: relative;
+    height: auto;
+    overflow: visible;
+  }
+  .wipu-sample-tl-track {
+    flex-direction: column;
+    width: 100%;
+    height: auto;
+    transform: none !important;
+    transition: none;
+  }
+  .wipu-sample-tl-stop {
+    flex: 0 0 auto;
+    width: 100%;
+    padding: 48px 24px;
+  }
+  .wipu-sample-tl-figure {
+    transform: none;
+    opacity: 1;
+  }
+  .wipu-sample-tl-images {
+    flex-direction: column;
+    max-height: none;
+    gap: 16px;
+  }
+  .wipu-sample-tl-images img.wipu-sample-tl-image {
+    max-height: none;
+  }
+  .wipu-sample-tl-anno-svg { display: none; }
+  .wipu-sample-tl-anno-arrow { display: none; }
+  .wipu-sample-tl-anno {
+    position: static;
+    opacity: 1;
+    transform: none;
+    width: 100%;
+    margin-top: 16px;
+  }
+  .wipu-sample-tl-progress { display: none; }
+}
+
+/* Design explorations — wonky dense grid, mixed tile sizes.
+   Mirrors the language of the archive (creator) and media (05/06)
+   slides: rounded-corner placeholders flowing into an irregular
+   composition rather than a uniform 3×3 contact sheet. */
+.wipu-sample-explore {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-auto-rows: minmax(120px, 14svh);
+  grid-auto-flow: dense;
+  gap: 14px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.wipu-sample-explore-tile {
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+  grid-column: span 2;
+  grid-row: span 1;
+}
+.wipu-sample-explore-1x1 { grid-column: span 2; grid-row: span 1; }
+.wipu-sample-explore-2x1 { grid-column: span 4; grid-row: span 1; }
+.wipu-sample-explore-1x2 { grid-column: span 2; grid-row: span 2; }
+.wipu-sample-explore-2x2 { grid-column: span 4; grid-row: span 2; }
+.wipu-sample-explore-tile[data-tint="terracotta"] {
+  background: linear-gradient(135deg, #7a2e15 0%, #1f1410 100%);
+}
+.wipu-sample-explore-tile[data-tint="mint"] {
+  background: linear-gradient(135deg, #0f3a28 0%, #101b18 100%);
+}
+.wipu-sample-explore-tile[data-tint="mustard"] {
+  background: linear-gradient(135deg, #5a4410 0%, #1e1c12 100%);
+}
+.wipu-sample-explore-tile[data-tint="rose"] {
+  background: linear-gradient(135deg, #3e1c20 0%, #1a1010 100%);
+}
+.wipu-sample-explore-tile[data-tint="navy"] {
+  background: linear-gradient(135deg, #132060 0%, #0c0f1e 100%);
+}
+
+/* 05b morph cluster styles live in
+   app/_deck/slides/text-image/text-image.css so both the templates
+   showcase and the home-deck AI Native slide pick them up. */
+
+/* Hero metric */
+.wipu-sample-heroMetric {
+  text-align: center;
+}
+.wipu-sample-heroMetric-n {
+  font-size: clamp(120px, 18vw, 280px);
+  font-weight: 300;
+  letter-spacing: -0.04em;
+  line-height: 0.9;
+  color: var(--wipu-terracotta);
+  display: block;
+  margin-bottom: 24px;
+}
+.wipu-sample-heroMetric-lbl {
+  font-size: 18px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--wipu-ink);
+  margin-bottom: 16px;
+}
+.wipu-sample-heroMetric-note {
+  max-width: 50ch;
+  margin: 24px auto 0;
+  font-size: 14px;
+  color: var(--wipu-ink-dim);
+  line-height: 1.55;
+}
+
+/* SVG stroke-only hero metric — the glyph outlines draw on via
+   stroke-dashoffset, never filled. Mono face for the ASCII-adjacent
+   line-art feel. The component bumps a key on viewport entry to
+   remount the SVG and replay the animation. */
+.wipu-sample-heroMetric-svg {
+  display: block;
+  width: 100%;
+  max-width: min(1100px, 92vw);
+  height: auto;
+  /* Tight gap to the label below — pulls the subtitle in close to the
+     number so the stack doesn't feel bottom-heavy. */
+  margin: 0 auto 12px;
+  color: var(--wipu-terracotta);
+  overflow: visible;
+  /* Hide until measurement settles to avoid a flash of mis-sized text. */
+  opacity: 0;
+  transition: opacity 200ms ease-out;
+}
+.wipu-sample-heroMetric-svg[data-ready="true"] {
+  opacity: 1;
+}
+.wipu-sample-heroMetric-svg-text {
+  font-family: var(--wipu-mono), ui-monospace, SFMono-Regular, monospace;
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  /* Heuristic dasharray — large enough to cover the combined glyph
+     paths for short metric strings ("20–30%", "+13%", etc.). */
+  stroke-dasharray: 4000;
+  stroke-dashoffset: 4000;
+  animation: wipu-stroke-draw 2.6s cubic-bezier(0.4, 0.6, 0.2, 1) 250ms
+    forwards;
+}
+@keyframes wipu-stroke-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wipu-sample-heroMetric-svg-text {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Metrics collection */
+.wipu-sample-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(24px, 3vw, 40px);
+  text-align: left;
+  max-width: min(1080px, 92vw);
+  margin: 0 auto;
+}
+.wipu-sample-metrics-title {
+  grid-column: 1 / -1;
+  font-size: clamp(20px, 2.4vw, 32px);
+  font-weight: 500;
+  margin: 0 0 16px;
+}
+.wipu-sample-metric-n {
+  font-size: clamp(48px, 6.4vw, 96px);
+  font-weight: 300;
+  letter-spacing: -0.03em;
+  line-height: 0.95;
+  display: block;
+  margin-bottom: 10px;
+}
+.wipu-sample-metric-n[data-tone="terracotta"] { color: var(--wipu-terracotta); }
+.wipu-sample-metric-n[data-tone="mint"] { color: var(--wipu-mint); }
+.wipu-sample-metric-n[data-tone="mustard"] { color: var(--wipu-mustard); }
+.wipu-sample-metric-n[data-tone="rose"] { color: var(--wipu-rose); }
+.wipu-sample-metric-n[data-tone="navy"] { color: var(--wipu-navy); }
+.wipu-sample-metric-lbl {
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--wipu-ink-dim);
+  line-height: 1.4;
+}
+
+/* Variable-column metrics. Default stays at 3-up so existing slides
+   don't shift; opt in to 4 / 5 / auto via data-cols on the container. */
+.wipu-sample-metrics[data-cols="4"] {
+  grid-template-columns: repeat(4, 1fr);
+}
+.wipu-sample-metrics[data-cols="5"] {
+  grid-template-columns: repeat(5, 1fr);
+}
+.wipu-sample-metrics[data-cols="auto"] {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+.wipu-sample-metrics[data-cols="4"] .wipu-sample-metric-n,
+.wipu-sample-metrics[data-cols="5"] .wipu-sample-metric-n {
+  font-size: clamp(40px, 5vw, 72px);
+}
+@media (max-width: 880px) {
+  .wipu-sample-metrics[data-cols="4"],
+  .wipu-sample-metrics[data-cols="5"] {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Closing tagline beneath a metrics block — qualitative complement to
+   the numeric stats (e.g. "Veo drives Gemini subscriptions"). */
+.wipu-sample-metrics-tagline {
+  grid-column: 1 / -1;
+  margin: clamp(16px, 2vw, 24px) 0 0;
+  padding: clamp(16px, 2vw, 24px) 0 0;
+  border-top: 1px solid var(--wipu-rule);
+  font-size: clamp(15px, 1.4vw, 19px);
+  line-height: 1.55;
+  color: var(--wipu-ink);
+  max-width: 60ch;
+}
+
+/* Press wall — 2x2 grid of quote cards. Each card is paper-feel: tinted
+   surface, hairline border, monospace quote, uppercase attribution. */
+.wipu-sample-press {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: clamp(20px, 2.4vw, 36px);
+  width: 100%;
+  max-width: min(1100px, 92vw);
+  margin: 0 auto;
+  text-align: left;
+}
+.wipu-sample-press-title {
+  grid-column: 1 / -1;
+  font-size: clamp(20px, 2.4vw, 32px);
+  font-weight: 500;
+  margin: 0 0 8px;
+}
+.wipu-sample-press-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: clamp(20px, 2vw, 28px);
+  background: var(--wipu-bg-elev);
+  border: 1px solid var(--wipu-rule);
+  border-radius: var(--wipu-frame-radius);
+}
+.wipu-sample-press-q {
+  font-family: var(--wipu-mono);
+  font-size: clamp(15px, 1.3vw, 18px);
+  line-height: 1.5;
+  color: var(--wipu-ink);
+  margin: 0;
+}
+.wipu-sample-press-q::before {
+  content: "\201C";
+  margin-right: 0.05em;
+}
+.wipu-sample-press-q::after {
+  content: "\201D";
+  margin-left: 0.05em;
+}
+.wipu-sample-press-attr {
+  font-family: var(--wipu-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--wipu-ink-faint);
+  margin: 0;
+}
+@media (max-width: 760px) {
+  .wipu-sample-press {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Section heading rendered above a template (e.g. ThreeUp) when the
+   slide needs an explicit title the template itself doesn't emit. */
+.wipu-sample-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(28px, 3vw, 44px);
+}
+.wipu-sample-section-title {
+  font-family: var(--wipu-mono);
+  font-size: clamp(22px, 2.6vw, 36px);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--wipu-ink);
+  margin: 0;
+  text-align: center;
+  max-width: min(960px, 80vw);
+}
+
+/* Prototype — full-bleed embed of the real /prototypes/<slug> page.
+   Self-contained slide: no inset, no border, no shadow — the prototype
+   IS the slide. Sample/preview wrappers are bypassed via SELF_CONTAINED. */
+.wipu-sample-proto {
+  display: block;
+  width: 100%;
+  height: 100svh;
+  margin: 0;
+  padding: 0;
+  background: var(--wipu-bg);
+  scroll-snap-align: start;
+}
+.wipu-sample-proto-iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+/* Force-dark slides: redeclare the dark token set on the section itself
+   so it renders dark regardless of the root theme. Mirrors the dark block
+   on .wipu-root in theme.css. Used for slide 13 (Video Embed) where the
+   ambient glow + saturated palette read better against ink. */
+.wipu-sample-slide[data-theme="dark"],
+.wipu-preview-slide[data-theme="dark"] {
+  --wipu-bg: #000000;
+  --wipu-bg-elev: #0f0f12;
+  --wipu-ink: #f2efe6;
+  --wipu-ink-dim: #9a9690;
+  --wipu-ink-faint: #5a5650;
+  --wipu-rule: #1e1e22;
+  --wipu-rule-strong: #2d2d33;
+  background: var(--wipu-bg);
+  color: var(--wipu-ink);
+  transition: background-color 240ms ease, color 240ms ease;
+}
+
+/* Video embed — centered 16:9 YouTube iframe with hue-sync ambient glow.
+   The glow is the blurred YouTube thumbnail scaled slightly larger than
+   the frame, sitting behind it. Static (live frame sampling is blocked by
+   YouTube's cross-origin iframe), but tracks the video's dominant colors
+   well enough to feel ambient. */
+.wipu-sample-video {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  width: 100%;
+  margin: 0;
+}
+.wipu-sample-video-stage {
+  position: relative;
+  width: min(100%, 1040px);
+  aspect-ratio: 16 / 9;
+  isolation: isolate;
+}
+.wipu-sample-video-glow {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  /* Initial values — overridden every rAF tick by VideoEmbedSlide for
+     ambient drift + audio-shaped pulse. Honors reduced-motion: when set,
+     JS skips the loop and these static values stand. Centered (no Y bias)
+     so the glow emits symmetrically from top and bottom. */
+  filter: blur(112px) saturate(1.5);
+  opacity: 0.5;
+  transform: scale(1.18) translate(0, 5%);
+  border-radius: 22px;
+  z-index: -1;
+  pointer-events: none;
+}
+.wipu-sample-video-frame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 22px;
+  overflow: hidden;
+  /* Black fill behind the iframe — holds shape before YouTube paints
+     and avoids a Y-biased drop shadow (the ambient glow is the lift). */
+  background: #000;
+}
+.wipu-sample-video-iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+.wipu-sample-video-title {
+  text-align: center;
+  font-size: clamp(15px, 1.4vw, 18px);
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--wipu-ink);
+  max-width: 48ch;
+}
+
+/* Vertical variant — 9:16 frame for YouTube Shorts and other portrait
+   media. Width derived from svh so a 9:16 frame stays within the viewport
+   height (height = width * 16/9; constrained ≤ 80svh). */
+.wipu-sample-video.is-vertical .wipu-sample-video-stage {
+  width: min(420px, 70vw, 45svh);
+  aspect-ratio: 9 / 16;
+}
+
+/* Share embed — reuses the video frame chrome to wrap a clickable
+   link tile when the target page (e.g. gemini.google.com) blocks
+   iframe embedding via x-frame-options. */
+.wipu-share-embed-link {
+  position: relative;
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  outline: none;
+}
+.wipu-share-embed-cover {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  user-select: none;
+  transition: transform 480ms cubic-bezier(0.22, 0.8, 0.2, 1),
+    filter 320ms ease;
+  filter: brightness(0.78) saturate(1.05);
+}
+.wipu-share-embed-cta {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(16px, 4%, 28px);
+  transform: translateX(-50%);
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--wipu-bg) 72%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid color-mix(in srgb, var(--wipu-ink) 22%, transparent);
+  color: var(--wipu-ink);
+  font-family: var(--wipu-mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  transition: transform 220ms cubic-bezier(0.22, 0.8, 0.2, 1),
+    background 220ms ease, border-color 220ms ease;
+}
+.wipu-share-embed-link:hover .wipu-share-embed-cover {
+  transform: scale(1.02);
+  filter: brightness(0.9) saturate(1.12);
+}
+.wipu-share-embed-link:hover .wipu-share-embed-cta {
+  transform: translateX(-50%) translateY(-2px);
+  background: var(--wipu-bg);
+  border-color: var(--wipu-ink-dim);
+}
+.wipu-share-embed-link:focus-visible .wipu-share-embed-cta {
+  border-color: var(--wipu-ink);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--wipu-ink) 22%, transparent);
+}
+@media (prefers-reduced-motion: reduce) {
+  .wipu-share-embed-cover,
+  .wipu-share-embed-cta {
+    transition: none;
+  }
+  .wipu-share-embed-link:hover .wipu-share-embed-cover {
+    transform: none;
+  }
+  .wipu-share-embed-link:hover .wipu-share-embed-cta {
+    transform: translateX(-50%);
+  }
+}
+
+/* Archive gallery */
+.wipu-sample-archive {
+  text-align: center;
+}
+.wipu-sample-archive-trigger {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 28px;
+  background: none;
+  border: 1px dashed var(--wipu-rule-strong);
+  border-radius: 12px;
+  color: var(--wipu-ink);
+  cursor: pointer;
+  font-family: var(--wipu-mono);
+  transition: transform 220ms ease, border-color 220ms ease;
+}
+.wipu-sample-archive-trigger:hover {
+  transform: translateY(-4px);
+  border-color: var(--wipu-mustard);
+}
+.wipu-sample-archive-icon {
+  font-size: 56px;
+}
+.wipu-sample-archive-lbl {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--wipu-ink-dim);
+}
+.wipu-sample-archive-caption {
+  margin-top: 32px;
+  font-size: 13px;
+  color: var(--wipu-ink-faint);
+}
+
+/* Back link */
+.wipu-sample-back {
+  display: block;
+  text-align: center;
+  padding: 48px 24px 64px;
+  font-family: var(--wipu-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--wipu-ink-dim);
+  text-decoration: none;
+}
+.wipu-sample-back:hover { color: var(--wipu-ink); }
+
+@media (max-width: 900px) {
+  .wipu-sample-info-grid,
+  .wipu-sample-metrics,
+  .wipu-sample-explore {
+    grid-template-columns: 1fr;
+  }
+}

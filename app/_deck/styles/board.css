@@ -1,0 +1,2665 @@
+/* whatispeterupto — slide-style sections inspired by the reference deck. */
+
+/* ——— RESETS & SKIP ——— */
+.wipu-skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--wipu-ink);
+  color: var(--wipu-bg);
+  padding: 10px 14px;
+  z-index: 100;
+}
+.wipu-skip:focus { left: 12px; top: 12px; }
+
+.wipu-main {
+  position: relative;
+  /* Transparent so the fixed .wipu-scene-bg dot grid shows through */
+  background: transparent;
+}
+/* Root supplies the actual color under everything */
+.wipu-root { background: var(--wipu-bg); }
+
+/* Global fixed dot grid living behind every slide. The inner .wipu-scene-bg-grid
+   gets a parallax transform applied by SceneEffects (subtle — rate 0.025). */
+.wipu-scene-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+.wipu-scene-bg-grid {
+  position: absolute;
+  /* Slightly oversize so parallax translation never shows the edge */
+  left: -40px;
+  right: -40px;
+  top: -120px;
+  bottom: -120px;
+  background-image: radial-gradient(
+    color-mix(in srgb, var(--wipu-ink) 10%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: 18px 18px;
+  will-change: transform;
+}
+
+.wipu-slide > * { position: relative; z-index: 1; }
+
+/* ——— REVEAL ON ENTER ———
+   Anything with [data-reveal] fades + rises on entry. Individual elements,
+   not whole slides, so text flows reveal in sequence as you scroll. */
+[data-reveal] {
+  opacity: 0;
+  transform: translate3d(0, 24px, 0);
+  transition:
+    opacity 760ms cubic-bezier(0.22, 0.8, 0.2, 1),
+    transform 880ms cubic-bezier(0.22, 0.8, 0.2, 1);
+}
+[data-reveal].is-revealed {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+[data-reveal][data-reveal-delay="1"] { transition-delay: 80ms; }
+[data-reveal][data-reveal-delay="2"] { transition-delay: 160ms; }
+[data-reveal][data-reveal-delay="3"] { transition-delay: 240ms; }
+
+/* Parallax-transformed elements need room for the transform without shifting
+   surrounding layout: JS applies translate3d, so we don't set transition. */
+[data-parallax] { will-change: transform; }
+
+/* ——— SLIDE (full-viewport presentation frame) ——— */
+.wipu-slide {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 96px clamp(24px, 5vw, 96px);
+  overflow: hidden;
+}
+
+/* Every slide shows a tiny label top-left (reference pattern) */
+.wipu-slide-label {
+  position: absolute;
+  top: 72px;
+  left: clamp(24px, 5vw, 96px);
+  font-family: var(--wipu-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  z-index: 2;
+}
+
+.wipu-slide-inner {
+  position: relative;
+  width: 100%;
+  max-width: 1080px;
+  z-index: 1;
+}
+
+/* Full-bleed color-block slides override bg + text color */
+.wipu-slide-terracotta { background: var(--wipu-terracotta); color: var(--wipu-terracotta-ink); }
+.wipu-slide-mint       { background: var(--wipu-mint);       color: var(--wipu-mint-ink); }
+.wipu-slide-mustard    { background: var(--wipu-mustard);    color: var(--wipu-mustard-ink); }
+.wipu-slide-rose       { background: var(--wipu-rose);       color: var(--wipu-rose-ink); }
+.wipu-slide-navy       { background: var(--wipu-navy);       color: var(--wipu-navy-ink); }
+
+/* ——— SLIDE 1: HERO (ref img 5 — 🍫 Hi, I'm Peter Hershey) ——— */
+.wipu-hero {
+  text-align: center;
+}
+.wipu-hero-row {
+  font-family: var(--wipu-mono);
+  font-size: clamp(26px, 4.2vw, 44px);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+  margin: 0;
+}
+.wipu-hero-row .wipu-hero-emoji {
+  display: inline-block;
+  font-size: 0.8em;
+  transform: rotate(-14deg);
+  margin-right: 14px;
+  vertical-align: -0.1em;
+}
+.wipu-hero-row .wipu-hero-greet {
+  color: var(--wipu-ink-dim);
+}
+.wipu-hero-name-big {
+  display: block;
+  font-weight: 600;
+  font-size: clamp(34px, 6vw, 72px);
+  letter-spacing: -0.02em;
+  margin-top: 6px;
+}
+.wipu-hero-scroll {
+  margin-top: 96px;
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--wipu-ink-faint);
+  animation: wipu-bob 2.4s ease-in-out infinite;
+}
+@keyframes wipu-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(8px); }
+}
+
+/* ——— LONG-FORM SLIDE COMPOSITIONS ——— */
+
+/* Two-column slide layout: title left, body right. Used for creator/DC/invitation. */
+.wipu-layout-twocol {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  gap: clamp(32px, 5vw, 80px);
+  align-items: start;
+}
+@media (max-width: 800px) {
+  .wipu-layout-twocol { grid-template-columns: 1fr; gap: 32px; }
+}
+
+.wipu-longform-title {
+  font-family: var(--wipu-mono);
+  font-weight: 600;
+  font-size: clamp(32px, 5vw, 56px);
+  letter-spacing: -0.025em;
+  line-height: 1.0;
+  margin: 0 0 28px;
+  white-space: pre-line;
+}
+.wipu-longform-title em {
+  font-style: normal;
+  text-decoration: underline;
+  text-decoration-color: var(--wipu-emph);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 6px;
+}
+.wipu-longform-kicker {
+  font-family: var(--wipu-mono);
+  font-size: clamp(16px, 1.8vw, 20px);
+  line-height: 1.4;
+  color: var(--wipu-ink-dim);
+  max-width: 520px;
+  margin: 0 0 28px;
+  font-style: italic;
+  letter-spacing: -0.005em;
+}
+.wipu-longform-body {
+  font-family: var(--wipu-mono);
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--wipu-ink);
+  max-width: 540px;
+}
+.wipu-longform-body p { margin: 0 0 14px; }
+.wipu-longform-body p:last-child { margin: 0; }
+
+/* Pull-moment: giant thin number + small label. Light weight so the size breathes. */
+.wipu-pullnum {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  margin: 0 0 32px;
+}
+.wipu-pullnum-n {
+  font-family: var(--wipu-mono);
+  font-weight: 300;
+  font-size: clamp(72px, 14vw, 180px);
+  letter-spacing: -0.045em;
+  line-height: 0.86;
+  color: var(--wipu-mint);
+}
+.wipu-pullnum-lbl {
+  font-family: var(--wipu-mono);
+  font-size: clamp(14px, 1.6vw, 16px);
+  line-height: 1.35;
+  letter-spacing: 0.02em;
+  color: var(--wipu-ink-dim);
+  padding-bottom: 18px;
+}
+
+/* ——— PACED STATS SCATTER ——— */
+/* Multiple pull-stats composed with varied x-offset + rotation,
+   not a grid. Use [data-indent] on each .wipu-stat to push the row. */
+.wipu-stats-scatter {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(20px, 3.5vw, 40px);
+  margin: 56px 0 0;
+}
+.wipu-stat {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 16px;
+  width: fit-content;
+  max-width: 100%;
+}
+.wipu-stat[data-indent="1"] { margin-left: 8%; }
+.wipu-stat[data-indent="2"] { margin-left: 22%; }
+.wipu-stat[data-indent="3"] { margin-left: 4%; }
+.wipu-stat[data-indent="4"] { margin-left: 18%; }
+@media (max-width: 720px) {
+  .wipu-stat[data-indent] { margin-left: 0; }
+}
+.wipu-stat-n {
+  font-family: var(--wipu-mono);
+  font-weight: 300;
+  font-size: clamp(56px, 9vw, 128px);
+  letter-spacing: -0.045em;
+  line-height: 0.86;
+  color: var(--wipu-ink);
+}
+.wipu-stat-lbl {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-bottom: clamp(8px, 1vw, 14px);
+  max-width: 240px;
+}
+.wipu-stat-lbl-pri {
+  font-family: var(--wipu-mono);
+  font-size: clamp(13px, 1.2vw, 15px);
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  line-height: 1.3;
+  color: var(--wipu-ink);
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 4px;
+  text-decoration-color: currentColor;
+}
+.wipu-stat-lbl-sub {
+  font-family: var(--wipu-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--wipu-ink-dim);
+}
+.wipu-stat[data-accent="mint"]       .wipu-stat-n { color: var(--wipu-mint); }
+.wipu-stat[data-accent="mustard"]    .wipu-stat-n { color: var(--wipu-mustard); }
+.wipu-stat[data-accent="terracotta"] .wipu-stat-n { color: var(--wipu-terracotta); }
+.wipu-stat[data-accent="rose"]       .wipu-stat-n { color: var(--wipu-rose); }
+.wipu-stat[data-accent="navy"]       .wipu-stat-n { color: var(--wipu-navy); }
+
+/* ——— DC LOGO WALL (smaller, inline with copy) ——— */
+.wipu-logo-strip {
+  margin-top: 44px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 40px 56px;
+  padding-top: 28px;
+  border-top: 1px dashed var(--wipu-rule-strong);
+}
+.wipu-logo-strip .wipu-logo { font-size: 20px; }
+.wipu-logo-strip .wipu-logo-serif { font-size: 22px; }
+
+/* ——— INVITATION FOOTNOTE ——— */
+.wipu-footnote {
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px dashed var(--wipu-rule-strong);
+  font-family: var(--wipu-mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--wipu-ink-dim);
+  max-width: 540px;
+}
+
+/* (archive-foot removed — folder now lives in its own full-bleed band) */
+
+/* ——— OLD SLIDE 2 BOARD (unused now, but keep compatibility) ——— */
+
+.wipu-board-slide {
+  min-height: 140vh;
+  padding-top: 120px;
+  padding-bottom: 120px;
+}
+/* Board slide uses the global dot grid via ::after — no duplicate bg here. */
+
+.wipu-board-head {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-bottom: 48px;
+}
+.wipu-board-title {
+  font-family: var(--wipu-mono);
+  font-weight: 600;
+  font-size: clamp(30px, 4.2vw, 48px);
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  margin: 0;
+  max-width: 620px;
+}
+.wipu-board-title em {
+  font-style: normal;
+  text-decoration: underline;
+  text-decoration-color: var(--wipu-emph);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 6px;
+}
+
+.wipu-board-cluster {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+/* Sticky notes on the cluster */
+.wipu-note {
+  position: absolute;
+  padding: 14px 16px;
+  border-radius: var(--wipu-note-radius);
+  font-family: var(--wipu-mono);
+  font-size: 13px;
+  line-height: 1.4;
+  max-width: 240px;
+  min-width: 120px;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.28), 0 2px 0 rgba(0, 0, 0, 0.18);
+  transform-origin: center;
+}
+.wipu-note.is-lg { font-size: 16px; max-width: 340px; padding: 18px 20px; }
+.wipu-note.is-sm { font-size: 36px; padding: 8px 14px; font-weight: 600; }
+
+.wipu-note-kicker {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0.65;
+  margin-bottom: 6px;
+}
+.wipu-note-sub {
+  display: block;
+  margin-top: 6px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  opacity: 0.7;
+}
+
+/* Callout pill (ref img pattern: colored pill → dashed arrow → target) */
+.wipu-callout {
+  position: absolute;
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-family: var(--wipu-mono);
+  font-size: 12px;
+  line-height: 1.3;
+  font-weight: 500;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.24);
+  letter-spacing: 0.02em;
+  max-width: 260px;
+}
+.wipu-callout .wipu-note-kicker {
+  color: currentColor;
+  opacity: 0.7;
+  margin-bottom: 3px;
+  font-size: 9px;
+}
+
+/* Quote card */
+.wipu-quote {
+  position: absolute;
+  padding: 20px 22px;
+  border-radius: 6px;
+  font-family: var(--wipu-mono);
+  font-size: 15px;
+  line-height: 1.5;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.3), 0 3px 0 rgba(0, 0, 0, 0.2);
+  max-width: 320px;
+}
+.wipu-quote.is-lg {
+  font-size: 20px;
+  max-width: 460px;
+  padding: 26px 30px;
+}
+.wipu-quote em {
+  font-style: normal;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+/* Board arrows */
+.wipu-board-arrows {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+.wipu-board-arrows path {
+  stroke: var(--wipu-ink-faint);
+  stroke-width: 1.25;
+  stroke-dasharray: 4 6;
+  fill: none;
+}
+.wipu-board-arrows .head {
+  stroke: var(--wipu-ink-faint);
+  stroke-width: 1.25;
+  fill: none;
+}
+
+/* "Explore the board" CTA */
+.wipu-board-foot {
+  position: relative;
+  z-index: 2;
+  margin-top: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+}
+
+.wipu-btn {
+  all: unset;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 22px;
+  border: 1.5px solid currentColor;
+  border-radius: 999px;
+  font-family: var(--wipu-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  transition: background 160ms ease, transform 160ms ease;
+}
+.wipu-btn:hover { background: color-mix(in srgb, currentColor 12%, transparent); transform: translateX(3px); }
+.wipu-btn:focus-visible { outline: 2px solid var(--wipu-emph); outline-offset: 4px; }
+.wipu-btn.is-solid {
+  border-color: var(--wipu-ink);
+  background: var(--wipu-ink);
+  color: var(--wipu-bg);
+}
+.wipu-btn.is-solid:hover { transform: translateX(3px); }
+
+/* ——— SLIDE 3: AGENDA (ref img 8) ——— */
+.wipu-agenda-title {
+  font-family: var(--wipu-mono);
+  font-weight: 600;
+  font-size: clamp(28px, 3.6vw, 40px);
+  letter-spacing: -0.02em;
+  margin: 0 0 56px;
+  max-width: 700px;
+  line-height: 1.1;
+}
+.wipu-agenda-title em {
+  font-style: normal;
+  text-decoration: underline;
+  text-decoration-color: var(--wipu-emph);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 6px;
+}
+.wipu-agenda-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+.wipu-agenda-item {
+  display: grid;
+  grid-template-columns: 54px 1fr;
+  align-items: baseline;
+  gap: 28px;
+}
+.wipu-agenda-num {
+  font-family: var(--wipu-mono);
+  font-weight: 600;
+  font-size: clamp(36px, 4.2vw, 52px);
+  color: var(--wipu-mustard);
+  letter-spacing: -0.02em;
+}
+.wipu-agenda-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.wipu-agenda-body-title {
+  font-family: var(--wipu-mono);
+  font-size: clamp(24px, 3vw, 36px);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+.wipu-agenda-body-sub {
+  font-family: var(--wipu-mono);
+  font-size: 14px;
+  color: var(--wipu-ink-dim);
+  margin: 0;
+}
+
+/* ——— SLIDE 4: LOGO WALL (ref img 19) ——— */
+.wipu-logowall-title {
+  text-align: center;
+  font-family: var(--wipu-mono);
+  font-weight: 500;
+  font-size: clamp(18px, 2.2vw, 22px);
+  letter-spacing: 0.02em;
+  margin: 0 0 64px;
+  color: var(--wipu-ink-dim);
+}
+.wipu-logowall-title em {
+  font-style: normal;
+  color: var(--wipu-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--wipu-emph);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 6px;
+}
+.wipu-logowall {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 48px 56px;
+  max-width: 860px;
+  margin: 0 auto;
+  align-items: center;
+  justify-items: center;
+}
+@media (max-width: 720px) {
+  .wipu-logowall { grid-template-columns: repeat(2, 1fr); gap: 40px 32px; }
+}
+.wipu-logo {
+  font-family: var(--wipu-mono);
+  font-weight: 500;
+  color: var(--wipu-ink);
+  opacity: 0.85;
+  transition: opacity 160ms ease;
+  font-size: 22px;
+  text-align: center;
+  letter-spacing: -0.01em;
+}
+.wipu-logo:hover { opacity: 1; }
+.wipu-logo-serif {
+  font-family: "Iowan Old Style", "Georgia", serif;
+  font-size: 26px;
+  font-style: italic;
+  font-weight: 500;
+}
+
+/* ——— SLIDE 5: LIFE (mustard background) ——— */
+.wipu-life {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 64px;
+  align-items: start;
+}
+@media (max-width: 800px) { .wipu-life { grid-template-columns: 1fr; gap: 40px; } }
+.wipu-life-title {
+  font-family: var(--wipu-mono);
+  font-weight: 600;
+  font-size: clamp(36px, 5vw, 60px);
+  letter-spacing: -0.03em;
+  line-height: 1.0;
+  margin: 0;
+}
+.wipu-life-title em {
+  font-style: normal;
+  text-decoration: underline;
+  text-decoration-color: var(--wipu-navy);
+  text-decoration-thickness: 3px;
+  text-underline-offset: 8px;
+}
+.wipu-life-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-family: var(--wipu-mono);
+  font-size: clamp(16px, 1.8vw, 20px);
+  line-height: 1.4;
+}
+.wipu-life-list li {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.wipu-life-emoji {
+  font-size: 24px;
+  display: inline-block;
+  width: 32px;
+  text-align: center;
+}
+.wipu-life-kicker {
+  font-family: var(--wipu-mono);
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 1.5;
+  padding: 16px 20px;
+  background: color-mix(in srgb, currentColor 90%, transparent);
+  color: var(--wipu-mustard);
+  border-radius: 4px;
+  max-width: 420px;
+}
+
+/* ——— CTA SLIDE ——— */
+.wipu-cta {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+}
+.wipu-cta-title {
+  font-family: var(--wipu-mono);
+  font-weight: 600;
+  font-size: clamp(48px, 8vw, 120px);
+  letter-spacing: -0.04em;
+  line-height: 0.9;
+  margin: 0;
+}
+.wipu-cta-email {
+  font-family: var(--wipu-mono);
+  font-size: clamp(18px, 2vw, 22px);
+  text-decoration: underline;
+  text-decoration-color: var(--wipu-emph);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 6px;
+}
+.wipu-cta-links {
+  display: flex;
+  gap: 24px;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.wipu-cta-links a { color: var(--wipu-ink-dim); }
+.wipu-cta-links a:hover { color: var(--wipu-ink); }
+
+/* ——— CASE STUDIES (6, 7) ——— */
+.wipu-cases {
+  padding: 0 clamp(24px, 5vw, 96px) 140px;
+  display: flex;
+  justify-content: center;
+}
+.wipu-cases-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  max-width: 1280px;
+  width: 100%;
+}
+@media (max-width: 800px) { .wipu-cases-grid { grid-template-columns: 1fr; } }
+.wipu-case {
+  position: relative;
+  border-radius: 14px;
+  padding: 44px;
+  min-height: 520px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 200ms ease, box-shadow 200ms ease;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.35);
+}
+.wipu-case:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 32px 64px rgba(0, 0, 0, 0.45);
+}
+.wipu-case-label {
+  font-family: var(--wipu-mono);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  opacity: 0.8;
+  margin: 0 0 20px;
+}
+.wipu-case-title {
+  font-family: var(--wipu-mono);
+  font-weight: 600;
+  font-size: clamp(26px, 3vw, 34px);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin: 0 0 14px;
+  max-width: 340px;
+}
+.wipu-case-blurb {
+  font-family: var(--wipu-mono);
+  font-size: 14px;
+  line-height: 1.55;
+  max-width: 360px;
+  margin: 0 0 28px;
+  opacity: 0.85;
+}
+
+/* Mid-fi phone mock inside case card (ref img pattern) */
+.wipu-phone {
+  position: absolute;
+  right: -30px;
+  bottom: -60px;
+  width: 220px;
+  height: 420px;
+  border: 2px solid currentColor;
+  border-radius: 28px;
+  padding: 14px 12px;
+  transform: rotate(6deg);
+  opacity: 0.9;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.wipu-phone-bar {
+  height: 12px;
+  border-radius: 2px;
+  background: color-mix(in srgb, currentColor 20%, transparent);
+}
+.wipu-phone-bar.is-full { height: 60px; }
+.wipu-phone-bar.is-accent { background: currentColor; opacity: 0.85; }
+
+.wipu-case .wipu-btn {
+  position: relative;
+  z-index: 2;
+}
+
+/* Callout label on case (pill pointing at the phone) */
+.wipu-case-callout {
+  position: absolute;
+  top: 44px;
+  right: 44px;
+  padding: 6px 14px;
+  background: var(--wipu-ink);
+  color: var(--wipu-bg);
+  font-family: var(--wipu-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  border-radius: 999px;
+  transform: rotate(6deg);
+}
+
+/* ——— IMAGE BAND (full-bleed image lead-in between sections) ——— */
+.wipu-image-band {
+  position: relative;
+  width: 100%;
+  padding: clamp(80px, 12vw, 140px) clamp(24px, 5vw, 96px);
+  display: flex;
+  justify-content: center;
+}
+.wipu-image-frame {
+  position: relative;
+  margin: 0;
+  width: 100%;
+  max-width: 1080px;
+  background: #f5f0e4;
+  padding: 14px 14px 0;
+  border-radius: 2px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.45), 0 4px 0 rgba(0, 0, 0, 0.2);
+  transform: rotate(-0.6deg);
+}
+.wipu-image-frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 1px;
+}
+.wipu-image-cap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 6px 18px;
+  font-family: var(--wipu-mono);
+  color: #15150f;
+  font-size: 12px;
+}
+.wipu-image-kicker {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+
+/* ——— ARCHIVE BAND (full-bleed blue section holding the folder) ——— */
+.wipu-archive-band {
+  position: relative;
+  width: 100%;
+  background: var(--wipu-navy);
+  color: var(--wipu-navy-ink);
+  padding: clamp(96px, 14vw, 180px) 24px clamp(120px, 16vw, 200px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.wipu-archive-band::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(
+    color-mix(in srgb, var(--wipu-navy-ink) 10%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: 18px 18px;
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+/* ——— FOLDER (idle entry point) ——— */
+.wipu-folder {
+  all: unset;
+  cursor: pointer;
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  transition: transform 280ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  z-index: 1;
+}
+.wipu-folder:hover { transform: translateY(-4px); }
+.wipu-folder:focus-visible {
+  outline: 2px solid var(--wipu-terracotta);
+  outline-offset: 10px;
+}
+.wipu-folder.is-hidden { visibility: hidden; pointer-events: none; }
+
+.wipu-folder-icon {
+  position: relative;
+  width: clamp(150px, 14vw, 190px);
+  height: clamp(118px, 11vw, 150px);
+  filter: drop-shadow(0 16px 32px rgba(0, 0, 0, 0.25));
+}
+
+/* Back body (sits behind tab & front) */
+.wipu-folder-back {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 18%;
+  bottom: 0;
+  background: var(--wipu-mustard);
+  border-radius: 10px 10px 14px 14px;
+}
+
+/* Terracotta tab on top-left */
+.wipu-folder-tab {
+  position: absolute;
+  top: 0;
+  left: 10%;
+  width: 40%;
+  height: 28%;
+  background: var(--wipu-terracotta);
+  border-radius: 6px 0 0 0;
+  clip-path: polygon(0 0, 86% 0, 100% 100%, 0 100%);
+  transform-origin: 0% 100%;
+  transition: transform 360ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Paper sheets peeking out (behind the front lip, in front of the back body) */
+.wipu-folder-paper {
+  position: absolute;
+  width: 60%;
+  left: 20%;
+  top: 22%;
+  height: 54%;
+  border-radius: 2px;
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+  transition: transform 360ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.wipu-folder-paper--a {
+  background: #f5f0e4;
+  transform: translate(-6%, -24%) rotate(-5deg);
+  z-index: 1;
+}
+.wipu-folder-paper--b {
+  background: var(--wipu-mint);
+  transform: translate(8%, -16%) rotate(4deg);
+  z-index: 1;
+}
+
+/* Front lip — slightly shaded mustard, in front of papers */
+.wipu-folder-front {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 28%;
+  bottom: 0;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--wipu-mustard) 92%, #000) 0%,
+    var(--wipu-mustard) 20%
+  );
+  border-radius: 6px 6px 14px 14px;
+  z-index: 2;
+  transform-origin: 50% 100%;
+  transition: transform 360ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Hover: tab peels, front lifts a hair, papers poke out more */
+.wipu-folder:hover .wipu-folder-tab    { transform: rotate(-6deg); }
+.wipu-folder:hover .wipu-folder-front  { transform: translateY(3%); }
+.wipu-folder:hover .wipu-folder-paper--a { transform: translate(-9%, -32%) rotate(-7deg); }
+.wipu-folder:hover .wipu-folder-paper--b { transform: translate(11%, -24%) rotate(6deg); }
+
+.wipu-folder-label {
+  font-family: var(--wipu-mono);
+  font-size: clamp(14px, 1.4vw, 16px);
+  letter-spacing: 0.02em;
+  color: var(--wipu-navy-ink);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   FOLDERSTUFF — fullscreen navy figjam overlay
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Hide page chrome (HUD + pen toolbar) while folderstuff is active. */
+body.wipu-fs-active .wipu-hud,
+body.wipu-fs-active .wipu-drawtool {
+  display: none !important;
+}
+
+.wipu-fs {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: var(--wipu-navy);
+  color: var(--wipu-navy-ink);
+  overflow: hidden;
+  cursor: grab;
+}
+.wipu-fs:active { cursor: grabbing; }
+.wipu-fs::before {
+  content: "";
+  position: absolute;
+  inset: -60px;
+  background-image: radial-gradient(
+    color-mix(in srgb, var(--wipu-navy-ink) 14%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: 18px 18px;
+  pointer-events: none;
+}
+.wipu-fs-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+.wipu-fs-card {
+  position: absolute;
+  transform-origin: center;
+  will-change: transform, opacity;
+}
+.wipu-fs-card:hover { z-index: 2; }
+
+/* Single centered back button */
+.wipu-fs-back {
+  all: unset;
+  cursor: pointer;
+  position: fixed;
+  left: 50%;
+  bottom: clamp(28px, 4vw, 48px);
+  z-index: 60;
+  padding: 18px 44px;
+  border-radius: 999px;
+  background: var(--wipu-navy-ink);
+  color: var(--wipu-navy);
+  font-family: var(--wipu-mono);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.32);
+  transform: translate(-50%, 16px);
+  opacity: 0;
+  transition:
+    transform 360ms cubic-bezier(0.22, 0.9, 0.24, 1),
+    opacity 240ms ease,
+    background 160ms ease,
+    color 160ms ease;
+}
+.wipu-fs-back.is-visible { transform: translate(-50%, 0); opacity: 1; }
+.wipu-fs-back:hover { background: var(--wipu-terracotta); color: var(--wipu-terracotta-ink); }
+.wipu-fs-back:focus-visible { outline: 2px solid var(--wipu-terracotta); outline-offset: 4px; }
+@media (max-width: 540px) {
+  .wipu-fs-back { padding: 14px 28px; font-size: 12px; }
+}
+
+/* ——— Base card wrapper ——— */
+.wipu-fs-bi {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  font-family: var(--wipu-mono);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.3), 0 2px 0 rgba(0, 0, 0, 0.2);
+}
+.wipu-fs-kicker {
+  display: block;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0.7;
+  margin-bottom: 6px;
+}
+.wipu-fs-label { display: block; font-size: 12px; line-height: 1.4; }
+
+/* ——— Polaroid ——— */
+.wipu-fs-polaroid {
+  padding: 12px 12px 0;
+  display: flex;
+  flex-direction: column;
+  border-radius: 2px;
+  background: #f5f0e4;
+  color: #15150f;
+}
+.wipu-fs-polaroid-photo {
+  flex: 0 0 auto;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: linear-gradient(135deg, #2a2a30 0%, #18181c 100%);
+  border-radius: 1px;
+  position: relative;
+  overflow: hidden;
+}
+.wipu-fs-polaroid-photo::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px);
+  background-size: 12px 12px;
+}
+.wipu-fs-polaroid-photo::after {
+  content: "";
+  position: absolute;
+  left: 20%; top: 40%; width: 60%; height: 60%;
+  border-radius: 50%;
+  background: radial-gradient(circle at center, rgba(224,122,82,0.25) 0%, transparent 60%);
+}
+.wipu-fs-polaroid-cap { padding: 10px 4px 12px; }
+.wipu-fs-polaroid-cap .wipu-fs-kicker { opacity: 0.55; margin-bottom: 3px; }
+.wipu-fs-polaroid-cap .wipu-fs-label { font-size: 12px; font-weight: 500; }
+
+/* ——— Video polaroid (YouTube embed inside polaroid frame) ——— */
+.wipu-fs-video {
+  /* Inherits .wipu-fs-polaroid styling — paper bg + caption strip */
+}
+.wipu-fs-video-frame {
+  flex: 1;
+  position: relative;
+  background: #000;
+  border-radius: 1px;
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.4);
+}
+.wipu-fs-video-frame iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+.wipu-fs-polaroid-tint-terracotta .wipu-fs-polaroid-photo { background: linear-gradient(135deg,#7a2e15 0%,#1f1410 100%); }
+.wipu-fs-polaroid-tint-terracotta .wipu-fs-polaroid-photo::after { background: radial-gradient(circle at center, rgba(224,122,82,0.55) 0%, transparent 60%); }
+.wipu-fs-polaroid-tint-mustard .wipu-fs-polaroid-photo { background: linear-gradient(135deg,#5a4410 0%,#1e1c12 100%); }
+.wipu-fs-polaroid-tint-mustard .wipu-fs-polaroid-photo::after { background: radial-gradient(circle at center, rgba(242,208,106,0.45) 0%, transparent 60%); }
+.wipu-fs-polaroid-tint-mint .wipu-fs-polaroid-photo { background: linear-gradient(135deg,#0f3a28 0%,#101b18 100%); }
+.wipu-fs-polaroid-tint-mint .wipu-fs-polaroid-photo::after { background: radial-gradient(circle at center, rgba(140,224,168,0.45) 0%, transparent 60%); }
+.wipu-fs-polaroid-tint-rose .wipu-fs-polaroid-photo { background: linear-gradient(135deg,#3e1c20 0%,#1a1010 100%); }
+.wipu-fs-polaroid-tint-rose .wipu-fs-polaroid-photo::after { background: radial-gradient(circle at center, rgba(163,99,107,0.55) 0%, transparent 60%); }
+.wipu-fs-polaroid-tint-navy .wipu-fs-polaroid-photo { background: linear-gradient(135deg,#132060 0%,#0c0f1e 100%); }
+.wipu-fs-polaroid-tint-navy .wipu-fs-polaroid-photo::after { background: radial-gradient(circle at center, rgba(78,110,255,0.45) 0%, transparent 60%); }
+
+/* ——— Image tile — borderless tinted square, no frame, no caption.
+       Pure visual filler. Reuses the polaroid photo's gradient + glow
+       but fills the whole card. ——— */
+.wipu-fs-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 2px;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #2a2a30 0%, #18181c 100%);
+}
+.wipu-fs-image::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px);
+  background-size: 12px 12px;
+}
+.wipu-fs-image::after {
+  content: "";
+  position: absolute;
+  left: 20%; top: 40%; width: 60%; height: 60%;
+  border-radius: 50%;
+  background: radial-gradient(circle at center, rgba(224,122,82,0.25) 0%, transparent 60%);
+}
+.wipu-fs-image-tint-terracotta { background: linear-gradient(135deg,#7a2e15 0%,#1f1410 100%); }
+.wipu-fs-image-tint-terracotta::after { background: radial-gradient(circle at center, rgba(224,122,82,0.55) 0%, transparent 60%); }
+.wipu-fs-image-tint-mustard { background: linear-gradient(135deg,#5a4410 0%,#1e1c12 100%); }
+.wipu-fs-image-tint-mustard::after { background: radial-gradient(circle at center, rgba(242,208,106,0.45) 0%, transparent 60%); }
+.wipu-fs-image-tint-mint { background: linear-gradient(135deg,#0f3a28 0%,#101b18 100%); }
+.wipu-fs-image-tint-mint::after { background: radial-gradient(circle at center, rgba(140,224,168,0.45) 0%, transparent 60%); }
+.wipu-fs-image-tint-rose { background: linear-gradient(135deg,#3e1c20 0%,#1a1010 100%); }
+.wipu-fs-image-tint-rose::after { background: radial-gradient(circle at center, rgba(163,99,107,0.55) 0%, transparent 60%); }
+.wipu-fs-image-tint-navy { background: linear-gradient(135deg,#132060 0%,#0c0f1e 100%); }
+.wipu-fs-image-tint-navy::after { background: radial-gradient(circle at center, rgba(78,110,255,0.45) 0%, transparent 60%); }
+
+/* ——— Note ——— */
+.wipu-fs-note {
+  padding: 14px 16px;
+  border-radius: 3px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.wipu-fs-note-body {
+  font-size: 13px;
+  line-height: 1.45;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+}
+
+/* ——— Quote ——— */
+.wipu-fs-quote {
+  padding: 18px 20px;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+}
+.wipu-fs-quote-body {
+  font-size: 15px;
+  line-height: 1.5;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+}
+.wipu-fs-quote-sub {
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+.wipu-fs-quote-blue-on-mint {
+  background: var(--wipu-mint) !important;
+  color: var(--wipu-navy) !important;
+}
+.wipu-fs-quote-blue-on-mint .wipu-fs-quote-body {
+  text-decoration: underline;
+  text-decoration-color: var(--wipu-navy);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 4px;
+}
+.wipu-fs-quote-blue-on-mint .wipu-fs-quote-sub { color: var(--wipu-navy); opacity: 0.8; }
+.wipu-fs-quote-blue-on-mustard {
+  background: var(--wipu-mustard) !important;
+  color: var(--wipu-navy) !important;
+}
+.wipu-fs-quote-blue-on-mustard .wipu-fs-quote-body {
+  text-decoration: underline;
+  text-decoration-color: var(--wipu-navy);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 4px;
+}
+
+/* ——— Stat (big thin number + label) ——— */
+.wipu-fs-stat {
+  padding: 18px 22px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.wipu-fs-stat-num {
+  font-family: var(--wipu-mono);
+  font-weight: 300;
+  font-size: clamp(44px, 5vw, 68px);
+  letter-spacing: -0.045em;
+  line-height: 0.86;
+}
+.wipu-fs-stat-lbl {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+.wipu-fs-stat-kicker {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 4px;
+}
+.wipu-fs-stat-sub {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  opacity: 0.75;
+}
+
+/* ——— Callout pill ——— */
+.wipu-fs-callout {
+  padding: 0 20px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-align: center;
+}
+
+/* ——— Bare phone ——— */
+.wipu-fs-phone {
+  background: #f5f0e4;
+  color: #15150f;
+  border: 2px solid #15150f;
+  border-radius: 22px;
+  padding: 18px 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.wipu-fs-phone-notch {
+  width: 40%;
+  height: 6px;
+  background: #15150f;
+  border-radius: 3px;
+  margin: 0 auto 6px;
+}
+.wipu-fs-phone-bar { height: 26px; background: #e8e0cf; border-radius: 3px; }
+.wipu-fs-phone-bar.is-short { width: 70%; }
+.wipu-fs-phone-bar.is-full { height: 56px; }
+.wipu-fs-phone-bar.is-accent { background: var(--wipu-terracotta); height: 44px; }
+
+/* ——— Annotated phone ——— */
+.wipu-fs-phonea {
+  background: color-mix(in srgb, var(--wipu-navy-ink) 8%, var(--wipu-navy));
+  border: 1px solid color-mix(in srgb, var(--wipu-navy-ink) 20%, transparent);
+  border-radius: 10px;
+  padding: 18px 22px 22px;
+  display: flex;
+  flex-direction: column;
+  color: var(--wipu-navy-ink);
+}
+.wipu-fs-phonea-kicker {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  opacity: 0.7;
+  margin-bottom: 10px;
+}
+.wipu-fs-phonea-body {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: color-mix(in srgb, var(--wipu-navy-ink) 40%, transparent);
+}
+.wipu-fs-phonea-phone {
+  width: 220px;
+  height: 440px;
+  background: #f5f0e4;
+  color: #15150f;
+  border: 2px solid #15150f;
+  border-radius: 24px;
+  padding: 16px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 2;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.32);
+}
+.wipu-fs-phonea-phone .wipu-fs-phone-notch { background:#15150f; width:40%; height:6px; border-radius:3px; margin:0 auto 6px; }
+.wipu-fs-phonea-phone .wipu-fs-phone-bar { background:#e8e0cf; height:22px; border-radius:3px; }
+.wipu-fs-phonea-phone .wipu-fs-phone-bar.is-full { height: 56px; }
+.wipu-fs-phonea-phone .wipu-fs-phone-bar.is-short { width: 70%; }
+.wipu-fs-phonea-phone .wipu-fs-phone-bar.is-accent { background: var(--wipu-terracotta); }
+.wipu-fs-phonea-arrows {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+.wipu-fs-phonea-pill {
+  position: absolute;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 500;
+  z-index: 3;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+  white-space: nowrap;
+}
+.wipu-fs-phonea-caption {
+  margin-top: 14px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  text-align: center;
+}
+
+/* ——— Triad ——— */
+.wipu-fs-triad {
+  background: color-mix(in srgb, var(--wipu-navy-ink) 8%, var(--wipu-navy));
+  border: 1px solid color-mix(in srgb, var(--wipu-navy-ink) 20%, transparent);
+  border-radius: 10px;
+  padding: 22px 24px 26px;
+  display: flex;
+  flex-direction: column;
+  color: var(--wipu-navy-ink);
+}
+.wipu-fs-triad-kicker {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  opacity: 0.7;
+  margin-bottom: 16px;
+}
+.wipu-fs-triad-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 20px;
+  flex: 1;
+}
+.wipu-fs-triad-col {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  border-right: 1px dashed color-mix(in srgb, var(--wipu-navy-ink) 25%, transparent);
+  padding-right: 16px;
+}
+.wipu-fs-triad-col:last-child { border-right: none; padding-right: 0; }
+.wipu-fs-triad-tag {
+  align-self: flex-start;
+  padding: 6px 14px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+.wipu-fs-triad-phone {
+  aspect-ratio: 9 / 18;
+  max-width: 110px;
+  width: 100%;
+  margin: 0 auto;
+  background: transparent;
+  border: 2px solid color-mix(in srgb, var(--wipu-navy-ink) 50%, transparent);
+  border-radius: 18px;
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.wipu-fs-triad-phone .wipu-fs-phone-notch { background: color-mix(in srgb, var(--wipu-navy-ink) 50%, transparent); width:40%; height:4px; margin:0 auto 4px; border-radius:2px; }
+.wipu-fs-triad-phone .wipu-fs-phone-bar { background: color-mix(in srgb, var(--wipu-navy-ink) 30%, transparent); height:16px; border-radius:2px; margin-top:auto; }
+.wipu-fs-triad-phone .wipu-fs-phone-bar.is-short { width: 60%; }
+.wipu-fs-triad-phone .wipu-fs-phone-bar.is-accent { background: var(--wipu-terracotta); }
+.wipu-fs-triad-bullets {
+  list-style: none;
+  padding: 0; margin: 0;
+  display: flex; flex-direction: column; gap: 4px;
+  font-size: 11px; line-height: 1.4;
+}
+.wipu-fs-triad-bullets li::before { content: "· "; opacity: 0.6; }
+
+/* ——— Overlap stack ——— */
+.wipu-fs-overlap {
+  border-radius: 10px;
+  padding: 22px 24px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: visible;
+}
+.wipu-fs-overlap-kicker {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  opacity: 0.7;
+  margin-bottom: 12px;
+}
+.wipu-fs-overlap-stage {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.wipu-fs-overlap-card {
+  position: absolute;
+  padding: 14px 16px;
+  border-radius: 3px;
+  min-width: 200px;
+  max-width: 280px;
+  font-size: 13px;
+  line-height: 1.4;
+  box-shadow: 0 10px 22px rgba(0,0,0,0.25), 0 2px 0 rgba(0,0,0,0.15);
+}
+.wipu-fs-overlap-num {
+  display: block;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  opacity: 0.65;
+  margin-bottom: 4px;
+}
+.wipu-fs-overlap-body { font-weight: 500; letter-spacing: -0.005em; }
+
+/* ——— Agenda ——— */
+.wipu-fs-agenda {
+  border-radius: 6px;
+  padding: 22px 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.wipu-fs-agenda-list {
+  list-style: none;
+  padding: 0; margin: 0;
+  display: flex; flex-direction: column; gap: 14px;
+}
+.wipu-fs-agenda-list li {
+  display: grid;
+  grid-template-columns: 32px 1fr;
+  align-items: baseline;
+  gap: 14px;
+}
+.wipu-fs-agenda-n {
+  font-size: 22px;
+  font-weight: 300;
+  color: var(--wipu-mustard);
+  letter-spacing: -0.02em;
+}
+.wipu-fs-agenda-label {
+  font-size: 16px;
+  letter-spacing: -0.005em;
+}
+
+/* ——— Emoji row ——— */
+.wipu-fs-emoji {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 14px;
+  border-radius: 4px;
+}
+.wipu-fs-emoji-glyph { font-size: 34px; letter-spacing: 0.1em; line-height: 1; }
+.wipu-fs-emoji-label {
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+/* ——— Logo card ——— */
+.wipu-fs-logo {
+  background: #f5f0e4;
+  color: #15150f;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  font-family: "Iowan Old Style", "Georgia", serif;
+  font-size: 20px;
+  font-style: italic;
+  font-weight: 500;
+  text-align: center;
+  letter-spacing: -0.01em;
+}
+
+/* ——— Shapes ——— */
+.wipu-fs-shape-circle { border-radius: 50%; box-shadow: 0 6px 14px rgba(0,0,0,0.2); }
+.wipu-fs-shape-rect   { border-radius: 2px; box-shadow: 0 6px 14px rgba(0,0,0,0.2); }
+.wipu-fs-shape-line   { border-radius: 2px; box-shadow: none; }
+.wipu-fs-shape-triangle {
+  width: 0 !important; height: 0 !important;
+  background: transparent !important;
+  box-shadow: none;
+  border-left: 40px solid transparent;
+  border-right: 40px solid transparent;
+  border-bottom: 70px solid;
+}
+
+/* ——— HUD (persistent top chrome) ——— */
+.wipu-hud {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 22px;
+  font-family: var(--wipu-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--wipu-ink-dim);
+  pointer-events: none;
+  mix-blend-mode: difference;
+}
+.wipu-hud > * { pointer-events: auto; }
+.wipu-hud-left, .wipu-hud-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.wipu-hud-mark { color: #fff; letter-spacing: 0.1em; font-weight: 500; }
+.wipu-theme-toggle {
+  all: unset;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--wipu-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--wipu-ink);
+}
+
+/* ——— PEN TOOL (carried over) ——— */
+.wipu-drawtool {
+  position: fixed;
+  left: 18px;
+  bottom: 18px;
+  z-index: 35;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px dashed var(--wipu-rule-strong);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--wipu-bg) 80%, transparent);
+  backdrop-filter: blur(8px);
+  font-family: var(--wipu-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--wipu-ink);
+  max-width: calc(100vw - 36px);
+  flex-wrap: wrap;
+}
+.wipu-drawtool.is-active {
+  border-color: var(--wipu-terracotta);
+  box-shadow: 0 0 0 1px var(--wipu-terracotta) inset;
+}
+.wipu-drawtool-toggle {
+  all: unset;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--wipu-ink);
+  color: var(--wipu-bg);
+  font-weight: 500;
+}
+.wipu-drawtool.is-active .wipu-drawtool-toggle {
+  background: var(--wipu-terracotta);
+  color: var(--wipu-terracotta-ink);
+}
+.wipu-drawtool-toggle:focus-visible { outline: 2px solid var(--wipu-terracotta); outline-offset: 2px; }
+.wipu-drawtool-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 8px;
+  border-left: 1px dashed var(--wipu-rule);
+}
+.wipu-drawtool-swatch {
+  all: unset;
+  cursor: pointer;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  transition: transform 120ms ease, border-color 120ms ease;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
+}
+.wipu-drawtool-swatch:hover { transform: scale(1.12); }
+.wipu-drawtool-swatch.is-active { border-color: var(--wipu-ink); transform: scale(1.12); }
+.wipu-drawtool-swatch:focus-visible { outline: 2px solid var(--wipu-ink); outline-offset: 2px; }
+.wipu-drawtool-sizes { gap: 4px; }
+.wipu-drawtool-size {
+  all: unset;
+  cursor: pointer;
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid transparent;
+  transition: border-color 120ms ease, background 120ms ease;
+}
+.wipu-drawtool-size:hover { background: color-mix(in srgb, var(--wipu-ink) 10%, transparent); }
+.wipu-drawtool-size.is-active { border-color: var(--wipu-ink); }
+.wipu-drawtool-size-dot { display: block; border-radius: 50%; }
+.wipu-drawtool-clear {
+  all: unset;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px dashed var(--wipu-rule-strong);
+  color: var(--wipu-ink-dim);
+  font-family: var(--wipu-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.wipu-drawtool-clear:hover:not([disabled]) { color: var(--wipu-ink); border-color: var(--wipu-ink); }
+.wipu-drawtool-clear[disabled] { opacity: 0.35; cursor: not-allowed; }
+
+/* ——— TONE UTILITIES ——— */
+.wipu-tone-terracotta { background: var(--wipu-terracotta); color: var(--wipu-terracotta-ink); }
+.wipu-tone-mint       { background: var(--wipu-mint);       color: var(--wipu-mint-ink); }
+.wipu-tone-mustard    { background: var(--wipu-mustard);    color: var(--wipu-mustard-ink); }
+.wipu-tone-rose       { background: var(--wipu-rose);       color: var(--wipu-rose-ink); }
+.wipu-tone-navy       { background: var(--wipu-navy);       color: var(--wipu-navy-ink); }
+.wipu-tone-neutral    { background: var(--wipu-bg-elev);    color: var(--wipu-ink); border: 1px solid var(--wipu-rule); }
+.wipu-tone-paper      { background: #f5f0e4; color: #1a1a1d; }
+
+@media (prefers-reduced-motion: reduce) {
+  .wipu-hero-scroll { animation: none; }
+}
+
+/* ——— CASE STUDY (full long-form page) ——— */
+
+/* Hero — uses .wipu-slide as the frame */
+.wipu-case-hero {
+  text-align: left;
+  max-width: 960px;
+  margin: 0 auto;
+  width: 100%;
+}
+.wipu-case-hero-kicker {
+  font-family: var(--wipu-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--wipu-mint);
+  margin: 0 0 28px;
+}
+
+/* Big emoji row above the hero title — thematic marquee per case study */
+.wipu-case-hero-glyphs {
+  display: flex;
+  align-items: center;
+  gap: clamp(16px, 2.6vw, 36px);
+  margin: 0 0 36px;
+  line-height: 1;
+  font-size: clamp(56px, 9vw, 112px);
+}
+.wipu-case-hero-glyph {
+  display: inline-block;
+  transform-origin: center;
+  animation: wipu-glyph-idle 6s ease-in-out infinite;
+  will-change: transform;
+}
+.wipu-case-hero-glyph:nth-child(1) { transform: rotate(-8deg); animation-delay:   0s; }
+.wipu-case-hero-glyph:nth-child(2) { transform: rotate( 4deg); animation-delay: 600ms; }
+.wipu-case-hero-glyph:nth-child(3) { transform: rotate(-3deg); animation-delay: 1200ms; }
+.wipu-case-hero-glyph:nth-child(4) { transform: rotate( 6deg); animation-delay: 1800ms; }
+@keyframes wipu-glyph-idle {
+  0%, 100% { translate: 0 0; }
+  50%      { translate: 0 -6px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wipu-case-hero-glyph { animation: none; }
+}
+
+.wipu-case-hero-title {
+  font-family: var(--wipu-mono);
+  font-weight: 600;
+  font-size: clamp(40px, 7vw, 92px);
+  letter-spacing: -0.035em;
+  line-height: 0.95;
+  margin: 0 0 32px;
+  white-space: pre-line;
+}
+.wipu-case-hero-title em {
+  font-style: normal;
+  text-decoration: underline;
+  text-decoration-color: var(--wipu-emph);
+  text-decoration-thickness: 3px;
+  text-underline-offset: 8px;
+}
+.wipu-case-hero-subtitle {
+  font-family: var(--wipu-mono);
+  font-size: clamp(16px, 1.9vw, 22px);
+  line-height: 1.5;
+  color: var(--wipu-ink-dim);
+  max-width: 720px;
+  margin: 0 0 56px;
+  font-style: italic;
+  letter-spacing: -0.005em;
+}
+
+/* Meta row — role / team / shipped / platforms */
+.wipu-case-meta {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 28px;
+  padding: 28px 0 0;
+  border-top: 1px dashed var(--wipu-rule-strong);
+}
+@media (max-width: 800px) {
+  .wipu-case-meta { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+}
+.wipu-case-meta-col {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.wipu-case-meta-label {
+  font-family: var(--wipu-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--wipu-ink-faint);
+}
+.wipu-case-meta-value {
+  font-family: var(--wipu-mono);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--wipu-ink);
+  letter-spacing: -0.005em;
+}
+
+/* Stat row — horizontal flex of pull-numbers inside a prose section */
+.wipu-case-statrow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 32px 40px;
+  margin: 56px 0 0;
+  padding: 40px 0 0;
+  border-top: 1px dashed var(--wipu-rule-strong);
+}
+.wipu-case-statrow .wipu-pullnum {
+  margin: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+.wipu-case-statrow .wipu-pullnum-n {
+  font-size: clamp(40px, 5vw, 56px);
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+}
+.wipu-case-statrow .wipu-pullnum-lbl {
+  padding-bottom: 0;
+  white-space: pre-line;
+  line-height: 1.4;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--wipu-ink-dim);
+}
+
+/* Impact grid — 2×2 of stats, bigger */
+.wipu-case-impactgrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 48px 56px;
+  margin: 0 0 64px;
+}
+@media (max-width: 800px) {
+  .wipu-case-impactgrid { grid-template-columns: 1fr; gap: 40px; }
+}
+.wipu-case-impactgrid .wipu-pullnum-n {
+  font-size: clamp(64px, 10vw, 132px);
+}
+
+/* Press quote grid — 2 columns of quote cards, tone-background each */
+.wipu-case-pressgrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  margin: 0 0 48px;
+}
+@media (max-width: 800px) {
+  .wipu-case-pressgrid { grid-template-columns: 1fr; }
+}
+.wipu-case-press {
+  position: relative;
+  padding: 28px 30px;
+  border-radius: 8px;
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.3), 0 3px 0 rgba(0, 0, 0, 0.2);
+  transform-origin: top left;
+}
+.wipu-case-press:nth-child(odd) { transform: rotate(-0.6deg); }
+.wipu-case-press:nth-child(even) { transform: rotate(0.8deg); }
+.wipu-case-press-quote {
+  font-family: var(--wipu-mono);
+  font-size: clamp(16px, 1.8vw, 20px);
+  line-height: 1.45;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  margin: 0 0 14px;
+}
+.wipu-case-press-attribution {
+  font-family: var(--wipu-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.75;
+  margin: 0;
+}
+
+/* Notes (small-caps footnote list under Impact) */
+.wipu-case-notes {
+  list-style: none;
+  padding: 32px 0 0;
+  margin: 0;
+  border-top: 1px dashed var(--wipu-rule-strong);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-family: var(--wipu-mono);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--wipu-ink-dim);
+  letter-spacing: 0.02em;
+}
+.wipu-case-notes li::before {
+  content: "◆ ";
+  color: var(--wipu-emph);
+  margin-right: 6px;
+}
+.wipu-case-honest {
+  margin: 28px 0 0;
+  padding: 18px 22px;
+  border: 1px dashed var(--wipu-rule-strong);
+  border-radius: 6px;
+  font-family: var(--wipu-mono);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--wipu-ink-dim);
+  font-style: italic;
+  letter-spacing: -0.005em;
+}
+
+/* Act slide — full-bleed tone block */
+.wipu-case-act-inner {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: clamp(40px, 5vw, 96px);
+  align-items: start;
+  width: 100%;
+  max-width: 1200px;
+}
+@media (max-width: 900px) {
+  .wipu-case-act-inner { grid-template-columns: 1fr; gap: 40px; }
+}
+.wipu-case-act-head {
+  position: relative;
+}
+.wipu-case-actnum {
+  font-family: var(--wipu-mono);
+  font-weight: 600;
+  font-size: clamp(96px, 14vw, 180px);
+  letter-spacing: -0.05em;
+  line-height: 0.9;
+  margin: 0 0 -16px;
+  opacity: 0.28;
+  user-select: none;
+}
+.wipu-case-act-title {
+  font-family: var(--wipu-mono);
+  font-weight: 600;
+  font-size: clamp(32px, 4.5vw, 56px);
+  letter-spacing: -0.025em;
+  line-height: 1.0;
+  margin: 0 0 24px;
+  max-width: 520px;
+}
+.wipu-case-act-setup {
+  font-family: var(--wipu-mono);
+  font-size: clamp(16px, 1.8vw, 20px);
+  line-height: 1.45;
+  font-style: italic;
+  margin: 0 0 28px;
+  max-width: 520px;
+  opacity: 0.88;
+  letter-spacing: -0.005em;
+}
+.wipu-case-act-body {
+  font-family: var(--wipu-mono);
+  font-size: 15px;
+  line-height: 1.7;
+  max-width: 560px;
+}
+.wipu-case-act-body p { margin: 0 0 16px; }
+.wipu-case-act-body p:last-child { margin: 0; }
+
+.wipu-case-pullquote {
+  font-family: var(--wipu-mono);
+  font-weight: 500;
+  font-size: clamp(22px, 3vw, 34px);
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  margin: 48px 0 0;
+  padding: 28px 0 0;
+  max-width: 780px;
+  border-top: 2px solid currentColor;
+}
+.wipu-case-pullquote em {
+  font-style: normal;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 6px;
+}
+
+/* Image well — dashed frame placeholder */
+.wipu-case-image-well {
+  position: relative;
+  width: 100%;
+  border: 1.5px dashed var(--wipu-rule-strong);
+  border-radius: 6px;
+  background-image: radial-gradient(
+    color-mix(in srgb, currentColor 10%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: 18px 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  color: var(--wipu-ink-faint);
+  margin: 48px 0 0;
+}
+.wipu-case-image-well.is-wide { aspect-ratio: 16 / 9; }
+.wipu-case-image-well.is-phone { aspect-ratio: 9 / 16; max-width: 320px; margin-inline: auto; }
+.wipu-case-image-well.is-square { aspect-ratio: 1 / 1; max-width: 560px; margin-inline: auto; }
+.wipu-case-image-well-glyph {
+  font-size: 32px;
+  line-height: 1;
+  opacity: 0.7;
+}
+.wipu-case-image-well-caption {
+  font-family: var(--wipu-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 0 20px;
+  max-width: 80%;
+}
+.wipu-case-image-well-caption::before { content: "IMAGE · "; opacity: 0.6; }
+
+/* Act-slide image wells adopt the current slide's ink color */
+.wipu-slide-rose .wipu-case-image-well,
+.wipu-slide-navy .wipu-case-image-well,
+.wipu-slide-mustard .wipu-case-image-well,
+.wipu-slide-mint .wipu-case-image-well,
+.wipu-slide-terracotta .wipu-case-image-well {
+  border-color: color-mix(in srgb, currentColor 40%, transparent);
+  color: color-mix(in srgb, currentColor 70%, transparent);
+}
+
+/* Reflections — numbered list, reuses agenda patterns but standalone */
+.wipu-case-reflections {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+  max-width: 780px;
+  margin: 16px 0 0;
+}
+.wipu-case-reflection {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 28px;
+  align-items: baseline;
+}
+@media (max-width: 600px) {
+  .wipu-case-reflection { grid-template-columns: 1fr; gap: 8px; }
+}
+.wipu-case-reflection-num {
+  font-family: var(--wipu-mono);
+  font-weight: 600;
+  font-size: clamp(32px, 4vw, 48px);
+  color: var(--wipu-terracotta);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.wipu-case-reflection-heading {
+  font-family: var(--wipu-mono);
+  font-size: clamp(20px, 2.4vw, 26px);
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+  margin: 0 0 12px;
+  color: var(--wipu-ink);
+}
+.wipu-case-reflection-body {
+  font-family: var(--wipu-mono);
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--wipu-ink-dim);
+  margin: 0;
+}
+
+/* Back-link footer */
+.wipu-case-footer {
+  padding: 80px clamp(24px, 5vw, 96px) 120px;
+  display: flex;
+  justify-content: center;
+}
+.wipu-case-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 22px;
+  border: 1.5px solid var(--wipu-rule-strong);
+  border-radius: 999px;
+  font-family: var(--wipu-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--wipu-ink-dim);
+  text-decoration: none;
+  transition: background 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+.wipu-case-back:hover {
+  background: color-mix(in srgb, var(--wipu-ink) 8%, transparent);
+  border-color: var(--wipu-ink);
+  color: var(--wipu-ink);
+  transform: translateX(-3px);
+}
+
+/* ——— PASSPORT STAMP (per-act decorative mark, floats on slide) ——— */
+.wipu-case-stamp {
+  position: absolute;
+  z-index: 3;
+  pointer-events: none;
+  width: clamp(180px, 22vw, 260px);
+  color: currentColor;
+  opacity: 0.92;
+  /* Each city overrides --stamp-rot for varied "randomly stamped" feel.
+     Rotation lives on the inner SVG so it doesn't fight with [data-reveal]
+     translate transforms on this outer div. */
+  --stamp-rot: -10deg;
+}
+.wipu-case-stamp-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  transform: rotate(var(--stamp-rot));
+  transform-origin: center;
+}
+
+/* Per-city placement + rotation — stamps float in the empty left-side gutter
+   of each act slide, tilted strongly enough to feel "slapped on" rather than
+   laid out. Rotations escalate 24° → -42° → 68° across the three acts. */
+.wipu-case-stamp-nyc {
+  bottom: clamp(120px, 20vh, 280px);
+  left: clamp(40px, 5vw, 140px);
+  --stamp-rot: 24deg;
+  width: clamp(190px, 22vw, 260px);
+}
+.wipu-case-stamp-zurich {
+  top: clamp(320px, 48vh, 560px);
+  left: clamp(24px, 4vw, 120px);
+  --stamp-rot: -42deg;
+  width: clamp(180px, 20vw, 240px);
+}
+.wipu-case-stamp-mxcity {
+  top: clamp(140px, 20vh, 280px);
+  left: clamp(48px, 7vw, 180px);
+  --stamp-rot: 68deg;
+  width: clamp(200px, 23vw, 270px);
+}
+
+/* Stroke-draw system */
+.wipu-case-stamp-draw {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 1500ms cubic-bezier(0.22, 0.8, 0.2, 1);
+}
+.wipu-case-stamp.is-revealed .wipu-case-stamp-draw {
+  stroke-dashoffset: 0;
+}
+
+/* Stagger: rings → ticks → star → rules → plane */
+.wipu-case-stamp-draw-ring-outer  { transition-delay:   0ms; stroke-width: 1.8; }
+.wipu-case-stamp-draw-ring-mid    { transition-delay: 120ms; stroke-width: 0.9; opacity: 0.7; }
+.wipu-case-stamp-draw-ring-inner  { transition-delay: 200ms; stroke-width: 1.2; }
+.wipu-case-stamp-draw-tick        { transition-delay: 340ms; stroke-width: 1.3; transition-duration: 900ms; }
+.wipu-case-stamp-draw-star        { transition-delay: 560ms; stroke-width: 1.3; }
+.wipu-case-stamp-draw-rule        { transition-delay: 700ms; stroke-width: 1.1; }
+.wipu-case-stamp-draw-plane       { transition-delay: 880ms; stroke-width: 1.1; opacity: 0.82; }
+
+/* Stamp text — separate fade-in after rings draw */
+.wipu-case-stamp-text-arc,
+.wipu-case-stamp-text-date {
+  font-family: var(--wipu-mono);
+  font-weight: 600;
+  fill: currentColor;
+  letter-spacing: 0.22em;
+  opacity: 0;
+  transition: opacity 600ms ease 920ms;
+}
+.wipu-case-stamp-text-arc { font-size: 9px; }
+.wipu-case-stamp-text-arc-bottom { font-size: 7px; letter-spacing: 0.28em; }
+.wipu-case-stamp-text-date { font-size: 10px; letter-spacing: 0.2em; }
+.wipu-case-stamp.is-revealed .wipu-case-stamp-text-arc,
+.wipu-case-stamp.is-revealed .wipu-case-stamp-text-date {
+  opacity: 0.88;
+}
+
+/* On full-bleed tone slides, soften stamp so it reads as ink over content.
+   Blend mode swaps based on whether slide ink is lighter (screen) or darker
+   (multiply) than its background — matches how real stamp ink behaves. */
+.wipu-slide-mustard .wipu-case-stamp,
+.wipu-slide-mint .wipu-case-stamp,
+.wipu-slide-terracotta .wipu-case-stamp {
+  mix-blend-mode: multiply;
+  opacity: 0.72;
+}
+.wipu-slide-rose .wipu-case-stamp,
+.wipu-slide-navy .wipu-case-stamp {
+  mix-blend-mode: screen;
+  opacity: 0.55;
+}
+
+/* Tablet/phone — stamps revert to inline flow above the act numeral */
+@media (max-width: 900px) {
+  .wipu-case-stamp,
+  .wipu-case-stamp-nyc,
+  .wipu-case-stamp-zurich,
+  .wipu-case-stamp-mxcity {
+    position: relative;
+    top: auto;
+    right: auto;
+    left: auto;
+    margin: 0 0 20px;
+    width: clamp(160px, 44vw, 220px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wipu-case-stamp-draw,
+  .wipu-case-stamp-text-arc,
+  .wipu-case-stamp-text-date {
+    transition: none !important;
+    stroke-dashoffset: 0 !important;
+    opacity: 0.88;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   GEMINI TIMELINE — horizontal scroll-pinned section
+   Three reference images: Assistant keyboard → Gemini home → Gemini Live.
+   Drives a horizontal pan via JS from GeminiTimeline.tsx (rAF-throttled,
+   matches Scene.tsx idiom).
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.wipu-timeline {
+  position: relative;
+  height: 500vh; /* STOPS.length * 100vh — keep in sync with GeminiTimeline.tsx */
+  width: 100%;
+}
+
+/* Invisible snap markers — one per stop, stacked at 0/100vh/200vh/…
+   The page scroll (html { scroll-snap-type }) snaps to each marker. */
+.wipu-timeline-snap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 100vh;
+  pointer-events: none;
+  scroll-snap-align: start;
+  scroll-snap-stop: normal;
+}
+
+.wipu-timeline-pin {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+}
+
+.wipu-timeline-track {
+  display: flex;
+  flex-wrap: nowrap;
+  width: 500%; /* STOPS.length * 100% */
+  height: 100%;
+  will-change: transform;
+  transition: transform 80ms linear;
+}
+
+.wipu-timeline-stop {
+  flex: 0 0 calc(100% / 5);
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px 160px;
+}
+
+.wipu-timeline-figure {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  max-height: 100%;
+  max-width: 100%;
+  transition: transform 480ms cubic-bezier(0.2, 0.6, 0.2, 1),
+              opacity 480ms ease;
+  transform: scale(0.97);
+  opacity: 0.82;
+}
+.wipu-timeline-stop.is-active .wipu-timeline-figure {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.wipu-timeline-image {
+  max-height: min(68vh, 620px);
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 18px;
+  user-select: none;
+}
+
+.wipu-timeline-stop-caption {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+}
+.wipu-timeline-stop-label {
+  font-family: var(--wipu-mono);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--wipu-ink);
+}
+.wipu-timeline-stop-date {
+  font-family: var(--wipu-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--wipu-ink-faint);
+}
+
+/* ——— Progress indicator: a dated timeline with 3 tick points ——— */
+.wipu-timeline-progress {
+  position: absolute;
+  bottom: 72px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(880px, 84vw);
+  pointer-events: none;
+  z-index: 5;
+}
+.wipu-timeline-progress-rail {
+  position: relative;
+  width: 100%;
+  height: 2px;
+  background: var(--wipu-rule-strong);
+  border-radius: 2px;
+}
+.wipu-timeline-progress-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0%;
+  background: var(--wipu-ink);
+  border-radius: 2px;
+  will-change: width;
+  transition: width 80ms linear;
+}
+
+/* Tick = circle sitting ON the rail + date label hanging below. */
+.wipu-timeline-tick {
+  position: absolute;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  transform: translate(-50%, -50%);
+}
+.wipu-timeline-tick-dot {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: var(--wipu-bg);
+  border: 2px solid var(--wipu-rule-strong);
+  box-shadow: 0 0 0 4px var(--wipu-bg);
+  transition: background 220ms ease, border-color 220ms ease,
+              transform 220ms cubic-bezier(0.2, 0.6, 0.2, 1);
+}
+.wipu-timeline-tick.is-reached .wipu-timeline-tick-dot {
+  background: var(--wipu-ink);
+  border-color: var(--wipu-ink);
+}
+.wipu-timeline-tick.is-active .wipu-timeline-tick-dot {
+  background: var(--wipu-emph);
+  border-color: var(--wipu-emph);
+  transform: scale(1.15);
+  box-shadow: 0 0 0 4px var(--wipu-bg),
+              0 0 0 8px color-mix(in srgb, var(--wipu-emph) 18%, transparent);
+}
+.wipu-timeline-tick-label {
+  position: absolute;
+  top: calc(100% + 14px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--wipu-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--wipu-ink-faint);
+  white-space: nowrap;
+  transition: color 220ms ease;
+}
+.wipu-timeline-tick.is-active .wipu-timeline-tick-label {
+  color: var(--wipu-ink);
+}
+
+/* ——— Fallback: reduced motion or narrow viewport → vertical stack ——— */
+@media (max-width: 820px), (prefers-reduced-motion: reduce) {
+  .wipu-timeline {
+    height: auto;
+  }
+  .wipu-timeline-pin {
+    position: relative;
+    height: auto;
+    overflow: visible;
+  }
+  .wipu-timeline-track {
+    flex-direction: column;
+    width: 100%;
+    height: auto;
+    transform: none !important;
+    transition: none;
+  }
+  .wipu-timeline-stop {
+    flex: 0 0 auto;
+    width: 100%;
+    padding: 48px 16px;
+  }
+  .wipu-timeline-image {
+    max-height: min(80vh, 620px);
+    transform: none;
+    opacity: 1;
+  }
+  .wipu-timeline-progress { display: none; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ZURICH VARIATIONS STRIP — continuous horizontal scroll of design
+   variations explored in the shipping sprint. No pin, no scrolljack;
+   just a native overflow-x: auto container. Drag / trackpad / shift-wheel.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.wipu-zurich-strip {
+  position: relative;
+  padding: clamp(60px, 10vh, 120px) 0;
+}
+
+.wipu-zurich-strip-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.wipu-zurich-strip-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 0 clamp(24px, 6vw, 120px);
+}
+
+.wipu-zurich-strip-label {
+  font-family: var(--wipu-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--wipu-navy);
+}
+
+.wipu-zurich-strip-hint {
+  margin: 0;
+  font-family: var(--wipu-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--wipu-ink-faint);
+}
+
+.wipu-zurich-strip-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--wipu-rule-strong) transparent;
+}
+.wipu-zurich-strip-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+.wipu-zurich-strip-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.wipu-zurich-strip-scroll::-webkit-scrollbar-thumb {
+  background: var(--wipu-rule-strong);
+  border-radius: 6px;
+}
+
+.wipu-zurich-strip-list {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: clamp(24px, 4vw, 56px);
+  padding: 8px clamp(24px, 6vw, 120px) 32px;
+  margin: 0;
+  list-style: none;
+}
+
+.wipu-zurich-strip-item {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.wipu-zurich-strip-image {
+  display: block;
+  height: min(62vh, 520px);
+  width: auto;
+  max-width: none;
+  object-fit: contain;
+  border-radius: 6px;
+  user-select: none;
+  background: var(--wipu-bg);
+}
+
+.wipu-zurich-strip-caption {
+  font-family: var(--wipu-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--wipu-ink-dim);
+}
+
+@media (max-width: 820px) {
+  .wipu-zurich-strip-image {
+    height: min(52vh, 420px);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LIVE VIDEO EMBED — renders the /prototypes/voice-chat prototype inside the
+   Zurich act section. Wrapped in .proto-root to activate proto CSS vars;
+   this override neuters .proto-root's page-level background + min-height.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.wipu-live-embed.proto-root {
+  min-height: 0;
+  background: transparent;
+  background-image: none;
+  color: inherit;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px 0;
+  width: 100%;
+}
+.wipu-live-embed .proto-phone {
+  height: min(640px, 72vh);
+  width: auto;
+}
+@media (max-width: 820px) {
+  .wipu-live-embed .proto-phone {
+    height: auto;
+    width: min(320px, calc(100vw - 48px));
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   HERO STAT — single full-slide metric. The number itself is an SVG
+   <text> with a stroke-draw reveal: outline is drawn first
+   (stroke-dashoffset), then the ink fills in. Eyebrow + label
+   cross-fade around it. Scroll-triggered via [data-reveal].
+   ═══════════════════════════════════════════════════════════════════ */
+.wipu-herostat {
+  position: relative;
+  padding: clamp(60px, 12vh, 140px) clamp(24px, 6vw, 120px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(28px, 4vw, 56px);
+  text-align: center;
+  min-height: 60vh;
+}
+/* Wrapper carries [data-reveal] so SceneEffects toggles .is-revealed on it,
+   but we cancel the default fade — the CHILDREN animate, not the whole block. */
+.wipu-herostat[data-reveal] { opacity: 1; transform: none; }
+
+.wipu-herostat-eyebrow {
+  font-family: var(--wipu-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--wipu-ink-faint);
+  opacity: 0;
+  transition: opacity 520ms ease 120ms;
+}
+
+.wipu-herostat-num {
+  display: block;
+  width: 100%;
+  max-width: 1100px;
+  height: auto;
+  color: var(--wipu-ink);
+  overflow: visible;
+}
+.wipu-herostat-num-text {
+  font-family: var(--wipu-mono);
+  font-weight: 300;
+  font-size: 240px;
+  letter-spacing: -0.05em;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: currentColor;
+  fill-opacity: 0;
+  stroke-dasharray: 4000;
+  stroke-dashoffset: 4000;
+  transition:
+    stroke-dashoffset 3400ms cubic-bezier(0.22, 0.8, 0.2, 1) 280ms,
+    fill-opacity 900ms ease 2800ms;
+}
+
+.wipu-herostat-label {
+  font-family: var(--wipu-mono);
+  font-size: clamp(14px, 1.3vw, 17px);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1.5;
+  color: var(--wipu-ink-dim);
+  max-width: 560px;
+  margin: 0;
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 700ms ease 3500ms,
+    transform 700ms cubic-bezier(0.22, 0.8, 0.2, 1) 3500ms;
+}
+
+.wipu-herostat.is-revealed .wipu-herostat-eyebrow  { opacity: 1; }
+.wipu-herostat.is-revealed .wipu-herostat-num-text { stroke-dashoffset: 0; fill-opacity: 1; }
+.wipu-herostat.is-revealed .wipu-herostat-label    { opacity: 1; transform: translateY(0); }
+
+.wipu-herostat[data-accent="mint"]       { color: var(--wipu-mint); }
+.wipu-herostat[data-accent="mustard"]    { color: var(--wipu-mustard); }
+.wipu-herostat[data-accent="terracotta"] { color: var(--wipu-terracotta); }
+.wipu-herostat[data-accent="rose"]       { color: var(--wipu-rose); }
+.wipu-herostat[data-accent="navy"]       { color: var(--wipu-navy); }
+.wipu-herostat[data-accent] .wipu-herostat-num { color: inherit; }
+
+@media (prefers-reduced-motion: reduce) {
+  .wipu-herostat-eyebrow,
+  .wipu-herostat-num-text,
+  .wipu-herostat-label {
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+  }
+}

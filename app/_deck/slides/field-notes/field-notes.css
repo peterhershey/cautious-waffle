@@ -1,0 +1,451 @@
+/* whatispeterupto — field-notes slide (Slide 3)
+   Two acts: archive-trigger intro, explosion into bento gallery. */
+
+/* ───────── Act 1: Intro ───────── */
+
+.field-notes-slide {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.field-notes-intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: opacity 260ms ease, transform 320ms cubic-bezier(0.22, 0.8, 0.2, 1);
+}
+.field-notes-intro[aria-hidden="true"] {
+  opacity: 0;
+  transform: scale(0.98);
+  pointer-events: none;
+}
+
+.field-notes-archive-trigger {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 28px;
+  background: none;
+  border: 1px dashed var(--wipu-rule-strong);
+  border-radius: 12px;
+  color: var(--wipu-ink);
+  cursor: pointer;
+  font-family: var(--wipu-mono);
+  transition: transform 220ms ease, border-color 220ms ease;
+}
+.field-notes-archive-trigger:hover {
+  transform: translateY(-4px);
+  border-color: var(--wipu-mustard);
+}
+.field-notes-archive-trigger:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.field-notes-archive-icon {
+  font-size: 56px;
+  line-height: 1;
+}
+
+.field-notes-archive-lbl {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--wipu-ink-dim);
+}
+
+.field-notes-archive-caption {
+  margin-top: 32px;
+  font-size: 13px;
+  color: var(--wipu-ink-faint);
+}
+
+.field-notes-archive-hint {
+  font-family: var(--wipu-mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--wipu-ink-faint);
+  margin-top: 4px;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 360ms ease 600ms, transform 360ms ease 600ms;
+}
+.wipu-slide[data-active="true"]
+  .field-notes-slide[data-state="closed"]
+  .field-notes-archive-hint {
+  opacity: 0.85;
+  transform: translateY(0);
+}
+
+/* Arrival bounce + ambient breathing on the folder when its slide is the
+   active one. Plays once on activation, then a slow pulse ambient hint
+   keeps suggesting interactivity. */
+.wipu-slide[data-active="true"]
+  .field-notes-slide[data-state="closed"]
+  .field-notes-archive-trigger {
+  animation:
+    field-notes-archive-arrival 1100ms cubic-bezier(0.22, 0.8, 0.2, 1) 220ms 1 both,
+    field-notes-archive-pulse 3.6s ease-in-out 1500ms infinite;
+}
+@keyframes field-notes-archive-arrival {
+  0%   { transform: translateY(0) scale(1); }
+  35%  { transform: translateY(-8px) scale(1.03); }
+  62%  { transform: translateY(0) scale(1); }
+  82%  { transform: translateY(-3px) scale(1.01); }
+  100% { transform: translateY(0) scale(1); }
+}
+@keyframes field-notes-archive-pulse {
+  0%, 100% { border-color: var(--wipu-rule-strong); }
+  50%      { border-color: var(--wipu-mustard); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wipu-slide[data-active="true"]
+    .field-notes-slide[data-state="closed"]
+    .field-notes-archive-trigger {
+    animation: none;
+  }
+  .field-notes-archive-hint { opacity: 0.85; transform: none; transition: none; }
+}
+
+/* ───────── Act 2: Exploded overlay ───────── */
+
+.field-notes-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: var(--wipu-bg);
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  opacity: 0;
+  transition: opacity 260ms ease;
+  cursor: none;
+}
+@media (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .field-notes-overlay { cursor: auto; }
+}
+.field-notes-overlay .field-notes-x { cursor: pointer; }
+.field-notes-overlay::-webkit-scrollbar { display: none; }
+.field-notes-overlay[data-state="opening"] { opacity: 0; }
+.field-notes-overlay[data-state="open"] { opacity: 1; }
+.field-notes-overlay[data-state="closing"] { opacity: 0; transition-duration: 360ms; }
+
+.field-notes-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-auto-rows: minmax(0, 1fr);
+  grid-auto-flow: dense;
+  gap: 12px;
+  padding: clamp(16px, 3vw, 28px);
+  padding-bottom: clamp(88px, 10vh, 128px); /* room for X button */
+  max-width: 1800px;
+  margin: 0 auto;
+  /* aspect-ratio keeps rows squarish */
+}
+
+/* Cell sizing — each 1x1 cell is ~aspect 1:1 */
+.field-notes-grid > .field-notes-tile {
+  aspect-ratio: 1 / 1;
+  position: relative;
+}
+.field-notes-tile-1x1 {
+  grid-column: span 1;
+  grid-row: span 1;
+}
+.field-notes-tile-2x1 {
+  grid-column: span 2;
+  grid-row: span 1;
+  aspect-ratio: 2 / 1;
+}
+.field-notes-tile-1x2 {
+  grid-column: span 1;
+  grid-row: span 2;
+  aspect-ratio: 1 / 2;
+}
+.field-notes-tile-2x2 {
+  grid-column: span 2;
+  grid-row: span 2;
+  aspect-ratio: 1 / 1;
+}
+.field-notes-tile-3x2 {
+  grid-column: span 3;
+  grid-row: span 2;
+  aspect-ratio: 3 / 2;
+}
+
+/* Narrower viewports — collapse to fewer columns, relax aspect constraints */
+@media (max-width: 960px) {
+  .field-notes-grid { grid-template-columns: repeat(4, 1fr); }
+  .field-notes-tile-2x2 { grid-column: span 2; grid-row: span 2; }
+  .field-notes-tile-3x2 { grid-column: span 3; grid-row: span 2; aspect-ratio: 3 / 2; }
+}
+@media (max-width: 600px) {
+  .field-notes-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .field-notes-tile-2x2,
+  .field-notes-tile-2x1,
+  .field-notes-tile-3x2 { grid-column: span 2; grid-row: span 1; aspect-ratio: 2 / 1; }
+  .field-notes-tile-1x2 { grid-column: span 1; grid-row: span 2; aspect-ratio: 1 / 2; }
+}
+
+/* ───────── Tile base ───────── */
+
+.field-notes-tile {
+  border-radius: 26px;
+  overflow: hidden;
+  /* Explosion transitions */
+  opacity: 0;
+  transform: scale(0.42);
+  transform-origin: center;
+  transition-property: opacity, transform;
+  transition-duration: 320ms;
+  transition-timing-function: cubic-bezier(0.22, 0.8, 0.2, 1);
+  transition-delay: calc(var(--i, 0) * 8ms);
+  will-change: opacity, transform;
+}
+.field-notes-overlay[data-state="open"] .field-notes-tile {
+  opacity: 1;
+  transform: scale(1);
+  transition-duration: 720ms;
+  transition-timing-function: cubic-bezier(0.34, 1.42, 0.64, 1);
+  transition-delay: calc(var(--i, 0) * 32ms);
+}
+
+/* ───────── Tile: image ───────── */
+
+.field-notes-tile-image {
+  background: var(--wipu-bg-elev);
+}
+/* Image tile: inner has 10% overshoot in each direction so the parallax
+   translate never reveals the tile background. */
+.field-notes-tile-image .field-notes-tile-inner {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -10%;
+  height: 120%;
+  will-change: transform;
+}
+/* Ken Burns tiles zoom from a corner origin — no translate overshoot
+   needed, the tile's overflow:hidden clips the scaled-up content. */
+.field-notes-tile-image[data-kb="true"] .field-notes-tile-inner {
+  top: 0;
+  height: 100%;
+}
+.field-notes-tile-image img,
+.field-notes-tile-image video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  user-select: none;
+  transition: filter 220ms ease;
+  animation: wipu-idle-zoom 11s ease-in-out infinite alternate;
+  /* Each tile gets a different phase so the grid doesn't breathe in unison */
+  animation-delay: calc(var(--i, 0) * -0.7s);
+}
+.field-notes-tile-image::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  pointer-events: none;
+  transition: box-shadow 220ms ease;
+}
+.field-notes-tile-image:hover img,
+.field-notes-tile-image:hover video {
+  filter: brightness(1.06);
+}
+.field-notes-tile-image:hover::after {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12),
+    0 12px 36px -12px rgba(0, 0, 0, 0.6);
+}
+
+/* ───────── Tile: color card ───────── */
+
+.field-notes-tile-card .field-notes-tile-inner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: clamp(14px, 2.4vw, 22px);
+  gap: 10px;
+  text-align: left;
+}
+.field-notes-card-emoji {
+  font-size: clamp(34px, 5vw, 56px);
+  line-height: 1;
+  filter: saturate(1.05);
+}
+.field-notes-card-text {
+  font-family: var(--wipu-mono);
+  font-weight: 500;
+  font-size: clamp(13px, 1.2vw, 16px);
+  line-height: 1.3;
+  letter-spacing: -0.005em;
+}
+
+.field-notes-tone-terracotta {
+  background: var(--wipu-terracotta);
+  color: var(--wipu-terracotta-ink);
+}
+.field-notes-tone-mint {
+  background: var(--wipu-mint);
+  color: var(--wipu-mint-ink);
+}
+.field-notes-tone-mustard {
+  background: var(--wipu-mustard);
+  color: var(--wipu-mustard-ink);
+}
+.field-notes-tone-rose {
+  background: var(--wipu-rose);
+  color: var(--wipu-rose-ink);
+}
+.field-notes-tone-navy {
+  background: var(--wipu-navy);
+  color: var(--wipu-navy-ink);
+}
+
+/* ───────── X close button ───────── */
+
+.field-notes-x {
+  position: fixed;
+  left: 50%;
+  bottom: clamp(20px, 4vh, 36px);
+  transform: translateX(-50%);
+  z-index: 210;
+  appearance: none;
+  background: color-mix(in srgb, var(--wipu-bg) 70%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  color: var(--wipu-ink);
+  border: 1px solid var(--wipu-rule);
+  width: 52px;
+  height: 52px;
+  border-radius: 999px;
+  font-size: 28px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateX(-50%) translateY(10px);
+  transition: opacity 240ms ease 180ms, transform 280ms cubic-bezier(0.22, 0.8, 0.2, 1) 180ms,
+    background-color 160ms ease, border-color 160ms ease;
+}
+.field-notes-overlay[data-state="open"] .field-notes-x {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+.field-notes-x:hover {
+  background: var(--wipu-bg-elev);
+  border-color: var(--wipu-ink-dim);
+}
+
+/* ───────── Tidal Scroll reveal ───────── */
+
+/* All tiles start unrevealed once the overlay is open */
+.field-notes-overlay[data-state="open"] .field-notes-tile[data-revealed="false"] {
+  opacity: 0;
+}
+
+/* Tall tiles (1x2, 2x2): grow from clipped height */
+.field-notes-tile-image.field-notes-tile-1x2[data-revealed="false"],
+.field-notes-tile-image.field-notes-tile-2x2[data-revealed="false"] {
+  clip-path: inset(40% 0 0 0);
+  transform: scale(1); /* override the explosion scale — they're already in */
+}
+.field-notes-tile-image.field-notes-tile-1x2[data-revealed="true"],
+.field-notes-tile-image.field-notes-tile-2x2[data-revealed="true"] {
+  clip-path: inset(0 0 0 0);
+  opacity: 1;
+  transform: scale(1);
+  transition: clip-path 900ms cubic-bezier(0.22, 0.8, 0.2, 1),
+    opacity 600ms ease;
+  transition-delay: calc(var(--reveal-delay, 0) * 1ms);
+}
+
+/* Small/wide tiles: slide up + fade */
+.field-notes-tile[data-revealed="false"]:not(.field-notes-tile-1x2):not(.field-notes-tile-2x2) {
+  transform: scale(1) translateY(18px);
+}
+.field-notes-tile[data-revealed="true"]:not(.field-notes-tile-1x2):not(.field-notes-tile-2x2) {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  transition: opacity 520ms ease,
+    transform 620ms cubic-bezier(0.22, 0.8, 0.2, 1);
+  transition-delay: calc(var(--reveal-delay, 0) * 1ms);
+}
+
+/* ───────── Velocity cursor (overlay only) ───────── */
+
+.field-notes-cursor {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 220;
+  opacity: 0;
+  overflow: visible;
+  transition: opacity 140ms ease;
+}
+.field-notes-cursor-dot {
+  fill: var(--wipu-ink);
+  transition: opacity 90ms ease-out;
+}
+.field-notes-cursor-line {
+  stroke: var(--wipu-ink);
+  stroke-width: 3.25;
+  stroke-dasharray: 10 14;
+  stroke-linecap: round;
+  fill: none;
+  /* stroke-dashoffset is driven from JS each frame so the march rate is
+     constant and not coupled to cursor velocity (path-pruning would
+     otherwise drag the dash pattern). */
+}
+.field-notes-cursor-head {
+  stroke: var(--wipu-ink);
+  stroke-width: 3.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .field-notes-cursor { display: none; }
+}
+
+/* ───────── Reduced motion ───────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .field-notes-tile {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .field-notes-overlay { transition: none !important; }
+  .field-notes-tile-inner { transform: none !important; }
+  .field-notes-tile-image img,
+  .field-notes-tile-image video {
+    animation: none !important;
+  }
+  .field-notes-tile[data-revealed] {
+    clip-path: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}

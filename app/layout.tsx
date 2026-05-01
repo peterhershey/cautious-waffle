@@ -16,9 +16,25 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
-  title: "Peter Hershey — Portfolio",
-  description:
-    "UX, visual, and AI product design. Selected work from Peter Hershey.",
+  metadataBase: new URL("https://whatspeterdo.ing"),
+  title: {
+    default: "Peter Hershey",
+    template: "%s — Peter Hershey",
+  },
+  description: "UX, visual, and AI product design.",
+  robots: { index: false, follow: false },
+  openGraph: {
+    title: "Peter Hershey",
+    description: "UX, visual, and AI product design.",
+    url: "https://whatspeterdo.ing",
+    siteName: "Peter Hershey",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Peter Hershey",
+    description: "UX, visual, and AI product design.",
+  },
 };
 
 export default function RootLayout({

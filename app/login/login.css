@@ -1,0 +1,98 @@
+.wpd-login-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: var(--wipu-bg);
+  color: var(--wipu-ink);
+  font-family: var(--wipu-mono);
+}
+
+.wpd-login-card {
+  width: 100%;
+  max-width: 380px;
+  padding: 28px 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.wpd-login-eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--wipu-ink-dim);
+}
+
+.wpd-login-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.wpd-login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.wpd-login-input {
+  width: 100%;
+  height: 44px;
+  padding: 0 14px;
+  background: var(--wipu-bg-elev);
+  color: var(--wipu-ink);
+  border: 1px solid var(--glass-border-strong);
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  outline: none;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.wpd-login-input:focus-visible {
+  border-color: var(--wipu-emph);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--wipu-emph) 22%, transparent);
+}
+
+.wpd-login-submit {
+  height: 44px;
+  border: 1px solid var(--glass-border-strong);
+  border-radius: 10px;
+  background: var(--wipu-ink);
+  color: var(--wipu-bg);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition:
+    transform 100ms ease,
+    opacity 160ms ease;
+}
+
+.wpd-login-submit:hover {
+  opacity: 0.92;
+}
+
+.wpd-login-submit:active {
+  transform: translateY(1px);
+}
+
+.wpd-login-error {
+  margin: 0;
+  font-size: 12px;
+  color: var(--wipu-terracotta);
+}
+
+.wpd-login-foot {
+  margin: 0;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--wipu-ink-faint);
+}

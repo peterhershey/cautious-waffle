@@ -119,12 +119,15 @@ export function FieldNotesSlide() {
   }, [breathing]);
 
   // Track data-active via MutationObserver so isActive is a real subscription,
-  // not a synchronous DOM read during render.
+  // not a synchronous DOM read during render. Seed from the current attribute
+  // so a slide mounted while already active doesn't miss the initial state —
+  // the observer only fires on changes.
   useEffect(() => {
     const el = document.querySelector<HTMLElement>(
       `[data-slide-id="${SLIDE_ID}"]`,
     );
     if (!el) return;
+    setIsActive(el.dataset.active === "true");
     const obs = new MutationObserver(() => {
       setIsActive(el.dataset.active === "true");
     });

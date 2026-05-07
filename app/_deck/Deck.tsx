@@ -11,6 +11,7 @@ import {
 } from "react";
 import { SLIDES } from "./slides";
 import { DeckChrome } from "./chrome/DeckChrome";
+import { useDeckScroll } from "./scroll/useDeckScroll";
 
 export type DeckContextSlide = { id: string; label: string };
 
@@ -48,11 +49,6 @@ function readHashIndex(): number {
   return i >= 0 ? i : 0;
 }
 
-function prefersReducedMotion(): boolean {
-  if (typeof window === "undefined") return false;
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-}
-
 export function Deck() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const slideRefs = useRef<(HTMLElement | null)[]>([]);
@@ -60,20 +56,18 @@ export function Deck() {
   const [immersive, setImmersive] = useState(false);
   const [lastNavKeyAt, setLastNavKeyAt] = useState(0);
 
-  const goTo = useCallback((index: number) => {
-    const container = containerRef.current;
-    if (!container) return;
-    const clamped = Math.max(0, Math.min(SLIDES.length - 1, index));
-    const target = clamped * container.clientHeight;
-    container.scrollTo({
-      top: target,
-      behavior: prefersReducedMotion() ? "auto" : "smooth",
-    });
-  }, []);
+  const bumpNavKey = useCallback(() => setLastNavKeyAt(Date.now()), []);
+
+  const { goTo, isAnimatingRef } = useDeckScroll({
+    containerRef,
+    total: SLIDES.length,
+    activeIndex,
+    setActiveIndex,
+    bumpNavKey,
+  });
 
   const next = useCallback(() => goTo(activeIndex + 1), [activeIndex, goTo]);
   const prev = useCallback(() => goTo(activeIndex - 1), [activeIndex, goTo]);
-  const bumpNavKey = useCallback(() => setLastNavKeyAt(Date.now()), []);
 
   // Sync the scroll position to the hash-derived initial slide before paint.
   // activeIndex is already initialized from the hash via lazy state; this just
@@ -93,6 +87,7 @@ export function Deck() {
     if (!container) return;
     const obs = new IntersectionObserver(
       (entries) => {
+        if (isAnimatingRef.current) return;
         let bestIdx = -1;
         let bestRatio = 0;
         for (const entry of entries) {
@@ -113,6 +108,7 @@ export function Deck() {
     );
     slideRefs.current.forEach((el) => el && obs.observe(el));
     return () => obs.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- isAnimatingRef is a ref; observer is created once
   }, []);
 
   useEffect(() => {
@@ -122,6 +118,26 @@ export function Deck() {
     if (window.location.hash !== nextHash) {
       history.replaceState(null, "", nextHash);
     }
+  }, [activeIndex]);
+
+  /* Play videos on the active slide, pause everywhere else. Single
+     source of truth — individual templates keep their `autoPlay` markup
+     for first-paint behavior; this just gates playback by activeness. */
+  useEffect(() => {
+    slideRefs.current.forEach((slide, i) => {
+      if (!slide) return;
+      const videos = slide.querySelectorAll<HTMLVideoElement>("video");
+      if (i === activeIndex) {
+        videos.forEach((v) => {
+          const p = v.play();
+          if (p && typeof p.catch === "function") p.catch(() => {});
+        });
+      } else {
+        videos.forEach((v) => {
+          if (!v.paused) v.pause();
+        });
+      }
+    });
   }, [activeIndex]);
 
   useEffect(() => {
@@ -183,11 +199,15 @@ export function Deck() {
     if (!container) return;
     let startY = 0;
     let startT = 0;
+    let allow = true;
     const onTouchStart = (e: TouchEvent) => {
       startY = e.touches[0]?.clientY ?? 0;
       startT = Date.now();
+      const t = e.target as HTMLElement | null;
+      allow = !t?.closest("[data-allow-scroll='true']");
     };
     const onTouchEnd = (e: TouchEvent) => {
+      if (!allow) return;
       const endY = e.changedTouches[0]?.clientY ?? 0;
       const dy = endY - startY;
       const dt = Date.now() - startT;

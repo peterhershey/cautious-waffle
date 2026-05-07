@@ -27,6 +27,8 @@
 
   --wipu-mono: var(--font-mono), "IBM Plex Mono", ui-monospace, SFMono-Regular,
     Menlo, monospace;
+  --wipu-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI",
+    system-ui, sans-serif;
 
   --wipu-frame-radius: 10px;
   --wipu-note-radius: 3px;

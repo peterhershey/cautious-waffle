@@ -3,24 +3,24 @@
 import type { ReactNode } from "react";
 import { FieldNotesSlide } from "./field-notes";
 import { MediaMorphSlide, type MediaMorphMedia } from "./media-morph/MediaMorphSlide";
-import { MovieEmbedSlide } from "./movie-embed/MovieEmbedSlide";
-import {
-  TextImageSlide,
-  TileColor,
-  TileImage,
-} from "./text-image/TextImageSlide";
+import { TextImageSlide } from "./text-image/TextImageSlide";
 import { IntroTemplate } from "../templates/IntroTemplate";
-import { QuoteTemplate } from "../templates/QuoteTemplate";
 import { StickyCardsTemplate } from "../templates/StickyCardsTemplate";
 import { ThreeUpTemplate } from "../templates/ThreeUpTemplate";
+import { TypeOnText } from "../templates/TypeOnText";
+import { HoverGif } from "../templates/HoverGif";
 
 function HeroSlide() {
   return (
     <IntroTemplate
-      emoji="🍫"
+      emoji={<HoverGif src="/portfolio%20transfer/chocolate%20emoji.gif" />}
       greeting={<>Hi, I&rsquo;m</>}
-      name="Peter Hershey."
-      note="No relation to the candy company."
+      name={
+        <TypeOnText perCharMs={140} wordPauseMs={320}>
+          Peter Hershey
+        </TypeOnText>
+      }
+      subtitle="AI Product Designer & Creator"
     />
   );
 }
@@ -49,20 +49,66 @@ const AI_ART_VIDEOS: MediaMorphMedia[] = [
 
 function AiNativeSlide() {
   return (
-    <MediaMorphSlide
-      side="left"
-      eyebrow="AI-NATIVE · 04"
-      title={<>AI native by default.</>}
-      subtitle="Always reaching for the next tool that changes the work — not just the workflow."
-      media={AI_ART_VIDEOS}
-      phaseMs={4500}
-    />
+    <>
+      <MediaMorphSlide
+        side="left"
+        eyebrow="AI-NATIVE · 04"
+        title={<>🤖 AI native by default.</>}
+        subtitle="Designing with the most advanced AI tools available. Building the ones that don't exist yet."
+        media={AI_ART_VIDEOS}
+        phaseMs={4500}
+      />
+      {/* Goal-template-style callout below the morphing media's bottom-left
+          corner, with a Manhattan leader rising up into the media. */}
+      <div
+        className="wipu-anno-callout"
+        style={{
+          position: "absolute",
+          bottom: "8vh",
+          left: "48vw",
+          width: "clamp(220px, 22vw, 300px)",
+        }}
+        aria-hidden
+      >
+        Shown at Noisebridge & The Gray Area
+      </div>
+      <svg
+        className="wipu-anno-callout-svg"
+        style={{
+          position: "absolute",
+          bottom: "calc(8vh + 60px)",
+          left: "48vw",
+          width: 300,
+          height: 100,
+        }}
+        viewBox="0 0 300 100"
+        preserveAspectRatio="none"
+        aria-hidden
+      >
+        <defs>
+          <marker
+            id="wipu-anno-callout-arrow-ain"
+            viewBox="0 0 10 10"
+            refX="5"
+            refY="5"
+            markerWidth="5"
+            markerHeight="5"
+            orient="auto-start-reverse"
+          >
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor" />
+          </marker>
+        </defs>
+        <path
+          d="M 80 96 V 60 H 220 V 4"
+          markerEnd="url(#wipu-anno-callout-arrow-ain)"
+        />
+      </svg>
+    </>
   );
 }
 
 function AiInPracticeSlide() {
   return (
-    <>
     <ThreeUpTemplate
       blocks={[
         {
@@ -95,86 +141,82 @@ function AiInPracticeSlide() {
         },
       ]}
     />
-      {/* Goal-template-style callout above the rightmost (TouchDesigner)
-          tile, with a Manhattan leader dropping down into the image. */}
-      <div
-        className="wipu-anno-callout"
-        style={{
-          position: "absolute",
-          top: "6vh",
-          right: "6vw",
-          width: "clamp(220px, 22vw, 300px)",
-        }}
-        aria-hidden
-      >
-        Exhibited at Noisebridge & The Gray Area
+  );
+}
+
+function EmpathySlide() {
+  return (
+    <TextImageSlide
+      side="left"
+      eyebrow="SEEING PEOPLE · 07"
+      title={"Design is empathy.\nTravel is practice."}
+      subtitle="Nearly fifty countries. Seeing how other people live is the most important thing a designer can do."
+      footer={
+        <a
+          className="wipu-ti-press"
+          href="https://www.washingtonpost.com/travel/tips/digital-nomad-visa-tips/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <div className="wipu-ti-press-thumb">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/portfolio%20transfer/wapoarticle.avif"
+              alt=""
+              loading="lazy"
+              draggable={false}
+            />
+          </div>
+          <div className="wipu-ti-press-meta">
+            <span className="wipu-ti-press-source">The Washington Post · Travel</span>
+            <span className="wipu-ti-press-headline">
+              My Digital Nomad Visa Tips <span className="wipu-ti-press-arrow" aria-hidden>↗</span>
+            </span>
+          </div>
+        </a>
+      }
+    >
+      <div>
+        <div className="wipu-ti-single">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/portfolio%20transfer/travel/stp.png"
+            alt="Three friends in front of Pico Cão Grande, São Tomé"
+            draggable={false}
+          />
+        </div>
+        <div className="wipu-ti-single-caption">
+          Pico Cão Grande, São Tomé
+        </div>
       </div>
-      <svg
-        className="wipu-anno-callout-svg"
-        style={{
-          position: "absolute",
-          top: "calc(6vh + 88px)",
-          right: "6vw",
-          width: 300,
-          height: 80,
-        }}
-        viewBox="0 0 300 80"
-        preserveAspectRatio="none"
-        aria-hidden
-      >
-        <defs>
-          <marker
-            id="wipu-anno-callout-arrow-aip"
-            viewBox="0 0 10 10"
-            refX="5"
-            refY="5"
-            markerWidth="5"
-            markerHeight="5"
-            orient="auto-start-reverse"
-          >
-            <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor" />
-          </marker>
-        </defs>
-        <path
-          d="M 106 4 V 36 H 70 V 76"
-          markerEnd="url(#wipu-anno-callout-arrow-aip)"
-        />
-      </svg>
-    </>
+    </TextImageSlide>
   );
 }
 
 function QualificationsSlide() {
   return (
-    <div className="wipu-quals">
-      <div className="wipu-quals-blocks">
-        <div className="wipu-quals-block">
-          <div className="wipu-quals-eyebrow">Currently</div>
-          <div className="wipu-quals-title">Senior AI Product Designer</div>
-          <div className="wipu-quals-org">@ Google DeepMind</div>
-        </div>
-        <div className="wipu-quals-block">
-          <div className="wipu-quals-eyebrow">Previously</div>
-          <div className="wipu-quals-title">Design Lead</div>
-          <div className="wipu-quals-org">@ The Washington Post</div>
-        </div>
-      </div>
-      <div className="wipu-quals-path">
-        <span>Federal</span>
-        <span className="wipu-quals-arrow" aria-hidden>
-          →
-        </span>
-        <span>Journalism</span>
-        <span className="wipu-quals-arrow" aria-hidden>
-          →
-        </span>
-        <span>Voice Assistant / Conversation Design</span>
-        <span className="wipu-quals-arrow" aria-hidden>
-          →
-        </span>
-        <span>Frontier AI</span>
-      </div>
-    </div>
+    <ThreeUpTemplate
+      blocks={[
+        {
+          eyebrow: "PREVIOUSLY",
+          title: "Design Lead @ The Washington Post",
+          body: "Led product design across the homepage, article reading experience, and the editorial tools that fed them.",
+          image: {
+            src: "/portfolio%20transfer/field%20notes/product/washington-post-homepage.gif",
+            alt: "Washington Post homepage redesign",
+          },
+        },
+        {
+          eyebrow: "CURRENTLY",
+          title: "Senior AI Product Designer @ Google DeepMind",
+          body: "Designing the multimodal future of Gemini — Live Video, Visual Overlays, and the input framework underneath them all.",
+          image: {
+            src: "/portfolio%20transfer/gemini_visualoverlays_commercial_2.gif",
+            alt: "Gemini Visual Overlays — what it feels like when a model can look at what you're looking at.",
+          },
+        },
+      ]}
+    />
   );
 }
 
@@ -197,17 +239,6 @@ export const SLIDES: SlideDef[] = [
     render: () => <QualificationsSlide />,
   },
   {
-    id: "visual-overlays",
-    label: "VISUAL OVERLAYS · 02",
-    render: () => (
-      <MovieEmbedSlide
-        src="/portfolio%20transfer/gemini_visualoverlays_commercial_2.gif"
-        alt="Gemini Visual Overlays commercial"
-        caption="I design thoughtful, elegant experiences that drive real impact for household names."
-      />
-    ),
-  },
-  {
     id: "field-notes",
     label: "FIELD NOTES · 03",
     render: () => <FieldNotesSlide />,
@@ -223,66 +254,18 @@ export const SLIDES: SlideDef[] = [
     render: () => <AiInPracticeSlide />,
   },
   {
-    id: "dc",
-    label: "DC YEARS · 06",
-    render: () => (
-      <TextImageSlide
-        side="right"
-        eyebrow="DC YEARS · 06"
-        title={<>I cut my teeth in Washington, DC.</>}
-        subtitle="Where I learned to design in complexity."
-      >
-        <div className="wipu-ti-cluster wipu-ti-cluster-b">
-          <TileColor tone="rose" />
-          <TileImage
-            src="/portfolio%20transfer/washington-post-homepage.gif"
-            alt="Washington Post homepage redesign"
-          />
-        </div>
-      </TextImageSlide>
-    ),
-  },
-  {
     id: "empathy",
     label: "SEEING PEOPLE · 07",
-    render: () => (
-      <TextImageSlide
-        side="left"
-        eyebrow="SEEING PEOPLE · 07"
-        title={"Design is empathy.\nTravel is practice."}
-        subtitle="Nearly fifty countries. Seeing how other people live is the most important thing a designer can do."
-      >
-        <div>
-          <div className="wipu-ti-single">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/portfolio%20transfer/Travel/stp.png"
-              alt="Three friends in front of Pico Cão Grande, São Tomé"
-              draggable={false}
-            />
-          </div>
-          <div className="wipu-ti-single-caption">
-            Pico Cão Grande, São Tomé
-          </div>
-        </div>
-      </TextImageSlide>
-    ),
-  },
-  {
-    id: "invitation",
-    label: "BIG & SCARY · 08",
-    render: () => (
-      <QuoteTemplate
-        quote={<>&ldquo;I love tackling big, scary projects.&rdquo;</>}
-        attribution="— Peter, on Mondays"
-      />
-    ),
+    render: () => <EmpathySlide />,
   },
   {
     id: "cases",
     label: "CASE STUDIES · 09",
     render: () => (
       <StickyCardsTemplate
+        eyebrow="CASE STUDIES · 09"
+        title="Selected work."
+        autoReveal
         blocks={[
           {
             eyebrow: "2025 · Google DeepMind",

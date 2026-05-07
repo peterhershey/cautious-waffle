@@ -1,0 +1,68 @@
+/* Gel — purple noise undulation for "next chapter" placeholders.
+   Fills .wipu-sample-tl-image (sizing inherited). Blobs render below
+   the existing radial-sheen ::after on the parent. */
+
+.wpd-gel {
+  background:
+    radial-gradient(120% 100% at 30% 20%, #2a1244 0%, #110522 60%, #0a0214 100%);
+  isolation: isolate;
+}
+
+.wpd-gel-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(64px);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  z-index: 1;
+  will-change: transform, opacity;
+}
+
+.wpd-gel-blob:nth-child(1) {
+  width: 70%;
+  height: 70%;
+  background: #6b3fb5;
+  top: -10%;
+  left: -10%;
+  animation: wpd-gel-a 9.4s ease-in-out infinite;
+}
+
+.wpd-gel-blob:nth-child(2) {
+  width: 65%;
+  height: 65%;
+  background: #b07cff;
+  top: 20%;
+  right: -15%;
+  animation: wpd-gel-b 11.7s ease-in-out infinite;
+}
+
+.wpd-gel-blob:nth-child(3) {
+  width: 55%;
+  height: 55%;
+  background: #d0a8ff;
+  bottom: -12%;
+  left: 25%;
+  animation: wpd-gel-c 13.2s ease-in-out infinite;
+}
+
+@keyframes wpd-gel-a {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.85; }
+  33% { transform: translate(20%, 12%) scale(1.18); opacity: 0.95; }
+  66% { transform: translate(-8%, 24%) scale(0.92); opacity: 0.78; }
+}
+
+@keyframes wpd-gel-b {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.78; }
+  40% { transform: translate(-18%, -10%) scale(1.1); opacity: 0.9; }
+  70% { transform: translate(10%, 8%) scale(0.95); opacity: 0.7; }
+}
+
+@keyframes wpd-gel-c {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.7; }
+  35% { transform: translate(-20%, -25%) scale(1.22); opacity: 0.85; }
+  72% { transform: translate(15%, -12%) scale(0.88); opacity: 0.62; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wpd-gel-blob { animation: none; }
+}

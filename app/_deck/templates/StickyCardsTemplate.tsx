@@ -35,6 +35,17 @@ export type StickyCardsTemplateProps = {
   blocks: StickyCardBlock[];
   /** Show a pin glyph on each card. Default true. */
   pin?: boolean;
+  /** Optional small eyebrow line above the heading. */
+  eyebrow?: ReactNode;
+  /** Optional h1 heading rendered above the cards. */
+  title?: ReactNode;
+  /** When true, cards reveal themselves on a timer once the slide
+      is centered in the viewport. Manual key nav still works. */
+  autoReveal?: boolean;
+  /** Delay between auto-reveal steps in ms. Default 650. */
+  autoRevealMs?: number;
+  /** Delay before the first card appears in ms. Default 350. */
+  autoRevealStartMs?: number;
 };
 
 const DEFAULT_TONES: StickyCardTone[] = ["terracotta", "mustard", "mint"];
@@ -43,10 +54,73 @@ const PINS = ["📌", "📍", "🖇️"];
 export function StickyCardsTemplate({
   blocks,
   pin = true,
+  eyebrow,
+  title,
+  autoReveal = false,
+  autoRevealMs = 650,
+  autoRevealStartMs = 350,
 }: StickyCardsTemplateProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const [step, setStep] = useState(0);
+  /* In manual mode, start at step=1 so the first card is already visible
+     on slide load. In autoReveal mode, start at 0 so all cards animate in
+     on a timer once the slide is centered in the viewport. Subsequent
+     arrow presses reveal additional cards in either mode, then fall
+     through to the deck's slide nav. */
+  const [step, setStep] = useState(autoReveal ? 0 : 1);
   const totalSteps = blocks.length + 1;
+
+  /* Auto-reveal: each time the slide enters the viewport, reset to 0
+     and walk `step` up on a timer. Leaving the viewport clears the
+     pending timers and resets so the next entry replays the animation. */
+  useEffect(() => {
+    if (!autoReveal) return;
+    const el = containerRef.current;
+    if (!el) return;
+
+    let active = false;
+    let timers: ReturnType<typeof setTimeout>[] = [];
+    const clear = () => {
+      for (const t of timers) clearTimeout(t);
+      timers = [];
+    };
+    const start = () => {
+      clear();
+      setStep(0);
+      const target = blocks.length;
+      for (let i = 1; i <= target; i++) {
+        timers.push(
+          setTimeout(
+            () => setStep((s) => (s < i ? i : s)),
+            autoRevealStartMs + (i - 1) * autoRevealMs,
+          ),
+        );
+      }
+    };
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const visible =
+            entry.isIntersecting && entry.intersectionRatio >= 0.5;
+          if (visible && !active) {
+            active = true;
+            start();
+          } else if (!visible && active && entry.intersectionRatio < 0.1) {
+            active = false;
+            clear();
+            setStep(0);
+          }
+        }
+      },
+      { threshold: [0, 0.1, 0.25, 0.5, 0.75, 1] },
+    );
+    io.observe(el);
+
+    return () => {
+      io.disconnect();
+      clear();
+    };
+  }, [autoReveal, autoRevealMs, autoRevealStartMs, blocks.length]);
 
   /* Capture-phase keyboard nav — consume arrow keys to reveal cards
      one-by-one before the deck's slide handler advances to the next
@@ -99,11 +173,17 @@ export function StickyCardsTemplate({
 
   return (
     <div ref={containerRef} className="wipu-tpl-sticky" data-step={step}>
+      {(eyebrow || title) && (
+        <div className="wipu-tpl-sticky-head">
+          {eyebrow && <div className="wipu-tpl-sticky-head-eyebrow">{eyebrow}</div>}
+          {title && <h1 className="wipu-tpl-sticky-head-title">{title}</h1>}
+        </div>
+      )}
       <div
         className="wipu-tpl-sticky-board"
         style={{
           gridTemplateColumns: `repeat(${blocks.length}, minmax(0, 1fr))`,
-          maxWidth: `min(${Math.min(blocks.length, 3) * 380 + 120}px, 92vw)`,
+          maxWidth: `min(${Math.min(blocks.length, 3) * 460 + 120}px, 92vw)`,
         }}
       >
         {blocks.map((b, i) => {

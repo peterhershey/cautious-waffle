@@ -173,6 +173,108 @@
   }
 }
 
+/* "In-product impact + external recognition" — a centered composite.
+   Mexico City vertical short on the left (no caption), the metrics +
+   MWC awards stack on the right. Grid sizes both tracks to their
+   content and centers the pair so the unit reads as a compact block;
+   text inside the right column stays left-aligned. */
+.wipu-cs-numbers-awards {
+  display: grid;
+  grid-template-columns: auto auto;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(64px, 8vw, 128px);
+  width: 100%;
+  max-width: min(1280px, 92vw);
+  margin: 0 auto;
+}
+.wipu-cs-numbers-awards-video.wipu-sample-video {
+  margin: 0;
+}
+.wipu-cs-numbers-awards-video.wipu-sample-video .wipu-sample-video-stage {
+  /* Smaller than the standalone vertical short (was min(420px, 70vw,
+     45svh)) — leaves room for the awards block alongside it. */
+  width: min(320px, 28vw, 56svh);
+}
+.wipu-cs-numbers-awards-text {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(32px, 4vh, 56px);
+  min-width: 0;
+  max-width: min(620px, 56vw);
+  text-align: left;
+}
+.wipu-cs-numbers-awards-metrics {
+  grid-template-columns: repeat(2, 1fr);
+  max-width: none;
+  margin: 0;
+}
+/* Tighter metric numbers in this composite — the standalone "By the
+   numbers" slide had room for full-size 96px digits, but here the
+   metrics share the slide with a video and a 4-line awards block. */
+.wipu-cs-numbers-awards-metrics .wipu-sample-metric-n {
+  font-size: clamp(40px, 4.6vw, 72px);
+}
+
+.wipu-cs-awards {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 1.6vh, 20px);
+}
+.wipu-cs-awards-title {
+  font-size: clamp(20px, 2.4vw, 32px);
+  font-weight: 500;
+  letter-spacing: -0.012em;
+  line-height: 1.2;
+  margin: 0;
+  color: var(--wipu-ink);
+}
+.wipu-cs-awards-sub {
+  font-size: clamp(13px, 1.05vw, 15px);
+  line-height: 1.5;
+  color: var(--wipu-ink-dim);
+  margin: 0;
+}
+.wipu-cs-awards-list {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.wipu-cs-awards-list li {
+  font-size: clamp(14px, 1.15vw, 17px);
+  line-height: 1.5;
+  color: var(--wipu-ink-dim);
+  display: flex;
+  gap: 14px;
+  align-items: baseline;
+}
+.wipu-cs-awards-list strong {
+  color: var(--wipu-ink);
+  font-weight: 600;
+}
+.wipu-cs-awards-emoji {
+  flex-shrink: 0;
+  font-size: 1.05em;
+  line-height: 1;
+}
+
+@media (max-width: 880px) {
+  .wipu-cs-numbers-awards {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 36px;
+  }
+  .wipu-cs-numbers-awards-text {
+    max-width: 92vw;
+  }
+  .wipu-cs-numbers-awards-video.wipu-sample-video .wipu-sample-video-stage {
+    width: min(320px, 70vw);
+  }
+}
+
 /* Veo case study — depth-of-field hero. Scattered tiles around centered copy.
    Sharp tiles in the foreground, blurred tiles further back. Mouse parallax
    shifts foreground tiles more than blurred ones; ambient drift keeps the
@@ -228,12 +330,17 @@
   overflow: hidden;
   background: var(--tile-color);
   filter: blur(calc(var(--tile-blur, 0px) + var(--blur-pulse, 0px)));
-  /* --tile-mx / --tile-my are written by VeoHero's rAF loop, one set per
-     tile, each smoothed at the tile's own --tile-px / --tile-py-implied
-     lerp rate. So tiles never move in lockstep. */
+  /* --tile-mx / --tile-my (mouse parallax) and --tile-sy (slide-relative
+     scroll progress) are all written by VeoHero's rAF loop, smoothed at
+     each tile's own lerp rate so tiles never move in lockstep. The y
+     translate combines mouse parallax with scroll drag — depth comes
+     from --tile-py, so foreground tiles travel more than blurred ones. */
   translate:
     calc(var(--tile-mx, 0) * var(--tile-px, 0) * -1px)
-    calc(var(--tile-my, 0) * var(--tile-py, 0) * -1px);
+    calc(
+      (var(--tile-my, 0) * var(--tile-py, 0) * -1px) +
+      (var(--tile-sy, 0) * var(--tile-py, 0) * 1.6px)
+    );
   rotate: var(--tile-rot, 0deg);
   scale: 1;
   will-change: transform, translate, scale, filter;
@@ -359,5 +466,1098 @@
   .wipu-veo-tile--blur-ml,
   .wipu-veo-tile--blur-br {
     width: clamp(160px, 36vw, 260px);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   Dossier — single-slide variant for the "Project at a glance" beat.
+   Flips the otherwise-quiet page into a deep ink-blue dossier with
+   cream type, mustard accents, and a corner case-file stamp. The
+   surrounding deck stays unchanged; this is one-slide special.
+
+   The :has() selector promotes the slide section itself to the dossier
+   palette so the bg goes full-bleed past .wipu-sample-slide's padding,
+   then we re-skin the nested .wipu-tpl-glance-* tokens.
+   ───────────────────────────────────────────────────────────────────── */
+
+.wpd-dossier {
+  --dossier-bg: var(--wipu-terracotta);
+  --dossier-ink: #f7dc7a;
+  --dossier-ink-dim: rgba(247, 220, 122, 0.78);
+  --dossier-ink-faint: rgba(247, 220, 122, 0.55);
+  --dossier-rule: rgba(247, 220, 122, 0.32);
+  --dossier-stamp-bg: #f7dc7a;
+  --dossier-stamp-ink: #2a0d04;
+
+  position: relative;
+  width: 100%;
+}
+
+/* Terracotta ground with mustard-cream type — warm-on-warm, complementary
+   in saturation, high enough contrast to stay legible. Reads as a hot
+   foil-stamped record cover rather than the previous folder-on-desk. */
+.wipu-sample-slide:has(.wpd-dossier) {
+  background:
+    radial-gradient(
+      130% 100% at 85% -10%,
+      #ee8a64 0%,
+      var(--wipu-terracotta) 55%,
+      #b25b39 100%
+    );
+  color: #f7dc7a;
+  isolation: isolate;
+}
+
+/* Cream-tinted grain at low alpha. Multiply blend keeps the saturated
+   terracotta from washing out while still suggesting paper texture. */
+.wipu-sample-slide:has(.wpd-dossier)::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      rgba(42, 13, 4, 0.05) 0px,
+      rgba(42, 13, 4, 0.05) 1px,
+      transparent 1px,
+      transparent 3px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(42, 13, 4, 0.03) 0px,
+      rgba(42, 13, 4, 0.03) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+  pointer-events: none;
+  z-index: 0;
+  mix-blend-mode: multiply;
+}
+
+.wipu-sample-slide:has(.wpd-dossier) > .wipu-sample-inner {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Re-skin the glance template inside .wpd-dossier ── */
+.wpd-dossier .wipu-tpl-glance-eyebrow {
+  color: var(--dossier-ink);
+  letter-spacing: 0.32em;
+  opacity: 0.7;
+}
+
+.wpd-dossier .wipu-tpl-glance-title {
+  color: var(--dossier-ink);
+  /* Faint underline accent — like a typed-and-underlined dossier title. */
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--dossier-ink);
+}
+
+.wpd-dossier .wipu-tpl-glance-field {
+  border-top-color: var(--dossier-rule);
+}
+
+.wpd-dossier .wipu-tpl-glance-label {
+  color: var(--dossier-ink-faint);
+}
+
+.wpd-dossier .wipu-tpl-glance-field[data-tier="primary"] .wipu-tpl-glance-value {
+  color: var(--dossier-ink);
+}
+
+.wpd-dossier .wipu-tpl-glance-field[data-tier="secondary"] .wipu-tpl-glance-value,
+.wpd-dossier .wipu-tpl-glance-aside {
+  color: var(--dossier-ink-dim);
+}
+
+.wpd-dossier .wipu-tpl-glance-field[data-tier="secondary"] .wipu-tpl-glance-label {
+  color: var(--dossier-ink-faint);
+}
+
+.wpd-dossier .wipu-tpl-glance-secondary {
+  border-top-color: var(--dossier-rule);
+}
+
+.wpd-dossier .wipu-tpl-glance-secondary-title {
+  color: var(--dossier-ink);
+}
+
+/* ── Corner stamp — solid cream badge in the top-right. The stamp inverts
+   the slide palette (cream block with deep ember ink) so it reads as a
+   foil seal pressed into the warm field. */
+.wpd-dossier-stamp {
+  position: absolute;
+  top: clamp(12px, 3vh, 32px);
+  right: clamp(-4px, 1vw, 12px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 6px;
+  font-family: var(--wipu-mono);
+  color: var(--dossier-stamp-ink);
+  background: var(--dossier-stamp-bg);
+  transform: rotate(4.5deg);
+  z-index: 2;
+  pointer-events: none;
+  user-select: none;
+  box-shadow: 0 4px 14px rgba(42, 13, 4, 0.35);
+}
+
+.wpd-dossier-stamp-line {
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+}
+
+.wpd-dossier-stamp-num {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  margin: 2px 0;
+}
+
+@media (max-width: 720px) {
+  .wpd-dossier-stamp {
+    top: 8px;
+    right: -4px;
+    padding: 6px 12px;
+    transform: rotate(3deg);
+  }
+  .wpd-dossier-stamp-num {
+    font-size: 16px;
+  }
+  .wpd-dossier-stamp-line {
+    font-size: 8px;
+    letter-spacing: 0.24em;
+  }
+}
+
+/* Multimodal Launcher screenshot slides — the artifact is 3 phones
+   laid side-by-side (≈5:4 native), so swap the default 4:3 well for
+   the image's true aspect ratio (no letterboxing) and drop the well
+   chrome so the image's own dark canvas reads uninterrupted. */
+.wpd-ml-initial .wipu-tpl-mediatext-media,
+.wpd-ml-issues .wipu-tpl-mediatext-media {
+  aspect-ratio: 2306 / 1824;
+  border: 0;
+  background: transparent;
+}
+/* Initial-integration slide — weight toward the media. */
+.wpd-ml-initial .wipu-tpl-mediatext {
+  grid-template-columns: 1.6fr 1fr;
+  max-width: min(1360px, 96vw);
+}
+/* Issues slide — tighten the column gap and narrow the text column
+   so the copy sits closer to the screenshot (text wraps at 36ch and
+   the default 1fr 1fr split leaves a wide whitespace gutter). */
+.wpd-ml-issues .wipu-tpl-mediatext {
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: clamp(12px, 1.5vw, 24px);
+}
+
+/* Issues slide — two equal stacked content blocks paired with the
+   same screenshot on the right. Block titles get the mono treatment
+   matching the rest of the deck; bodies inherit the dim ink tone. */
+.wpd-ml-issues-text {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(28px, 3.5vw, 48px);
+}
+.wpd-ml-issues-block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.wpd-ml-issues-title {
+  margin: 0;
+  font-family: var(--wipu-mono);
+  font-size: clamp(18px, 1.8vw, 26px);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.005em;
+  color: var(--wipu-ink);
+}
+.wpd-ml-issues-body {
+  margin: 0;
+  font-size: clamp(14px, 1.2vw, 17px);
+  line-height: 1.55;
+  color: var(--wipu-ink-dim);
+  max-width: 36ch;
+}
+
+/* "Teach computers to talk like humans" slide — pairs the hue-sync video
+   stage with the standard MediaText text column. Wider column gap than
+   the default MediaText so the ambient glow doesn't crowd the copy. */
+.wpd-talkhumans {
+  gap: clamp(56px, 7vw, 120px);
+}
+
+/* NYC · Multimodality slide — long pull-quote. Shrink the QuoteTemplate
+   default font and widen the line so the longer quote reads as a tight
+   block instead of a tall column. Scoped so other QuoteTemplate uses
+   are unaffected. Base text dimmed; <strong> brings the emphasized
+   portion forward (mirrors the MetricQuoteSplit pattern). */
+.wpd-multimodality .wipu-tpl-quote {
+  font-size: clamp(15px, 1.6vw, 24px);
+  line-height: 1.5;
+  max-width: 52ch;
+  color: var(--wipu-ink-dim);
+}
+.wpd-multimodality .wipu-tpl-quote strong {
+  color: var(--wipu-ink);
+  font-weight: 600;
+  font-style: normal;
+}
+
+/* NYC · Multimodality slide — two-up of pull quotes (Sundar + research
+   participant). Equal columns, mono-styled quote blocks with attribution
+   underneath. */
+.wpd-multimodality-twoup {
+  width: 100%;
+  max-width: min(1280px, 92vw);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: start;
+  gap: clamp(32px, 4vw, 72px);
+}
+.wpd-multimodality-twoup-quote {
+  margin: 0;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(16px, 2.4vh, 26px);
+  max-width: 36ch;
+}
+.wpd-multimodality-twoup-emoji {
+  font-size: clamp(36px, 4vw, 56px);
+  line-height: 1;
+}
+.wpd-multimodality-twoup-text {
+  margin: 0;
+  font-family: var(--wipu-mono);
+  font-style: normal;
+  font-size: clamp(16px, 1.7vw, 22px);
+  font-weight: 500;
+  line-height: 1.45;
+  letter-spacing: -0.005em;
+  color: var(--wipu-ink);
+}
+.wpd-multimodality-twoup-text strong {
+  color: var(--wipu-ink);
+  font-weight: 600;
+  font-style: normal;
+}
+.wpd-multimodality-twoup-dim {
+  color: var(--wipu-ink-dim);
+}
+.wpd-multimodality-twoup-attr {
+  font-family: var(--wipu-mono);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--wipu-ink-faint);
+  font-style: normal;
+}
+@media (max-width: 760px) {
+  .wpd-multimodality-twoup {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* NYC · Multimodal use cases — horizontal click-to-advance carousel.
+   Small gray label sits in the top-left corner; the active card centers
+   in the slide; prev/next sit to the left/right, blurred and scaled
+   down. The whole stage is the click target. */
+.wpd-multimodal-uc-board {
+  position: relative;
+  width: 100%;
+  align-self: stretch;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+.wpd-multimodal-uc-board-label {
+  align-self: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 5;
+  max-width: 40ch;
+  font-family: var(--wipu-mono);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.45;
+  letter-spacing: 0.02em;
+  color: var(--wipu-ink-dim);
+}
+.wpd-multimodal-uc-board-label > :first-child {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--wipu-ink-faint);
+}
+.wpd-multimodal-uc-board .wpd-multimodal-uc-stage {
+  flex: 1;
+}
+
+/* Two-up "key learnings" recap — slide-level title above a ThreeUp
+   used with two blocks. Sits at the top of the Realtime Video section. */
+.wipu-cs-learnings {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(36px, 5vh, 64px);
+}
+.wipu-cs-learnings-title {
+  font-size: clamp(24px, 2.8vw, 40px);
+  font-weight: 500;
+  letter-spacing: -0.012em;
+  line-height: 1.2;
+  color: var(--wipu-ink);
+  margin: 0;
+  text-align: center;
+  max-width: min(960px, 80vw);
+}
+
+/* Hero variant — the title is rendered as a StrokeHeroMetric so it
+   gets the same plotter-trace draw-on as other hero numbers. Mustard
+   to match the Zürich passport stamp; sized to dominate the top half
+   of the slide.
+
+   The title block is locked to ~50vh and the SVG is allowed to fit
+   that box (preserveAspectRatio="meet" inside the component height-
+   fits when the box is squarer than the glyphs). The 3-line title
+   "What / have we / learned?" gives a ~1.6:1 aspect that fills the
+   half-screen container both vertically and horizontally. */
+.wipu-cs-learnings-hero {
+  justify-content: flex-start;
+  height: 100%;
+  gap: clamp(48px, 6vh, 80px);
+}
+/* Match the ThreeUp grid's column (max-width: min(1280px, 92vw))
+   so the hero's left edge sits on the same line as the eyebrows
+   and titles in the blocks below. */
+.wipu-cs-learnings-hero .wipu-cs-learnings-title {
+  width: 100%;
+  max-width: min(1280px, 92vw);
+  margin: 0 auto;
+  height: 50vh;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+.wipu-cs-learnings-hero .wipu-sample-heroMetric {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: left;
+}
+.wipu-cs-learnings-hero .wipu-sample-heroMetric-svg {
+  height: 100%;
+  max-height: 100%;
+  width: auto;
+  max-width: 100%;
+  margin: 0;
+  color: var(--wipu-mustard);
+}
+/* Slower trace for the header — the long, multi-line title gets more
+   air to draw on than a short metric needs. */
+.wipu-cs-learnings-hero .wipu-sample-heroMetric-svg-text {
+  animation-duration: 7s;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   Veo case study — user-flow flowchart (slide 06).
+   Standard flowchart conventions (pill/rect/diamond) drawn in SVG so
+   nodes and the orthogonal edges between them stay locked in place
+   when the slide resizes. Whole graph reads as a quiet gray field;
+   hover lights the focused node and the edges that touch it.
+
+   Five tones: default → white (primary path), refine → mustard (loops
+   back into the input flow), success → mint, failure → rose, punt →
+   navy (terminal recommendation to a different modality).
+   ───────────────────────────────────────────────────────────────────── */
+.wpd-flow {
+  width: 100%;
+  max-width: min(1320px, 96vw);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(20px, 3vh, 40px);
+  align-items: stretch;
+}
+.wpd-flow-header {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.wpd-flow-eyebrow {
+  font-family: var(--wipu-mono);
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--wipu-ink-faint);
+  font-weight: 500;
+}
+.wpd-flow-title {
+  margin: 0;
+  font-family: var(--wipu-mono);
+  font-size: clamp(22px, 2.4vw, 34px);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--wipu-ink);
+}
+.wpd-flow-sub {
+  margin: 0;
+  font-family: var(--wipu-mono);
+  font-size: clamp(11px, 1vw, 13px);
+  letter-spacing: 0.06em;
+  color: var(--wipu-ink-faint);
+}
+
+.wpd-flow-svg {
+  width: 100%;
+  height: auto;
+  /* Cap the SVG height so on tall viewports the chart doesn't balloon
+     past comfortable reading size while still scaling on wider screens. */
+  max-height: clamp(560px, 90vh, 1100px);
+  display: block;
+  /* Tone surface palette — read by .wpd-flow-shape and edges below.
+     Per-node `data-tone` overrides --tone-* on hover via the rules
+     further down so each shape lifts to its semantic color. */
+  --tone-line: var(--wipu-ink-faint);
+  --tone-fill: transparent;
+  --tone-text: var(--wipu-ink-dim);
+}
+
+/* ── Edges ──
+   Default state is dim gray. Loop edges render dashed so backward
+   flow reads as recovery rather than primary motion. On the active
+   node, only the touching edges promote to full intensity + tone. */
+.wpd-flow-edge {
+  color: var(--wipu-ink-faint);
+  opacity: 0.55;
+  transition: color 220ms ease, opacity 220ms ease;
+}
+.wpd-flow-edge > path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: square;
+  stroke-linejoin: miter;
+}
+.wpd-flow-edge[data-loop="true"] > path {
+  stroke-dasharray: 5 6;
+  opacity: 0.7;
+}
+.wpd-flow-edge-label {
+  fill: var(--wipu-ink-dim);
+  font-family: var(--wipu-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: lowercase;
+  paint-order: stroke;
+  stroke: var(--wipu-bg);
+  stroke-width: 4;
+}
+
+.wpd-flow-edge[data-active="true"] {
+  opacity: 1;
+}
+.wpd-flow-edge[data-active="true"][data-tone="default"] { color: var(--wipu-ink); }
+.wpd-flow-edge[data-active="true"][data-tone="success"] { color: var(--wipu-mint); }
+.wpd-flow-edge[data-active="true"][data-tone="failure"] { color: var(--wipu-rose); }
+.wpd-flow-edge[data-active="true"][data-tone="refine"]  { color: var(--wipu-mustard); }
+.wpd-flow-edge[data-active="true"][data-tone="punt"]    { color: var(--wipu-navy); }
+.wpd-flow-edge[data-active="true"] > path { stroke-width: 2.2; }
+
+/* ── Cycle edges ──
+   The disambiguate cycle (submit → clear → suggest → clarify → submit)
+   reads as an active churn even when nothing is hovered: visible
+   mustard tone at rest, plus a marching-dash animation so the eye
+   tracks motion around the loop. Hovering any node in the cycle just
+   brightens the cycle without changing its rhythm. */
+.wpd-flow-edge[data-cycle="true"] {
+  color: color-mix(in srgb, var(--wipu-mustard) 75%, var(--wipu-ink-faint));
+  opacity: 0.9;
+}
+.wpd-flow-edge[data-cycle="true"] > path {
+  stroke-dasharray: 6 6;
+  animation: wpd-flow-cycle-march 1.6s linear infinite;
+}
+@keyframes wpd-flow-cycle-march {
+  to { stroke-dashoffset: -12; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wpd-flow-edge[data-cycle="true"] > path { animation: none; }
+}
+
+/* ── Nodes ──
+   Single shape style swapped via class on rect/polygon. The hover
+   focus is on the entire <g> so children pick up the data-active
+   state through cascade; the clickable hit-area is the foreignObject
+   text plus the shape fill, which is transparent until hover. */
+.wpd-flow-node {
+  cursor: default;
+  outline: none;
+}
+.wpd-flow-node:focus-visible .wpd-flow-shape {
+  outline: 2px solid var(--wipu-mustard);
+  outline-offset: 2px;
+}
+.wpd-flow-shape {
+  fill: var(--tone-fill, transparent);
+  stroke: var(--tone-line, var(--wipu-ink-faint));
+  stroke-width: 1.6;
+  transition: fill 220ms ease, stroke 220ms ease, stroke-width 220ms ease;
+}
+.wpd-flow-node[data-kind="terminal"] .wpd-flow-shape {
+  /* Pill — slightly heavier border so start/end read as anchors. */
+  stroke-width: 1.8;
+}
+
+.wpd-flow-label {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10px;
+  font-family: var(--wipu-mono);
+  font-size: 13px;
+  line-height: 1.2;
+  font-weight: 500;
+  text-align: center;
+  letter-spacing: -0.005em;
+  color: var(--tone-text, var(--wipu-ink-dim));
+  pointer-events: none;
+  transition: color 220ms ease;
+}
+
+/* Hover — the active node lifts to its tone. Decision diamonds and
+   pills follow the same rule because --tone-* drives both. */
+.wpd-flow-node[data-active="true"][data-tone="default"] {
+  --tone-line: var(--wipu-ink);
+  --tone-fill: var(--wipu-ink);
+  --tone-text: var(--wipu-bg);
+}
+.wpd-flow-node[data-active="true"][data-tone="success"] {
+  --tone-line: var(--wipu-mint);
+  --tone-fill: var(--wipu-mint);
+  --tone-text: var(--wipu-mint-ink);
+}
+.wpd-flow-node[data-active="true"][data-tone="failure"] {
+  --tone-line: var(--wipu-rose);
+  --tone-fill: var(--wipu-rose);
+  --tone-text: var(--wipu-rose-ink);
+}
+.wpd-flow-node[data-active="true"][data-tone="refine"] {
+  --tone-line: var(--wipu-mustard);
+  --tone-fill: var(--wipu-mustard);
+  --tone-text: var(--wipu-mustard-ink);
+}
+.wpd-flow-node[data-active="true"][data-tone="punt"] {
+  --tone-line: var(--wipu-navy);
+  --tone-fill: var(--wipu-navy);
+  --tone-text: var(--wipu-navy-ink);
+}
+
+/* ── Primary node (Submit) ──
+   The CTA at the heart of the experience. Painted with the same purple
+   gel texture used in the timeline's "what's next?" slot — three
+   blurred blobs on offset timings — so Submit feels alive while the
+   rest of the diagram sits still. No stroke; the gel <foreignObject>
+   behind the label is the entire shape. Drop shadow lifts it off the
+   field; hover deepens the shadow without changing the silhouette. */
+.wpd-flow-node[data-primary="true"] .wpd-flow-shape {
+  fill: transparent;
+  stroke: none;
+  filter: drop-shadow(0 6px 18px rgba(107, 63, 181, 0.45));
+}
+.wpd-flow-node[data-primary="true"] .wpd-flow-label {
+  color: #000;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 13px;
+}
+.wpd-flow-node[data-primary="true"][data-active="true"] .wpd-flow-shape {
+  filter: drop-shadow(0 10px 26px rgba(107, 63, 181, 0.7));
+}
+
+/* Gel — three drifting purple blobs clipped to the Submit pill.
+   Identical pattern to .wpd-gel/.wpd-gel-blob but scaled down for the
+   button: smaller blur radius and slightly smaller blobs so the texture
+   reads as a glowing surface rather than a single washed plane. */
+.wpd-flow-gel {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 14px;
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    radial-gradient(120% 100% at 30% 20%, #2a1244 0%, #110522 60%, #0a0214 100%);
+}
+.wpd-flow-gel-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(18px);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+.wpd-flow-gel-blob:nth-child(1) {
+  width: 60%;
+  height: 140%;
+  background: #6b3fb5;
+  top: -20%;
+  left: -10%;
+  animation: wpd-flow-gel-a 9.4s ease-in-out infinite;
+}
+.wpd-flow-gel-blob:nth-child(2) {
+  width: 55%;
+  height: 130%;
+  background: #b07cff;
+  top: -10%;
+  right: -15%;
+  animation: wpd-flow-gel-b 11.7s ease-in-out infinite;
+}
+.wpd-flow-gel-blob:nth-child(3) {
+  width: 45%;
+  height: 120%;
+  background: #d0a8ff;
+  bottom: -20%;
+  left: 30%;
+  animation: wpd-flow-gel-c 13.2s ease-in-out infinite;
+}
+@keyframes wpd-flow-gel-a {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.85; }
+  33%      { transform: translate(20%, 12%) scale(1.18); opacity: 0.95; }
+  66%      { transform: translate(-8%, 24%) scale(0.92); opacity: 0.78; }
+}
+@keyframes wpd-flow-gel-b {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.78; }
+  40%      { transform: translate(-18%, -10%) scale(1.1); opacity: 0.9; }
+  70%      { transform: translate(10%, 8%) scale(0.95); opacity: 0.7; }
+}
+@keyframes wpd-flow-gel-c {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.7; }
+  35%      { transform: translate(-20%, -25%) scale(1.22); opacity: 0.85; }
+  72%      { transform: translate(15%, -12%) scale(0.88); opacity: 0.62; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wpd-flow-gel-blob { animation: none; }
+}
+
+/* When NOTHING is hovered, surface a faint hint of tone on the
+   non-default nodes so the diagram still reads as map-with-categories
+   at rest. Dimmer than the active state — just enough to show shape. */
+.wpd-flow-svg:not(:hover) .wpd-flow-node[data-tone="success"] {
+  --tone-line: color-mix(in srgb, var(--wipu-mint) 60%, var(--wipu-ink-faint));
+}
+.wpd-flow-svg:not(:hover) .wpd-flow-node[data-tone="failure"] {
+  --tone-line: color-mix(in srgb, var(--wipu-rose) 60%, var(--wipu-ink-faint));
+}
+.wpd-flow-svg:not(:hover) .wpd-flow-node[data-tone="refine"] {
+  /* Lifted higher than the other tones — the disambiguate cycle is the
+     point of the slide, so it should already read as a connected loop
+     before you start hovering. */
+  --tone-line: color-mix(in srgb, var(--wipu-mustard) 80%, var(--wipu-ink-faint));
+  --tone-text: color-mix(in srgb, var(--wipu-mustard) 70%, var(--wipu-ink-dim));
+}
+.wpd-flow-svg:not(:hover) .wpd-flow-node[data-tone="punt"] {
+  --tone-line: color-mix(in srgb, var(--wipu-navy) 70%, var(--wipu-ink-faint));
+}
+
+/* Light-theme pass — when sample.css flips to the cream theme, the
+   default-tone hover swaps so the node fill is dark ink and the text
+   reads in cream. Other tones retain their saturated fills which work
+   in both themes. */
+[data-theme="light"] .wpd-flow-node[data-active="true"][data-tone="default"],
+.wpd-flow-svg [data-theme="light"] .wpd-flow-node[data-active="true"][data-tone="default"] {
+  --tone-fill: var(--wipu-ink);
+  --tone-text: var(--wipu-bg);
+}
+
+@media (max-width: 760px) {
+  .wpd-flow-svg {
+    max-height: none;
+  }
+  .wpd-flow-label {
+    font-size: 12px;
+  }
+}
+
+/* Multimodal use cases — three categories rendered as little chat threads.
+   Outlined emoji rings (the "icon chip") sit above mini message bubbles
+   that mimic iMessage: user query in a serif italic bubble tinted to the
+   card's brand tone, Gemini's behavior in a neutral receiver bubble. The
+   columns are vertically staggered and each ring rotates a touch to keep
+   the grid from feeling like a CMS. */
+.wpd-multimodal-uc {
+  width: 100%;
+  max-width: min(1280px, 92vw);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: clamp(8px, 1vw, 20px);
+}
+.wpd-multimodal-uc-quote {
+  margin: 0;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(16px, 2.4vh, 26px);
+  max-width: 36ch;
+  /* Sit at the right edge of the left column — the quote nudges toward
+     the carousel instead of clinging to the slide edge, closing the
+     visible gap between the two halves. */
+  justify-self: end;
+}
+.wpd-multimodal-uc-quote-text {
+  margin: 0;
+  font-family: var(--wipu-mono);
+  font-style: normal;
+  font-size: clamp(18px, 2vw, 26px);
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: -0.005em;
+  color: var(--wipu-ink);
+}
+.wpd-multimodal-uc-quote-dim {
+  color: var(--wipu-ink-dim);
+}
+.wpd-multimodal-uc-quote-attr {
+  font-family: var(--wipu-mono);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--wipu-ink-faint);
+  font-style: normal;
+}
+/* Carousel stage — fills the slide. Three cards laid out horizontally
+   and positioned absolutely. The active card sits centered + sharp; the
+   prev card peeks to the left and the next card peeks to the right at
+   ~84% scale with a 10px blur — same depth-of-field treatment as the
+   Veo hero. The whole stage is the click target. */
+.wpd-multimodal-uc-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.wpd-multimodal-uc-stage:focus-visible {
+  outline: 1px dashed var(--wipu-rule-strong);
+  outline-offset: 16px;
+  border-radius: 12px;
+}
+
+.wpd-multimodal-uc-card {
+  --wpd-tone: var(--wipu-terracotta);
+  --wpd-tone-ink: var(--wipu-terracotta-ink);
+  --card-rot: 0deg;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  min-width: 0;
+  padding: clamp(22px, 2.2vw, 32px);
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--wipu-ink) 6%, transparent);
+  border: 1px solid var(--wipu-rule);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+}
+.wpd-multimodal-uc-stage .wpd-multimodal-uc-card {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(560px, 56vw);
+  transition:
+    transform 600ms cubic-bezier(0.2, 0.6, 0.2, 1),
+    filter 600ms ease,
+    opacity 600ms ease;
+  will-change: transform, filter, opacity;
+}
+.wpd-multimodal-uc-card[data-tone="terracotta"] {
+  --wpd-tone: var(--wipu-terracotta);
+  --wpd-tone-ink: var(--wipu-terracotta-ink);
+  --card-rot: -1.5deg;
+}
+.wpd-multimodal-uc-card[data-tone="mint"] {
+  --wpd-tone: var(--wipu-mint);
+  --wpd-tone-ink: var(--wipu-mint-ink);
+  --card-rot: 1.2deg;
+}
+.wpd-multimodal-uc-card[data-tone="mustard"] {
+  --wpd-tone: var(--wipu-mustard);
+  --wpd-tone-ink: var(--wipu-mustard-ink);
+  --card-rot: -0.7deg;
+}
+
+.wpd-multimodal-uc-card[data-position="active"] {
+  transform: translate(-50%, -50%) rotate(var(--card-rot)) scale(1);
+  filter: blur(0);
+  opacity: 1;
+  z-index: 3;
+}
+.wpd-multimodal-uc-card[data-position="next"] {
+  /* Right of center */
+  transform:
+    translate(calc(-50% + clamp(300px, 36vw, 480px)), -50%)
+    rotate(calc(var(--card-rot) + 3deg))
+    scale(0.84);
+  filter: blur(28px);
+  opacity: 0.45;
+  z-index: 2;
+}
+.wpd-multimodal-uc-card[data-position="prev"] {
+  /* Left of center */
+  transform:
+    translate(calc(-50% - clamp(300px, 36vw, 480px)), -50%)
+    rotate(calc(var(--card-rot) - 3deg))
+    scale(0.84);
+  filter: blur(28px);
+  opacity: 0.45;
+  z-index: 2;
+}
+
+/* Hover acknowledgement — active card lifts a touch and straightens
+   slightly toward 0°; side cards lose a hint of blur. Faster transition
+   on hover so the response feels immediate; the slow 600ms eases stay on
+   the advance flip. */
+.wpd-multimodal-uc-stage:hover .wpd-multimodal-uc-card {
+  transition-duration: 280ms;
+}
+.wpd-multimodal-uc-stage:hover .wpd-multimodal-uc-card[data-position="active"] {
+  transform:
+    translate(-50%, calc(-50% - 4px))
+    rotate(calc(var(--card-rot) * 0.4))
+    scale(1.015);
+}
+.wpd-multimodal-uc-stage:hover .wpd-multimodal-uc-card[data-position="next"],
+.wpd-multimodal-uc-stage:hover .wpd-multimodal-uc-card[data-position="prev"] {
+  filter: blur(22px);
+  opacity: 0.55;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wpd-multimodal-uc-stage .wpd-multimodal-uc-card {
+    transition-duration: 1ms;
+  }
+}
+
+.wpd-multimodal-uc-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.wpd-multimodal-uc-emoji {
+  width: clamp(64px, 6.4vw, 88px);
+  height: clamp(64px, 6.4vw, 88px);
+  border-radius: 50%;
+  border: 1.5px solid var(--wpd-tone);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(30px, 3.1vw, 40px);
+  flex-shrink: 0;
+  background: transparent;
+  /* font-variant-emoji: text — Chrome 131+ renders monochrome glyphs
+     where available; other browsers fall back gracefully to color. */
+  font-variant-emoji: text;
+  line-height: 1;
+}
+.wpd-multimodal-uc-card[data-tone="terracotta"] .wpd-multimodal-uc-emoji {
+  transform: rotate(-3deg);
+}
+.wpd-multimodal-uc-card[data-tone="mint"] .wpd-multimodal-uc-emoji {
+  transform: rotate(2.5deg);
+}
+.wpd-multimodal-uc-card[data-tone="mustard"] .wpd-multimodal-uc-emoji {
+  transform: rotate(-1.5deg);
+}
+.wpd-multimodal-uc-cat {
+  font-family: var(--wipu-mono);
+  font-size: clamp(17px, 1.85vw, 23px);
+  font-weight: 500;
+  line-height: 1.22;
+  letter-spacing: -0.01em;
+  margin: 0;
+  color: var(--wipu-ink);
+}
+.wpd-multimodal-uc-thread {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
+}
+.wpd-multimodal-uc-bubble {
+  padding: 11px 16px;
+  border-radius: 20px;
+  max-width: 92%;
+  font-size: clamp(13px, 1.05vw, 15px);
+  line-height: 1.5;
+  position: relative;
+}
+.wpd-multimodal-uc-bubble.is-user {
+  align-self: flex-end;
+  background: var(--wpd-tone);
+  color: var(--wpd-tone-ink);
+  border-bottom-right-radius: 6px;
+  font-family: var(--font-serif), Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+}
+.wpd-multimodal-uc-bubble.is-ai {
+  align-self: flex-start;
+  background: var(--wipu-bg-elev);
+  color: var(--wipu-ink-dim);
+  border: 1px solid var(--wipu-rule);
+  border-bottom-left-radius: 6px;
+  font-family: var(--wipu-mono);
+}
+.wpd-multimodal-uc-ai-label {
+  font-family: var(--wipu-mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--wipu-ink-faint);
+  align-self: flex-start;
+  margin: 4px 0 -6px 6px;
+}
+
+@media (max-width: 880px) {
+  .wpd-multimodal-uc {
+    grid-template-columns: 1fr;
+    gap: clamp(36px, 5vh, 56px);
+    justify-items: center;
+  }
+  .wpd-multimodal-uc-quote {
+    text-align: center;
+    align-items: center;
+    max-width: 92vw;
+  }
+  .wpd-multimodal-uc-stage .wpd-multimodal-uc-card {
+    width: min(86vw, 380px);
+  }
+  .wpd-multimodal-uc-card[data-position="next"] {
+    transform:
+      translate(calc(-50% + 70vw), -50%)
+      rotate(calc(var(--card-rot) + 3deg))
+      scale(0.84);
+  }
+  .wpd-multimodal-uc-card[data-position="prev"] {
+    transform:
+      translate(calc(-50% - 70vw), -50%)
+      rotate(calc(var(--card-rot) - 3deg))
+      scale(0.84);
+  }
+}
+
+/* Hero slide ASCII eye — 5 stacked <pre> frames sampled from the talos-
+   principle GIF. Frame 1 (open) sits in flow and provides the layout;
+   frames 2–5 are absolute overlays that fade in on schedule for a gradual
+   blink. The dark page bg makes covering frames opaque without an explicit
+   background. */
+.wpd-tgts-ascii-eye {
+  position: relative;
+  display: inline-block;
+  font-family: var(--wipu-mono);
+  /* Smaller per-char size — combined with the higher-density 112-col frames,
+     this gives more visible characters while making the eye physically larger
+     overall (~75vw on widescreen vs the previous ~55vw). */
+  font-size: clamp(8px, 1.2vw, 20px);
+  line-height: 1.0;
+  letter-spacing: 0;
+  color: var(--wipu-ink);
+}
+/* Bigger emoji slot — let the eye breathe past the template's clamp. */
+.wipu-tpl-intro-emoji:has(.wpd-tgts-ascii-eye) {
+  font-size: 0;
+  line-height: 0;
+  filter: none;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+/* Hero with eye: shrink the title (was clamp(36, 5.6vw, 76)) and bump the
+   greeting (was clamp(16, 2vw, 24)) so the type pyramid balances under the
+   bigger illustration. */
+.wipu-tpl-intro:has(.wpd-tgts-ascii-eye) .wipu-tpl-intro-name {
+  font-size: clamp(28px, 4.2vw, 58px);
+}
+.wipu-tpl-intro:has(.wpd-tgts-ascii-eye) .wipu-tpl-intro-greeting {
+  font-size: clamp(20px, 2.4vw, 32px);
+}
+.wpd-tgts-ascii-eye-frame {
+  margin: 0;
+  font: inherit;
+  white-space: pre;
+  color: inherit;
+}
+.wpd-tgts-ascii-eye-frame-1 {
+  position: relative;
+}
+.wpd-tgts-ascii-eye-frame-2,
+.wpd-tgts-ascii-eye-frame-3,
+.wpd-tgts-ascii-eye-frame-4,
+.wpd-tgts-ascii-eye-frame-5 {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: var(--wipu-bg);
+}
+/* 6s cycle. Held open ~3.6s (was ~1.6s — roughly doubled gap between
+   blinks), then ~2.4s of gradual close→peak→open via frames 2→3→4→5
+   (each ~600ms). Handoffs are exact, no gaps. */
+.wpd-tgts-ascii-eye-frame-2 { animation: wpd-tgts-eye-f2 6s steps(1, end) infinite; }
+.wpd-tgts-ascii-eye-frame-3 { animation: wpd-tgts-eye-f3 6s steps(1, end) infinite; }
+.wpd-tgts-ascii-eye-frame-4 { animation: wpd-tgts-eye-f4 6s steps(1, end) infinite; }
+.wpd-tgts-ascii-eye-frame-5 { animation: wpd-tgts-eye-f5 6s steps(1, end) infinite; }
+
+@keyframes wpd-tgts-eye-f2 {
+  0%, 59%   { opacity: 0; }
+  60%, 69%  { opacity: 1; }
+  70%, 100% { opacity: 0; }
+}
+@keyframes wpd-tgts-eye-f3 {
+  0%, 69%   { opacity: 0; }
+  70%, 79%  { opacity: 1; }
+  80%, 100% { opacity: 0; }
+}
+@keyframes wpd-tgts-eye-f4 {
+  0%, 79%   { opacity: 0; }
+  80%, 89%  { opacity: 1; }
+  90%, 100% { opacity: 0; }
+}
+@keyframes wpd-tgts-eye-f5 {
+  0%, 89%   { opacity: 0; }
+  90%, 99%  { opacity: 1; }
+  100%      { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wpd-tgts-ascii-eye-frame-2,
+  .wpd-tgts-ascii-eye-frame-3,
+  .wpd-tgts-ascii-eye-frame-4,
+  .wpd-tgts-ascii-eye-frame-5 {
+    animation: none;
   }
 }

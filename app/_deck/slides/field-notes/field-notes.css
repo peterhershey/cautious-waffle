@@ -26,93 +26,141 @@
   pointer-events: none;
 }
 
-.field-notes-archive-trigger {
+/* Portal entry — hover-dwell trigger.
+   The slide root carries a `--dwell` custom property (0..1) set by JS
+   each frame while the user hovers. The trigger reads it for the ring
+   fill, aura, folder lift, and label fade. The overlay reads it for
+   the clip-path aperture (see .field-notes-overlay[data-state="previewing"]).
+   Ring circumference at r=46 ≈ 289.03 svg units — used as the dasharray
+   constant. */
+
+.field-notes-slide { --dwell: 0; }
+
+.field-notes-portal-trigger {
+  position: relative;
   display: inline-flex;
   flex-direction: column;
   align-items: center;
-  gap: 14px;
-  padding: 20px 28px;
+  gap: 22px;
+  padding: 12px;
   background: none;
-  border: 1px dashed var(--wipu-rule-strong);
-  border-radius: 12px;
+  border: none;
   color: var(--wipu-ink);
   cursor: pointer;
   font-family: var(--wipu-mono);
-  transition: transform 220ms ease, border-color 220ms ease;
+  -webkit-tap-highlight-color: transparent;
+  /* Sit above the overlay so the folder visibly stays on top of the
+     portal aperture growing behind it. */
+  z-index: 220;
 }
-.field-notes-archive-trigger:hover {
-  transform: translateY(-4px);
-  border-color: var(--wipu-mustard);
-}
-.field-notes-archive-trigger:disabled {
+.field-notes-portal-trigger:disabled {
   opacity: 0.4;
   cursor: default;
 }
+.field-notes-portal-trigger:focus-visible {
+  outline: none;
+}
+.field-notes-portal-trigger:focus-visible .field-notes-portal-disc::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 999px;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--wipu-mustard) 60%, transparent);
+}
 
-.field-notes-archive-icon {
-  font-size: 56px;
+.field-notes-portal-disc {
+  position: relative;
+  width: clamp(180px, 22vw, 260px);
+  aspect-ratio: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  transform: scale(calc(1 + var(--dwell) * 0.06));
+  /* No transition — JS rAF writes --dwell at 60fps; transitioning would
+     chase its own tail (esp. with non-linear ease, where per-frame
+     deltas vary). */
+}
+
+.field-notes-portal-aura {
+  position: absolute;
+  inset: -18%;
+  border-radius: 999px;
+  background:
+    radial-gradient(closest-side,
+      color-mix(in srgb, var(--wipu-mustard) 70%, transparent) 0%,
+      color-mix(in srgb, var(--wipu-mustard) 30%, transparent) 35%,
+      transparent 70%);
+  opacity: calc(0.18 + var(--dwell) * 0.55);
+  filter: blur(calc(8px + var(--dwell) * 18px));
+  pointer-events: none;
+}
+
+.field-notes-portal-ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+  overflow: visible;
+}
+.field-notes-portal-ring-track {
+  fill: none;
+  stroke: var(--wipu-rule-strong);
+  stroke-width: 1.2;
+}
+.field-notes-portal-ring-fill {
+  fill: none;
+  stroke: var(--wipu-mustard);
+  stroke-width: calc(2.2 + var(--dwell) * 1.6);
+  stroke-linecap: round;
+  /* dasharray is set inline (constant). Offset is dasharray * (1 - dwell)
+     so the ring fills clockwise from the top as dwell rises. */
+  stroke-dashoffset: calc(289.03 * (1 - var(--dwell)));
+  filter:
+    drop-shadow(0 0 calc(2px + var(--dwell) * 8px)
+      color-mix(in srgb, var(--wipu-mustard) 80%, transparent));
+}
+
+.field-notes-portal-icon {
+  position: relative;
+  font-size: clamp(72px, 9vw, 112px);
   line-height: 1;
+  transform: scale(calc(1 + var(--dwell) * 0.18))
+    rotate(calc(var(--dwell) * -6deg));
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.25));
 }
 
-.field-notes-archive-lbl {
-  font-size: 11px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--wipu-ink-dim);
-}
-
-.field-notes-archive-caption {
-  margin-top: 32px;
-  font-size: 13px;
-  color: var(--wipu-ink-faint);
-}
-
-.field-notes-archive-hint {
+.field-notes-portal-lbl {
   font-family: var(--wipu-mono);
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--wipu-ink-faint);
-  margin-top: 4px;
-  opacity: 0;
-  transform: translateY(4px);
-  transition: opacity 360ms ease 600ms, transform 360ms ease 600ms;
-}
-.wipu-slide[data-active="true"]
-  .field-notes-slide[data-state="closed"]
-  .field-notes-archive-hint {
-  opacity: 0.85;
-  transform: translateY(0);
+  color: var(--wipu-ink-dim);
+  opacity: calc(1 - var(--dwell) * 0.7);
+  transform: translateY(calc(var(--dwell) * 4px));
 }
 
-/* Arrival bounce + ambient breathing on the folder when its slide is the
-   active one. Plays once on activation, then a slow pulse ambient hint
-   keeps suggesting interactivity. */
+/* Idle ambient breathing while the slide is active and waiting to be
+   entered. The disc transform uses --dwell at rest (= 0), so this
+   animation drives the same property without conflict. Stops on hover. */
 .wipu-slide[data-active="true"]
   .field-notes-slide[data-state="closed"]
-  .field-notes-archive-trigger {
-  animation:
-    field-notes-archive-arrival 1100ms cubic-bezier(0.22, 0.8, 0.2, 1) 220ms 1 both,
-    field-notes-archive-pulse 3.6s ease-in-out 1500ms infinite;
+  .field-notes-portal-disc {
+  animation: field-notes-portal-breathe 4.2s ease-in-out infinite;
 }
-@keyframes field-notes-archive-arrival {
-  0%   { transform: translateY(0) scale(1); }
-  35%  { transform: translateY(-8px) scale(1.03); }
-  62%  { transform: translateY(0) scale(1); }
-  82%  { transform: translateY(-3px) scale(1.01); }
-  100% { transform: translateY(0) scale(1); }
+.field-notes-portal-trigger:hover .field-notes-portal-disc {
+  animation: none;
 }
-@keyframes field-notes-archive-pulse {
-  0%, 100% { border-color: var(--wipu-rule-strong); }
-  50%      { border-color: var(--wipu-mustard); }
+@keyframes field-notes-portal-breathe {
+  0%, 100% { transform: scale(calc(1 + var(--dwell) * 0.06)); }
+  50%      { transform: scale(calc(1 + var(--dwell) * 0.06 + 0.012)); }
 }
-@media (prefers-reduced-motion: reduce) {
-  .wipu-slide[data-active="true"]
-    .field-notes-slide[data-state="closed"]
-    .field-notes-archive-trigger {
-    animation: none;
-  }
-  .field-notes-archive-hint { opacity: 0.85; transform: none; transition: none; }
+
+@media (prefers-reduced-motion: reduce), (pointer: coarse) {
+  .field-notes-portal-disc { animation: none; }
+  .field-notes-portal-aura,
+  .field-notes-portal-ring-fill { display: none; }
 }
 
 /* ───────── Act 2: Exploded overlay ───────── */
@@ -128,26 +176,57 @@
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   opacity: 0;
-  transition: opacity 260ms ease;
-  cursor: none;
+  /* Default clip-path is large enough to cover any viewport — it only
+     shrinks when the portal is mid-dwell. Animating clip-path between
+     two circle() values gives the "aperture closing/opening" effect. */
+  clip-path: circle(150vmax at 50% 50%);
+  transition:
+    opacity 260ms ease,
+    clip-path 540ms cubic-bezier(0.22, 0.8, 0.2, 1);
 }
-@media (pointer: coarse), (prefers-reduced-motion: reduce) {
-  .field-notes-overlay { cursor: auto; }
-}
-.field-notes-overlay .field-notes-x { cursor: pointer; }
 .field-notes-overlay::-webkit-scrollbar { display: none; }
 .field-notes-overlay[data-state="opening"] { opacity: 0; }
 .field-notes-overlay[data-state="open"] { opacity: 1; }
 .field-notes-overlay[data-state="closing"] { opacity: 0; transition-duration: 360ms; }
 
+/* ── Portal preview ────────────────────────────────────────────────
+   While the user hovers the folder, the overlay is mounted underneath
+   with a small circular aperture centered on the folder. JS drives the
+   `--dwell` custom property each frame; this rule reads it via calc()
+   so the aperture grows in lock-step with the ring fill. We suppress
+   the clip-path transition here because the variable is already smooth
+   per-frame; transitioning would chase its own tail. */
+.field-notes-overlay[data-state="previewing"] {
+  opacity: 1;
+  clip-path: circle(
+    calc(var(--dwell, 0) * 70vmax) at 50% 50%
+  );
+  transition: opacity 200ms ease;
+  pointer-events: none;
+}
+/* During preview the bento tiles must already be in their resting state
+   (otherwise the explosion-prep CSS would render them invisible behind
+   the aperture). When state flips to "open" the existing rules take
+   over — both states show tiles at scale(1)/opacity(1), so there's no
+   visible swap. */
+.field-notes-overlay[data-state="previewing"] .field-notes-tile {
+  opacity: 1;
+  transform: scale(1);
+  transition: none;
+}
+
 .field-notes-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   grid-auto-rows: minmax(0, 1fr);
-  grid-auto-flow: dense;
+  /* Sequential flow (no `dense`) so a tile changing size doesn't cause
+     other tiles to back-fill into earlier-row holes. Combined with
+     pair-based breathing (an expander grows while a same-row shrinker
+     contracts), row totals stay balanced and tiles never jump rows. */
+  grid-auto-flow: row;
   gap: 12px;
   padding: clamp(16px, 3vw, 28px);
-  padding-bottom: clamp(88px, 10vh, 128px); /* room for X button */
+  padding-bottom: clamp(88px, 10vh, 128px); /* room for dock */
   max-width: 1800px;
   margin: 0 auto;
   /* aspect-ratio keeps rows squarish */
@@ -183,7 +262,36 @@
   aspect-ratio: 3 / 2;
 }
 
-/* Narrower viewports — collapse to fewer columns, relax aspect constraints */
+/* ───────── Breathing pulse ─────────
+   The JS scheduler picks pairs of tiles in the same row: an "expander"
+   1x1 grows to 2x1 while a "shrinker" intrinsic 2x1 contracts to 1x1.
+   Cells per row stay balanced so nothing reflows across rows. The
+   `data-breathing` attribute carries the override size token and the
+   CSS below maps it to the corresponding span + aspect. */
+.field-notes-tile-image[data-breathing="2x1"] {
+  grid-column: span 2;
+  grid-row: span 1;
+  aspect-ratio: 2 / 1;
+}
+.field-notes-tile-image[data-breathing="1x2"] {
+  grid-column: span 1;
+  grid-row: span 2;
+  aspect-ratio: 1 / 2;
+}
+.field-notes-tile-image[data-breathing="1x1"] {
+  grid-column: span 1;
+  grid-row: span 1;
+  aspect-ratio: 1 / 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  /* Belt-and-suspenders — the scheduler is also gated on this media query. */
+  .field-notes-tile-image[data-breathing] {
+    grid-column: span 1;
+    grid-row: span 1;
+    aspect-ratio: 1 / 1;
+  }
+}
+
 @media (max-width: 960px) {
   .field-notes-grid { grid-template-columns: repeat(4, 1fr); }
   .field-notes-tile-2x2 { grid-column: span 2; grid-row: span 2; }
@@ -215,15 +323,36 @@
 .field-notes-overlay[data-state="open"] .field-notes-tile {
   opacity: 1;
   transform: scale(1);
-  transition-duration: 720ms;
+  transition-duration: 920ms;
   transition-timing-function: cubic-bezier(0.34, 1.42, 0.64, 1);
-  transition-delay: calc(var(--i, 0) * 32ms);
+  transition-delay: calc(var(--i, 0) * 46ms);
 }
 
 /* ───────── Tile: image ───────── */
 
+/* Skeleton loader — a subtle highlight sweeps across an elevated-bg
+   plate while the media is downloading. The img/video sits in the
+   inner element with object-fit: cover and is opaque, so once it
+   paints it fully covers the skeleton — no JS toggle needed. */
 .field-notes-tile-image {
-  background: var(--wipu-bg-elev);
+  background-color: var(--wipu-bg-elev);
+  background-image: linear-gradient(
+    115deg,
+    transparent 32%,
+    color-mix(in srgb, var(--wipu-ink) 7%, transparent) 50%,
+    transparent 68%
+  );
+  background-size: 220% 100%;
+  background-repeat: no-repeat;
+  background-position: 200% 0;
+  animation: field-notes-skeleton 2400ms linear infinite;
+}
+@keyframes field-notes-skeleton {
+  from { background-position: 200% 0; }
+  to { background-position: -120% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .field-notes-tile-image { animation: none; }
 }
 /* Image tile: inner has 10% overshoot in each direction so the parallax
    translate never reveals the tile background. */
@@ -270,8 +399,18 @@
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12),
     0 12px 36px -12px rgba(0, 0, 0, 0.6);
 }
+/* Europalette stays quiet — no brighten, no border lift on hover. */
+.field-notes-tile-image[data-bucket="europalette"]:hover img,
+.field-notes-tile-image[data-bucket="europalette"]:hover video {
+  filter: none;
+}
+.field-notes-tile-image[data-bucket="europalette"]:hover::after {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+}
 
-/* ───────── Tile: color card ───────── */
+/* ───────── Tile: color card ─────────
+   Title + body. Bigger sizes only (2x1, 2x2). Title is a punchy claim;
+   body is one short descriptor sentence. */
 
 .field-notes-tile-card .field-notes-tile-inner {
   position: absolute;
@@ -280,21 +419,31 @@
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-end;
-  padding: clamp(14px, 2.4vw, 22px);
-  gap: 10px;
+  padding: clamp(20px, 2.6vw, 30px);
+  gap: clamp(8px, 0.9vw, 12px);
   text-align: left;
 }
-.field-notes-card-emoji {
-  font-size: clamp(34px, 5vw, 56px);
-  line-height: 1;
-  filter: saturate(1.05);
-}
-.field-notes-card-text {
+.field-notes-card-title {
   font-family: var(--wipu-mono);
-  font-weight: 500;
-  font-size: clamp(13px, 1.2vw, 16px);
-  line-height: 1.3;
+  font-weight: 600;
+  font-size: clamp(20px, 2vw, 28px);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+.field-notes-card-body {
+  font-family: var(--wipu-mono);
+  font-weight: 400;
+  font-size: clamp(13px, 1.05vw, 15px);
+  line-height: 1.45;
   letter-spacing: -0.005em;
+  margin: 0;
+  opacity: 0.85;
+  max-width: 38ch;
+}
+/* 2x1 cards are wider but shorter — keep title slightly smaller so the
+   body has room without crowding. */
+.field-notes-tile-card.field-notes-tile-2x1 .field-notes-card-title {
+  font-size: clamp(18px, 1.6vw, 22px);
 }
 
 .field-notes-tone-terracotta {
@@ -318,41 +467,153 @@
   color: var(--wipu-navy-ink);
 }
 
-/* ───────── X close button ───────── */
+/* ───────── Header ─────────
+   Question-framed hero title that sits sticky above the bento grid in
+   the open overlay. Each line of the question wraps in a <span> so it
+   stacks, mirroring the case-study "What have we learned?" hero. */
 
-.field-notes-x {
+.field-notes-header {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  font-family: var(--wipu-mono);
+  color: var(--wipu-ink);
+  padding: clamp(64px, 10vh, 120px) clamp(36px, 5vw, 72px) clamp(40px, 6vh, 64px);
+  max-width: 1800px;
+  margin: 0 auto;
+  opacity: 0;
+  transform: translateY(-6px);
+  transition:
+    opacity 320ms ease 200ms,
+    transform 360ms cubic-bezier(0.22, 0.8, 0.2, 1) 200ms;
+  pointer-events: none;
+}
+.field-notes-overlay[data-state="open"] .field-notes-header {
+  opacity: 1;
+  transform: translateY(0);
+}
+.field-notes-header-title {
+  margin: 0;
+  font-family: var(--wipu-mono);
+  font-weight: 500;
+  font-size: clamp(48px, 8vw, 116px);
+  line-height: 0.95;
+  letter-spacing: -0.025em;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.field-notes-header-title > span {
+  display: block;
+}
+/* Stagger the lines on entry so the question lands one beat at a time. */
+.field-notes-overlay[data-state="open"] .field-notes-header-title > span {
+  animation: field-notes-headline-rise 700ms cubic-bezier(0.22, 0.8, 0.2, 1) both;
+}
+.field-notes-overlay[data-state="open"] .field-notes-header-title > span:nth-child(1) { animation-delay: 240ms; }
+.field-notes-overlay[data-state="open"] .field-notes-header-title > span:nth-child(2) { animation-delay: 360ms; }
+.field-notes-overlay[data-state="open"] .field-notes-header-title > span:nth-child(3) { animation-delay: 480ms; }
+
+@keyframes field-notes-headline-rise {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.field-notes-header-sub {
+  margin: clamp(20px, 2vh, 32px) 0 0;
+  font-family: var(--wipu-mono);
+  font-weight: 400;
+  font-size: clamp(14px, 1.15vw, 17px);
+  line-height: 1.5;
+  letter-spacing: -0.005em;
+  color: var(--wipu-ink-dim);
+  max-width: 56ch;
+  opacity: 0;
+  animation: field-notes-headline-rise 600ms cubic-bezier(0.22, 0.8, 0.2, 1) 640ms forwards;
+}
+.field-notes-overlay:not([data-state="open"]) .field-notes-header-sub {
+  animation: none;
+  opacity: 0;
+}
+
+@media (max-width: 600px) {
+  .field-notes-header {
+    padding: 40px 20px 24px;
+  }
+  .field-notes-header-title { font-size: clamp(40px, 13vw, 64px); }
+}
+
+/* ───────── Dock (HUD pill) ─────────
+   Material — background, blur, gradient layers, border — comes from the
+   .hud class (see hud.css). These rules cover positioning, the open/close
+   reveal, and button sizing/icon styling only. */
+
+.field-notes-dock {
   position: fixed;
   left: 50%;
-  bottom: clamp(20px, 4vh, 36px);
-  transform: translateX(-50%);
+  bottom: clamp(28px, 5vh, 48px);
+  transform: translateX(-50%) translateY(14px);
   z-index: 210;
-  appearance: none;
-  background: color-mix(in srgb, var(--wipu-bg) 70%, transparent);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  color: var(--wipu-ink);
-  border: 1px solid var(--wipu-rule);
-  width: 52px;
-  height: 52px;
-  border-radius: 999px;
-  font-size: 28px;
-  line-height: 1;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  cursor: pointer;
+  gap: 14px;
   opacity: 0;
-  transform: translateX(-50%) translateY(10px);
-  transition: opacity 240ms ease 180ms, transform 280ms cubic-bezier(0.22, 0.8, 0.2, 1) 180ms,
-    background-color 160ms ease, border-color 160ms ease;
+  transition:
+    opacity 320ms ease 200ms,
+    transform 360ms cubic-bezier(0.22, 0.8, 0.2, 1) 200ms;
 }
-.field-notes-overlay[data-state="open"] .field-notes-x {
+.field-notes-overlay[data-state="open"] .field-notes-dock {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }
-.field-notes-x:hover {
-  background: var(--wipu-bg-elev);
-  border-color: var(--wipu-ink-dim);
+
+.field-notes-dock-btn {
+  appearance: none;
+  border: 0;
+  width: 64px;
+  height: 64px;
+  border-radius: 999px;
+  color: #fff;
+  background: linear-gradient(180deg, #1f1f1f 0%, #050505 100%);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 10px 24px rgba(0, 0, 0, 0.35);
+  transition:
+    transform 220ms cubic-bezier(0.22, 0.8, 0.2, 1),
+    box-shadow 220ms ease;
+}
+.field-notes-dock-btn:hover {
+  transform: translateY(-2px) scale(1.04);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.08) inset,
+    0 14px 28px rgba(0, 0, 0, 0.4);
+}
+.field-notes-dock-btn:active {
+  transform: translateY(0) scale(0.97);
+}
+.field-notes-dock-btn:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.55);
+  outline-offset: 2px;
+}
+.field-notes-dock-btn svg {
+  width: 24px;
+  height: 24px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+@media (max-width: 600px) {
+  .field-notes-dock { gap: 12px; }
+  .field-notes-dock-btn { width: 56px; height: 56px; }
+  .field-notes-dock-btn svg { width: 22px; height: 22px; }
 }
 
 /* ───────── Tidal Scroll reveal ───────── */
@@ -388,44 +649,6 @@
   transition: opacity 520ms ease,
     transform 620ms cubic-bezier(0.22, 0.8, 0.2, 1);
   transition-delay: calc(var(--reveal-delay, 0) * 1ms);
-}
-
-/* ───────── Velocity cursor (overlay only) ───────── */
-
-.field-notes-cursor {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 220;
-  opacity: 0;
-  overflow: visible;
-  transition: opacity 140ms ease;
-}
-.field-notes-cursor-dot {
-  fill: var(--wipu-ink);
-  transition: opacity 90ms ease-out;
-}
-.field-notes-cursor-line {
-  stroke: var(--wipu-ink);
-  stroke-width: 3.25;
-  stroke-dasharray: 10 14;
-  stroke-linecap: round;
-  fill: none;
-  /* stroke-dashoffset is driven from JS each frame so the march rate is
-     constant and not coupled to cursor velocity (path-pruning would
-     otherwise drag the dash pattern). */
-}
-.field-notes-cursor-head {
-  stroke: var(--wipu-ink);
-  stroke-width: 3.25;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  fill: none;
-}
-@media (prefers-reduced-motion: reduce) {
-  .field-notes-cursor { display: none; }
 }
 
 /* ───────── Reduced motion ───────── */

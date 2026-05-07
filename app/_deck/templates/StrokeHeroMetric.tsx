@@ -17,7 +17,9 @@ import {
 } from "react";
 
 export type StrokeHeroMetricProps = {
-  /** The big number itself, e.g. "20–30%". */
+  /** The big number itself, e.g. "20–30%". Newlines split into stacked
+     lines (rendered as tspans), letting longer titles like
+     "What have we\nlearned?" claim more vertical real estate. */
   number: string;
   label?: ReactNode;
   note?: ReactNode;
@@ -37,6 +39,11 @@ export function StrokeHeroMetric({
   const [run, setRun] = useState(0);
   const [viewBox, setViewBox] = useState<string>(FALLBACK_VIEWBOX);
   const [ready, setReady] = useState(false);
+  /* Dasharray sized from the measured bbox so the draw-on animation
+     traces the full glyph outlines for any string length, short metric
+     or long title. ~3× width is a safe heuristic for the combined
+     perimeter of mono-glyph outlines. */
+  const [dashLen, setDashLen] = useState<number>(4000);
 
   /* Measure the rendered text bbox, then size the viewBox to fit so the
      SVG scales precisely to its glyphs without slack. */
@@ -49,6 +56,11 @@ export function StrokeHeroMetric({
       setViewBox(
         `${b.x - PAD} ${b.y - PAD} ${b.width + PAD * 2} ${b.height + PAD * 2}`,
       );
+      /* getComputedTextLength sums character advances across all
+         tspans, so the dasharray scales correctly for multi-line
+         titles without underestimating from bbox.width alone. */
+      const advance = t.getComputedTextLength?.() ?? b.width;
+      setDashLen(Math.ceil(advance * 3));
       setReady(true);
       return true;
     };
@@ -110,8 +122,17 @@ export function StrokeHeroMetric({
           dominantBaseline="hanging"
           fontSize={FONT_SIZE}
           className="wipu-sample-heroMetric-svg-text"
+          style={{ strokeDasharray: dashLen, strokeDashoffset: dashLen }}
         >
-          {number}
+          {(() => {
+            const lines = number.split("\n");
+            if (lines.length === 1) return number;
+            return lines.map((line, i) => (
+              <tspan key={i} x="0" dy={i === 0 ? 0 : FONT_SIZE}>
+                {line}
+              </tspan>
+            ));
+          })()}
         </text>
       </svg>
       {label && <div className="wipu-sample-heroMetric-lbl">{label}</div>}

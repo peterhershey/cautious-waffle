@@ -4,8 +4,8 @@
 
 .wipu-ti {
   display: grid;
-  grid-template-columns: 5fr 7fr;
-  gap: clamp(32px, 5vw, 80px);
+  grid-template-columns: 6fr 5fr;
+  gap: clamp(20px, 2.5vw, 48px);
   align-items: center;
   width: 100%;
   max-width: min(1280px, 94vw);
@@ -54,6 +54,71 @@
   max-width: 38ch;
 }
 
+
+/* ───────── Press / link card (secondary footer in text column) ─────────
+   A tight horizontal card: small thumbnail + source eyebrow + headline.
+   Sits under the subtitle, visually subordinate to the main copy. */
+.wipu-ti-press {
+  margin-top: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 360px;
+  padding: 8px 14px 8px 8px;
+  border: 1px solid var(--wipu-rule);
+  border-radius: 14px;
+  background: var(--wipu-bg-elev);
+  color: var(--wipu-ink);
+  text-decoration: none;
+  transition: border-color 160ms ease, transform 160ms ease;
+}
+.wipu-ti-press:hover {
+  border-color: var(--wipu-rule-strong);
+  transform: translateY(-1px);
+}
+.wipu-ti-press-thumb {
+  flex: 0 0 auto;
+  width: 56px;
+  height: 56px;
+  border-radius: 9px;
+  overflow: hidden;
+  background: var(--wipu-rule);
+}
+.wipu-ti-press-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.wipu-ti-press-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.wipu-ti-press-source {
+  font-family: var(--wipu-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--wipu-ink-faint);
+}
+.wipu-ti-press-headline {
+  font-size: 14px;
+  line-height: 1.3;
+  color: var(--wipu-ink-dim);
+  letter-spacing: -0.005em;
+}
+.wipu-ti-press-arrow {
+  display: inline-block;
+  margin-left: 2px;
+  color: var(--wipu-ink-faint);
+  transition: transform 160ms ease, color 160ms ease;
+}
+.wipu-ti-press:hover .wipu-ti-press-arrow {
+  color: var(--wipu-ink);
+  transform: translate(2px, -2px);
+}
 
 /* ───────── Image-placeholder cluster ─────────
    Width is concrete (bounded by cell width AND viewport height),

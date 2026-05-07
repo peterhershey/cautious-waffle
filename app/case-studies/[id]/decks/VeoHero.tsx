@@ -86,15 +86,23 @@ function VeoTileField({ offset = 0, children }: VeoTileFieldProps) {
     if (!hero) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    const states = SLOTS.map((slot, i) => ({
+    type TileState = {
+      tile: HTMLDivElement;
+      lerp: number;
+      cx: number;
+      cy: number;
+      /** Lerped scroll-progress per tile. Tiles with smaller lerp rates
+          (the distant blurred ones) drag noticeably more than the sharp
+          foreground tiles — so the field doesn't settle in lockstep. */
+      sy: number;
+    };
+    const states: TileState[] = SLOTS.map((slot, i) => ({
       tile: tileRefs.current[i],
       lerp: slot.lerp,
       cx: 0,
       cy: 0,
-    })).filter(
-      (s): s is { tile: HTMLDivElement; lerp: number; cx: number; cy: number } =>
-        s.tile !== null,
-    );
+      sy: 0,
+    })).filter((s): s is TileState => s.tile !== null);
 
     let rafId = 0;
     let targetX = 0;
@@ -112,11 +120,25 @@ function VeoTileField({ offset = 0, children }: VeoTileFieldProps) {
     };
 
     const tick = () => {
+      // Slide-relative scroll progress: -1 when the slide sits a viewport
+      // above us, 0 when it's centered, +1 when it sits a viewport below.
+      // Clamped slightly past ±1 so tiles don't fly when the slide is
+      // far off-screen (we still apply an offset, but bounded).
+      const rect = hero.getBoundingClientRect();
+      const vh = window.innerHeight || 1;
+      const slideCenter = rect.top + rect.height / 2;
+      const rawSy = (slideCenter - vh / 2) / vh;
+      const targetSy = Math.max(-1.2, Math.min(1.2, rawSy));
+
       for (const s of states) {
         s.cx += (targetX - s.cx) * s.lerp;
         s.cy += (targetY - s.cy) * s.lerp;
+        // Same per-tile lerp rate as mouse parallax — lighter tiles
+        // (low `lerp`) lag further behind, giving the field its drag.
+        s.sy += (targetSy - s.sy) * s.lerp;
         s.tile.style.setProperty("--tile-mx", s.cx.toFixed(3));
         s.tile.style.setProperty("--tile-my", s.cy.toFixed(3));
+        s.tile.style.setProperty("--tile-sy", s.sy.toFixed(3));
       }
       rafId = requestAnimationFrame(tick);
     };

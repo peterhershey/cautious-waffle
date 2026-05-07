@@ -1,0 +1,59 @@
+/* invitation slide — TNP.gif full-bleed background that fades in when
+   the slide becomes active so the transition from the previous slide
+   doesn't slam.
+
+   Layers (back → front):
+     ::after   GIF, opacity 0 → 1 on data-active="true"
+     ::before  radial scrim (darkens edges so the quote stays readable)
+     > *       quote content
+   The slide's own bg color is the deck base so during the fade the
+   slide reads as deck-black with the gif blooming in.
+*/
+
+.wipu-slide[data-slide-id="invitation"] {
+  background: var(--wipu-bg);
+}
+
+.wipu-slide[data-slide-id="invitation"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("/portfolio%20transfer/TNP.gif");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transition: opacity 900ms ease-out;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.wipu-slide[data-slide-id="invitation"][data-active="true"]::after {
+  opacity: 1;
+}
+
+.wipu-slide[data-slide-id="invitation"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    color-mix(in srgb, var(--wipu-bg) 40%, transparent) 0%,
+    color-mix(in srgb, var(--wipu-bg) 70%, transparent) 60%,
+    color-mix(in srgb, var(--wipu-bg) 84%, transparent) 100%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+.wipu-slide[data-slide-id="invitation"] > * {
+  position: relative;
+  z-index: 2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wipu-slide[data-slide-id="invitation"]::after {
+    transition: none;
+  }
+}
+

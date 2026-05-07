@@ -9,8 +9,14 @@
 import { useEffect, useState, type ReactNode } from "react";
 
 export type MediaTextMedia =
-  | { kind?: "image"; src: string; alt: string }
-  | { kind: "video"; src: string; alt: string; poster?: string };
+  | { kind?: "image"; src: string; alt: string; fit?: "cover" | "contain" }
+  | {
+      kind: "video";
+      src: string;
+      alt: string;
+      poster?: string;
+      fit?: "cover" | "contain";
+    };
 
 export type MediaTextTemplateProps = {
   eyebrow?: ReactNode;
@@ -72,6 +78,8 @@ export function MediaSlot({
 
   if (items.length === 1) {
     const m = items[0];
+    const fitStyle =
+      m.fit === "contain" ? { objectFit: "contain" as const } : undefined;
     return m.kind === "video" ? (
       <video
         src={m.src}
@@ -81,17 +89,20 @@ export function MediaSlot({
         loop
         playsInline
         aria-label={m.alt}
+        style={fitStyle}
       />
     ) : (
       // eslint-disable-next-line @next/next/no-img-element
-      <img src={m.src} alt={m.alt} loading="lazy" />
+      <img src={m.src} alt={m.alt} loading="lazy" style={fitStyle} />
     );
   }
 
   return (
     <>
-      {items.map((m, i) =>
-        m.kind === "video" ? (
+      {items.map((m, i) => {
+        const fitStyle =
+          m.fit === "contain" ? { objectFit: "contain" as const } : undefined;
+        return m.kind === "video" ? (
           <video
             key={m.src}
             className="wipu-tpl-mediatext-slide"
@@ -104,6 +115,7 @@ export function MediaSlot({
             playsInline
             aria-label={m.alt}
             aria-hidden={i !== index}
+            style={fitStyle}
           />
         ) : (
           // eslint-disable-next-line @next/next/no-img-element
@@ -115,9 +127,10 @@ export function MediaSlot({
             alt={m.alt}
             loading={i === 0 ? "eager" : "lazy"}
             aria-hidden={i !== index}
+            style={fitStyle}
           />
-        ),
-      )}
+        );
+      })}
     </>
   );
 }

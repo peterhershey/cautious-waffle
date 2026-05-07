@@ -1,0 +1,277 @@
+/* HUD — unified glass material for the floating UI layer (nav, settings, field-notes dock).
+   Edge built from a gradient stroke + layered directional shadows (no `border`).
+   Theme-aware via .wipu-root[data-theme]. */
+
+/* Cursor reactivity ------------------------------------------------------- */
+@property --hud-mx { syntax: "<number>"; inherits: false; initial-value: 0.5; }
+@property --hud-my { syntax: "<number>"; inherits: false; initial-value: 0.5; }
+@property --hud-intensity { syntax: "<number>"; inherits: false; initial-value: 0; }
+
+/* Three independent ambient color blobs --------------------------------- */
+@property --hud-b1x { syntax: "<percentage>"; inherits: false; initial-value: 25%; }
+@property --hud-b1y { syntax: "<percentage>"; inherits: false; initial-value: 30%; }
+@property --hud-b2x { syntax: "<percentage>"; inherits: false; initial-value: 75%; }
+@property --hud-b2y { syntax: "<percentage>"; inherits: false; initial-value: 70%; }
+@property --hud-b3x { syntax: "<percentage>"; inherits: false; initial-value: 80%; }
+@property --hud-b3y { syntax: "<percentage>"; inherits: false; initial-value: 25%; }
+
+/* Stroke rotation — drives the iridescent gradient around the perimeter */
+@property --hud-edge-angle { syntax: "<angle>"; inherits: false; initial-value: 160deg; }
+
+.wipu-root {
+  --hud-radius: 20px;
+  --hud-blur: 40px;
+  --hud-saturate: 180%;
+  --hud-stroke: 1.5px;
+
+  /* Body fill — cool dark scrim so light icons + text read cleanly */
+  --hud-fill: rgba(15, 18, 28, 0.34);
+  --hud-fill-fallback: color-mix(in srgb, var(--wipu-bg) 82%, black);
+
+  /* Iridescent stroke — conic with restrained holographic stops.
+     Position drifts ambiently (--hud-edge-angle) so light moves around the rim. */
+  --hud-stroke-image: conic-gradient(
+    from var(--hud-edge-angle),
+    rgba(120, 200, 255, 0.50),
+    rgba(180, 140, 255, 0.36),
+    rgba(255, 160, 200, 0.30),
+    rgba(255, 220, 160, 0.26),
+    rgba(140, 255, 200, 0.32),
+    rgba(120, 200, 255, 0.50)
+  );
+
+  /* Layered shadow stack — directional lighting (cool top, warm bottom) */
+  --hud-s-rim:    inset 0 1px 1px 0 rgba(180, 210, 255, 0.30);     /* top sharp cool */
+  --hud-s-glow:   inset 0 8px 16px -6px rgba(255, 255, 255, 0.08); /* broad top diffusion */
+  --hud-s-warm:   inset 0 -1px 1px 0 rgba(255, 180, 200, 0.12);    /* bottom sharp warm */
+  --hud-s-depth:  inset 0 -2px 6px -2px rgba(0, 0, 0, 0.18);       /* bottom soft depth */
+  --hud-s-atmos:  inset 0 0 24px 0 rgba(255, 255, 255, 0.03);      /* internal scatter */
+  --hud-s-float:  0 12px 36px -8px rgba(0, 0, 0, 0.42);            /* outer float */
+  --hud-s-grip:   0 2px 5px 0 rgba(0, 0, 0, 0.22);                 /* outer contact */
+}
+
+.wipu-root[data-theme="light"] {
+  --hud-fill: rgba(255, 255, 255, 0.32);
+  --hud-fill-fallback: color-mix(in srgb, var(--wipu-bg) 80%, white);
+
+  --hud-stroke-image: conic-gradient(
+    from var(--hud-edge-angle),
+    rgba(120, 200, 255, 0.42),
+    rgba(180, 140, 255, 0.32),
+    rgba(255, 160, 200, 0.28),
+    rgba(255, 220, 160, 0.24),
+    rgba(140, 255, 200, 0.28),
+    rgba(120, 200, 255, 0.42)
+  );
+
+  --hud-s-rim:    inset 0 1px 1px 0 rgba(255, 255, 255, 0.55);
+  --hud-s-glow:   inset 0 8px 16px -6px rgba(255, 255, 255, 0.20);
+  --hud-s-warm:   inset 0 -1px 1px 0 rgba(180, 140, 200, 0.18);
+  --hud-s-depth:  inset 0 -2px 6px -2px rgba(0, 0, 0, 0.10);
+  --hud-s-atmos:  inset 0 0 24px 0 rgba(255, 255, 255, 0.05);
+  --hud-s-float:  0 12px 36px -8px rgba(0, 0, 0, 0.18);
+  --hud-s-grip:   0 2px 5px 0 rgba(0, 0, 0, 0.10);
+}
+
+/* Base material -------------------------------------------------------- */
+.hud {
+  position: relative;
+  isolation: isolate;
+  border: none;
+  padding: var(--hud-stroke);
+  border-radius: var(--hud-radius);
+  -webkit-backdrop-filter: blur(var(--hud-blur)) saturate(var(--hud-saturate));
+  backdrop-filter: blur(var(--hud-blur)) saturate(var(--hud-saturate));
+
+  /* Two-layer background:
+       padding-box → glass fill (the body, sits over the blurred backdrop)
+       border-box  → iridescent gradient stroke (only visible in the
+       --hud-stroke gap between content and outer edge) */
+  background:
+    linear-gradient(var(--hud-fill), var(--hud-fill)) padding-box,
+    var(--hud-stroke-image) border-box;
+
+  box-shadow:
+    var(--hud-s-rim),
+    var(--hud-s-glow),
+    var(--hud-s-warm),
+    var(--hud-s-depth),
+    var(--hud-s-atmos),
+    var(--hud-s-float),
+    var(--hud-s-grip);
+
+  transition:
+    box-shadow 240ms ease-out,
+    -webkit-backdrop-filter 240ms ease-out,
+    backdrop-filter 240ms ease-out;
+
+  animation: hud-edge-drift 22s linear infinite;
+}
+
+/* Iridescent ambient blobs — three independent drift cycles (coprime) */
+.hud::before {
+  content: "";
+  position: absolute;
+  inset: var(--hud-stroke);
+  border-radius: calc(var(--hud-radius) - var(--hud-stroke));
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(circle at var(--hud-b1x) var(--hud-b1y),
+      rgba(120, 200, 255, 0.30), transparent 55%),
+    radial-gradient(circle at var(--hud-b2x) var(--hud-b2y),
+      rgba(255, 150, 200, 0.24), transparent 60%),
+    radial-gradient(circle at var(--hud-b3x) var(--hud-b3y),
+      rgba(140, 255, 200, 0.24), transparent 55%);
+  filter: blur(10px) saturate(130%);
+  mix-blend-mode: screen;
+  opacity: calc(0.5 + 0.25 * var(--hud-intensity));
+  transition: opacity 240ms ease-out;
+  animation:
+    hud-blob-1 14s ease-in-out infinite,
+    hud-blob-2 19s ease-in-out infinite,
+    hud-blob-3 23s ease-in-out infinite;
+}
+
+/* Specular highlight — a soft elliptical hotspot that follows the cursor
+   in the upper-left third of the surface (clamped — reads as a real
+   light-source reflection rather than a tracked dot). */
+.hud::after {
+  content: "";
+  position: absolute;
+  inset: var(--hud-stroke);
+  border-radius: calc(var(--hud-radius) - var(--hud-stroke));
+  pointer-events: none;
+  z-index: 1;
+  background: radial-gradient(
+    ellipse 55% 38% at
+      calc(18% + var(--hud-mx) * 64%)
+      calc(8%  + var(--hud-my) * 48%),
+    rgba(255, 255, 255, calc(0.14 + 0.20 * var(--hud-intensity))),
+    rgba(255, 255, 255, 0.05) 38%,
+    transparent 70%
+  );
+  mix-blend-mode: screen;
+  transition: background 140ms ease-out;
+}
+
+/* Children sit above the iridescent layers */
+.hud > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* Hover — gentle box-shadow swap (lifts off background a touch) */
+.hud:hover,
+.hud[data-hud-active="true"] {
+  box-shadow:
+    var(--hud-s-rim),
+    inset 0 8px 18px -6px rgba(255, 255, 255, 0.12),
+    var(--hud-s-warm),
+    var(--hud-s-depth),
+    inset 0 0 28px 0 rgba(255, 255, 255, 0.05),
+    0 16px 44px -8px rgba(0, 0, 0, 0.46),
+    var(--hud-s-grip);
+}
+
+/* Active / pressed — glass "compresses" via blur reduction only.
+   No transform here so positioning transforms aren't overwritten. */
+button.hud:active,
+.hud[data-hud-pressed="true"] {
+  -webkit-backdrop-filter: blur(28px) saturate(var(--hud-saturate));
+  backdrop-filter: blur(28px) saturate(var(--hud-saturate));
+}
+
+/* Variants */
+.hud--panel { --hud-radius: 20px; }
+.hud--pill  { --hud-radius: 999px; }
+
+/* Inset variant — for HUDs nested inside another HUD (dock buttons).
+   Drops the body fill and backdrop-filter so we don't double-blur or
+   double-darken. Keeps the iridescent stroke + reduced inner shadows. */
+.hud--inset {
+  background:
+    linear-gradient(transparent, transparent) padding-box,
+    var(--hud-stroke-image) border-box;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow:
+    var(--hud-s-rim),
+    var(--hud-s-warm),
+    var(--hud-s-depth);
+}
+.hud--inset:hover,
+.hud--inset[data-hud-active="true"] {
+  box-shadow:
+    var(--hud-s-rim),
+    inset 0 6px 14px -6px rgba(255, 255, 255, 0.14),
+    var(--hud-s-warm),
+    var(--hud-s-depth);
+}
+
+/* Text inside HUD picks up a subtle cool glow so it reads as on-glass */
+.hud :where(a, button, label, span, p, h1, h2, h3, h4) {
+  text-shadow: 0 0 8px rgba(180, 200, 255, 0.18);
+}
+.wipu-root[data-theme="light"] .hud :where(a, button, label, span, p, h1, h2, h3, h4) {
+  text-shadow: 0 0 6px rgba(255, 255, 255, 0.5);
+}
+
+/* Animations ----------------------------------------------------------- */
+
+/* Edge stroke rotates ambiently so light slides around the rim */
+@keyframes hud-edge-drift {
+  0%   { --hud-edge-angle: 0deg; }
+  100% { --hud-edge-angle: 360deg; }
+}
+
+/* Ambient blob paths — coprime periods (14/19/23s) so the composite
+   never exactly repeats. */
+@keyframes hud-blob-1 {
+  0%   { --hud-b1x: 25%; --hud-b1y: 30%; }
+  22%  { --hud-b1x: 60%; --hud-b1y: 18%; }
+  48%  { --hud-b1x: 78%; --hud-b1y: 62%; }
+  73%  { --hud-b1x: 32%; --hud-b1y: 78%; }
+  100% { --hud-b1x: 25%; --hud-b1y: 30%; }
+}
+@keyframes hud-blob-2 {
+  0%   { --hud-b2x: 75%; --hud-b2y: 70%; }
+  18%  { --hud-b2x: 28%; --hud-b2y: 60%; }
+  44%  { --hud-b2x: 18%; --hud-b2y: 22%; }
+  68%  { --hud-b2x: 65%; --hud-b2y: 38%; }
+  100% { --hud-b2x: 75%; --hud-b2y: 70%; }
+}
+@keyframes hud-blob-3 {
+  0%   { --hud-b3x: 80%; --hud-b3y: 25%; }
+  26%  { --hud-b3x: 42%; --hud-b3y: 48%; }
+  52%  { --hud-b3x: 22%; --hud-b3y: 82%; }
+  78%  { --hud-b3x: 68%; --hud-b3y: 86%; }
+  100% { --hud-b3x: 80%; --hud-b3y: 25%; }
+}
+
+/* Fallback — browsers without backdrop-filter */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .hud {
+    background:
+      linear-gradient(var(--hud-fill-fallback), var(--hud-fill-fallback)) padding-box,
+      var(--hud-stroke-image) border-box;
+  }
+  .hud::before,
+  .hud::after { display: none; }
+}
+
+/* Reduced motion — freeze stroke + blobs */
+@media (prefers-reduced-motion: reduce) {
+  .hud {
+    animation: none;
+    --hud-edge-angle: 110deg;
+  }
+  .hud::before { animation: none; }
+  .hud::after {
+    background: radial-gradient(
+      ellipse 55% 38% at 30% 25%,
+      rgba(255, 255, 255, 0.10),
+      transparent 65%
+    );
+  }
+}

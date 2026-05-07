@@ -5,7 +5,7 @@
    Used by:
    - sample presentation slide 04 (ThreeUpSlide) */
 
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 export type ThreeUpBlock = {
   eyebrow?: ReactNode;
@@ -19,11 +19,18 @@ export type ThreeUpBlock = {
 
 export type ThreeUpTemplateProps = {
   blocks: ThreeUpBlock[];
+  /** "phone" = vertical phone screenshots shown uncropped, no frame, smaller text. */
+  variant?: "default" | "phone";
 };
 
-export function ThreeUpTemplate({ blocks }: ThreeUpTemplateProps) {
+export function ThreeUpTemplate({ blocks, variant = "default" }: ThreeUpTemplateProps) {
+  const colsStyle = { "--wipu-tpl-cols": blocks.length } as CSSProperties;
   return (
-    <div className="wipu-tpl-threeup">
+    <div
+      className="wipu-tpl-threeup"
+      data-variant={variant}
+      style={colsStyle}
+    >
       {blocks.map((b, i) => (
         <div key={i} className="wipu-tpl-threeup-block">
           {(b.video || b.image) && (
@@ -54,11 +61,13 @@ export function ThreeUpTemplate({ blocks }: ThreeUpTemplateProps) {
               ) : null}
             </div>
           )}
-          {b.eyebrow && (
-            <div className="wipu-tpl-threeup-eyebrow">{b.eyebrow}</div>
-          )}
-          <h3 className="wipu-tpl-threeup-title">{b.title}</h3>
-          {b.body && <p className="wipu-tpl-threeup-body">{b.body}</p>}
+          <div className="wipu-tpl-threeup-text">
+            {b.eyebrow && (
+              <div className="wipu-tpl-threeup-eyebrow">{b.eyebrow}</div>
+            )}
+            <h3 className="wipu-tpl-threeup-title">{b.title}</h3>
+            {b.body && <p className="wipu-tpl-threeup-body">{b.body}</p>}
+          </div>
         </div>
       ))}
     </div>

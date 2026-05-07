@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { useDeck } from "../Deck";
 
 /* Cross-page nav. Hard-coded for now — the portfolio's surface area is
@@ -29,116 +29,120 @@ function isPageActive(pathname: string, page: (typeof PAGES)[number]): boolean {
   return pathname === page.href;
 }
 
+/* Slide labels in the registry are styled all-caps for use as on-slide
+   eyebrows ("INDEX · 00", "AI · IN PRACTICE · 05"). The nav wants the
+   same identity in sentence case without the index suffix — preserving
+   acronyms like "AI". */
+const NAV_LABEL_ACRONYMS = new Set(["AI", "UX", "UI", "API", "ML"]);
+
+function toNavLabel(raw: string): string {
+  const stripped = raw.replace(/\s*·\s*\d+\s*$/, "");
+  const flat = stripped.replace(/\s*·\s*/g, " ");
+  const cased = flat
+    .split(/([\s-])/)
+    .map((tok) => (NAV_LABEL_ACRONYMS.has(tok) ? tok : tok.toLowerCase()))
+    .join("");
+  return cased.charAt(0).toUpperCase() + cased.slice(1);
+}
+
 export function NavCorner() {
   const { activeIndex, goTo, slides } = useDeck();
   const pathname = usePathname() ?? "/";
-  const [tapOpen, setTapOpen] = useState(false);
+  /* CSS :hover and :focus-within drive visibility. `kbdOpen` only opens
+     the panel via the 'n' keyboard shortcut; pointer interaction relies
+     entirely on hover state, so leaving the trigger area + sidebar
+     closes the panel naturally without Escape or click-outside logic. */
+  const [kbdOpen, setKbdOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement | null>(null);
 
-  // Keyboard shortcut: 'n' opens panel and focuses first item
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const t = e.target as HTMLElement | null;
-      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
+      if (
+        t &&
+        (t.tagName === "INPUT" ||
+          t.tagName === "TEXTAREA" ||
+          t.isContentEditable)
+      )
+        return;
       if (e.key === "n" || e.key === "N") {
         e.preventDefault();
-        setTapOpen(true);
-        const first = rootRef.current?.querySelector<HTMLButtonElement | HTMLAnchorElement>(
-          ".wipu-navcorner-item",
-        );
+        setKbdOpen(true);
+        const first = rootRef.current?.querySelector<
+          HTMLButtonElement | HTMLAnchorElement
+        >(".wipu-navcorner-item");
         first?.focus();
-      } else if (e.key === "Escape" && tapOpen) {
-        setTapOpen(false);
       }
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  }, [tapOpen]);
-
-  // Tap outside closes (touch-only)
-  useEffect(() => {
-    if (!tapOpen) return;
-    const onDown = (e: PointerEvent) => {
-      if (e.pointerType !== "touch") return;
-      const root = rootRef.current;
-      if (root && !root.contains(e.target as Node)) setTapOpen(false);
-    };
-    document.addEventListener("pointerdown", onDown);
-    return () => document.removeEventListener("pointerdown", onDown);
-  }, [tapOpen]);
+  }, []);
 
   return (
     <div
       ref={rootRef}
-      className="wipu-corner wipu-corner--left"
-      data-open={tapOpen ? "true" : undefined}
+      className="wipu-corner wipu-corner--left wipu-corner--takeover"
+      data-open={kbdOpen ? "true" : undefined}
+      onPointerLeave={() => setKbdOpen(false)}
     >
       <button
         type="button"
         className="wipu-corner-zone"
         aria-label="Open navigator"
-        aria-expanded={tapOpen}
-        onClick={() => setTapOpen((v) => !v)}
+        aria-expanded={kbdOpen}
       />
       <span className="wipu-corner-dot" aria-hidden />
-      <div className="wipu-corner-panel glass" role="dialog" aria-label="Navigator">
-        <div className="wipu-corner-panel-head">
-          <span>Pages</span>
-        </div>
-        <ul className="wipu-navcorner-list">
-          {PAGES.map((page) => {
-            const active = isPageActive(pathname, page);
-            return (
-              <li key={page.href}>
-                <Link
-                  href={page.href}
-                  className="wipu-navcorner-item"
-                  data-active={active ? "true" : undefined}
-                  aria-current={active ? "page" : undefined}
-                  onClick={() => setTapOpen(false)}
-                >
-                  <span className="wipu-navcorner-num" aria-hidden>
-                    →
-                  </span>
-                  <span>{page.label}</span>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-
-        {slides.length > 0 && (
-          <>
-            <div className="wipu-corner-panel-head wipu-corner-panel-head--sub">
-              <span>Slides</span>
-              <span className="wipu-corner-panel-hint">
-                {String(activeIndex + 1).padStart(2, "0")} /{" "}
-                {String(slides.length).padStart(2, "0")}
-              </span>
-            </div>
+      <div
+        className="wipu-corner-takeover"
+        role="dialog"
+        aria-label="Navigator"
+      >
+        <div className="wipu-takeover-inner">
+          <div className="wipu-takeover-section">
+            <div className="wipu-takeover-section-label">Pages</div>
             <ul className="wipu-navcorner-list">
-              {slides.map((slide, i) => (
-                <li key={slide.id}>
-                  <button
-                    type="button"
-                    className="wipu-navcorner-item"
-                    data-active={i === activeIndex ? "true" : undefined}
-                    aria-current={i === activeIndex ? "step" : undefined}
-                    onClick={() => {
-                      goTo(i);
-                      setTapOpen(false);
-                    }}
+              {PAGES.map((page, i) => {
+                const active = isPageActive(pathname, page);
+                return (
+                  <li
+                    key={page.href}
+                    style={{ "--i": i } as CSSProperties}
                   >
-                    <span className="wipu-navcorner-num">
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <span>{slide.label}</span>
-                  </button>
-                </li>
-              ))}
+                    <Link
+                      href={page.href}
+                      className="wipu-navcorner-item"
+                      data-active={active ? "true" : undefined}
+                      aria-current={active ? "page" : undefined}
+                    >
+                      {page.label}
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
-          </>
-        )}
+          </div>
+
+          {slides.length > 0 && (
+            <div className="wipu-takeover-section">
+              <div className="wipu-takeover-section-label">On this page</div>
+              <ul className="wipu-navcorner-list">
+                {slides.map((slide, i) => (
+                  <li key={slide.id} style={{ "--i": i } as CSSProperties}>
+                    <button
+                      type="button"
+                      className="wipu-navcorner-item"
+                      data-active={i === activeIndex ? "true" : undefined}
+                      aria-current={i === activeIndex ? "step" : undefined}
+                      onClick={() => goTo(i)}
+                    >
+                      {toNavLabel(slide.label)}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

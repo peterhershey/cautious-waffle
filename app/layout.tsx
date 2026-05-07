@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Fraunces } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 
 const inter = Inter({
@@ -37,6 +38,16 @@ export const metadata: Metadata = {
   },
 };
 
+const themeInit = `
+(function(){try{
+  var saved = localStorage.getItem('wipu-theme');
+  var prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+  var t = saved || (prefersLight ? 'light' : 'dark');
+  var r = document.querySelector('.wipu-root');
+  if(r) r.setAttribute('data-theme', t);
+}catch(e){}})();
+`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -47,7 +58,12 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} ${fraunces.variable} h-full antialiased`}
     >
-      <body className="min-h-full">{children}</body>
+      <body className="min-h-full">
+        <Script id="wipu-theme-init" strategy="beforeInteractive">
+          {themeInit}
+        </Script>
+        {children}
+      </body>
     </html>
   );
 }

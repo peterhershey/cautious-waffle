@@ -14,22 +14,15 @@
 .wipu-deck {
   height: 100svh;
   overflow-y: scroll;
-  scroll-snap-type: y mandatory;
-  scroll-behavior: smooth;
+  overscroll-behavior: contain;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
 }
 .wipu-deck::-webkit-scrollbar { display: none; }
 
-@media (prefers-reduced-motion: reduce) {
-  .wipu-deck { scroll-behavior: auto; }
-}
-
 .wipu-slide {
   height: 100svh;
   width: 100%;
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
   display: flex;
   align-items: center;
   justify-content: center;

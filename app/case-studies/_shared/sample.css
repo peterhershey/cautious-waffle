@@ -1,16 +1,20 @@
 /* Sample presentation — shows one of each template with lorem ipsum */
 
-/* Soft scroll-snap scoped to this route only — html rule is dropped
-   when the CSS unloads on navigation. Snaps at each slide boundary and
-   at each timeline stop. */
-html {
-  scroll-snap-type: y mandatory;
-}
-
+/* The case-study root owns its own scroll, just like the home page's
+   `.wipu-deck`. Containing the scroll here (rather than scrolling the
+   window) sidesteps a long list of browser quirks that fight a JS-driven
+   spring: scroll-anchoring shifts on image load, the global
+   `html { scroll-snap-type: y proximity }` from globals.css, etc. */
 .wipu-sample-root {
+  height: 100svh;
+  overflow-y: scroll;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
   background: var(--wipu-bg);
   color: var(--wipu-ink);
 }
+.wipu-sample-root::-webkit-scrollbar { display: none; }
 
 .wipu-sample-slide {
   min-height: 100svh;
@@ -21,8 +25,6 @@ html {
   justify-content: center;
   position: relative;
   border-bottom: 1px dashed var(--wipu-rule);
-  scroll-snap-align: start;
-  scroll-snap-stop: normal;
 }
 
 .wipu-sample-slide-label {
@@ -119,8 +121,6 @@ html {
   right: 0;
   height: 100svh;
   pointer-events: none;
-  scroll-snap-align: start;
-  scroll-snap-stop: normal;
 }
 
 .wipu-sample-tl-pin {
@@ -162,10 +162,10 @@ html {
   height: 100%;
   max-height: 100%;
   max-width: 100%;
-  transition: transform 480ms cubic-bezier(0.2, 0.6, 0.2, 1),
-    opacity 480ms ease;
-  transform: scale(0.97);
-  opacity: 0.82;
+  transition: transform 560ms cubic-bezier(0.2, 0.6, 0.2, 1),
+    opacity 560ms ease;
+  transform: scale(0.86);
+  opacity: 0.55;
 }
 .wipu-sample-tl-stop.is-active .wipu-sample-tl-figure {
   transform: scale(1);
@@ -177,7 +177,7 @@ html {
   width: min(1080px, 78vw);
   aspect-ratio: 16 / 10;
   max-height: 60svh;
-  border-radius: 18px;
+  border-radius: 40px;
   position: relative;
   overflow: hidden;
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
@@ -260,8 +260,8 @@ img.wipu-sample-tl-image {
 }
 .wipu-sample-tl.is-low-titles .wipu-sample-tl-image,
 .wipu-sample-tl.is-low-titles .wipu-sample-tl-images {
-  transform: scale(0.97);
-  transition: transform 480ms cubic-bezier(0.2, 0.6, 0.2, 1);
+  transform: scale(0.86);
+  transition: transform 560ms cubic-bezier(0.2, 0.6, 0.2, 1);
 }
 .wipu-sample-tl.is-low-titles .wipu-sample-tl-stop.is-active .wipu-sample-tl-image,
 .wipu-sample-tl.is-low-titles .wipu-sample-tl-stop.is-active .wipu-sample-tl-images {
@@ -348,7 +348,7 @@ img.wipu-sample-tl-image {
   letter-spacing: 0.02em;
   color: var(--wipu-ink);
   background: var(--wipu-bg-elev);
-  border-radius: 4px;
+  border-radius: 12px;
   padding: 16px 20px;
   z-index: 4;
   opacity: 0;
@@ -605,10 +605,8 @@ img.wipu-sample-tl-image {
   stroke-linejoin: round;
   stroke-linecap: round;
   vector-effect: non-scaling-stroke;
-  /* Heuristic dasharray — large enough to cover the combined glyph
-     paths for short metric strings ("20–30%", "+13%", etc.). */
-  stroke-dasharray: 4000;
-  stroke-dashoffset: 4000;
+  /* Dasharray + dashoffset are set inline by the component, sized from
+     the measured glyph bbox so the trace works for any string length. */
   animation: wipu-stroke-draw 2.6s cubic-bezier(0.4, 0.6, 0.2, 1) 250ms
     forwards;
 }
@@ -620,7 +618,7 @@ img.wipu-sample-tl-image {
 @media (prefers-reduced-motion: reduce) {
   .wipu-sample-heroMetric-svg-text {
     animation: none;
-    stroke-dashoffset: 0;
+    stroke-dashoffset: 0 !important;
   }
 }
 
@@ -780,7 +778,6 @@ img.wipu-sample-tl-image {
   margin: 0;
   padding: 0;
   background: var(--wipu-bg);
-  scroll-snap-align: start;
 }
 .wipu-sample-proto-iframe {
   width: 100%;

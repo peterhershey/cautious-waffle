@@ -13,11 +13,13 @@ export type IntroTemplateProps = {
   greeting?: ReactNode;
   /** Big name / title line — required. */
   name: ReactNode;
+  /** Medium dim subtitle below the name (e.g. role / tagline). */
+  subtitle?: ReactNode;
   /** Small faint note below the name. */
   note?: ReactNode;
 };
 
-export function IntroTemplate({ emoji, greeting, name, note }: IntroTemplateProps) {
+export function IntroTemplate({ emoji, greeting, name, subtitle, note }: IntroTemplateProps) {
   return (
     <div className="wipu-tpl-intro">
       {emoji && (
@@ -31,6 +33,7 @@ export function IntroTemplate({ emoji, greeting, name, note }: IntroTemplateProp
         )}
         <span className="wipu-tpl-intro-name">{name}</span>
       </h1>
+      {subtitle && <p className="wipu-tpl-intro-subtitle">{subtitle}</p>}
       {note && <p className="wipu-tpl-intro-note">{note}</p>}
     </div>
   );

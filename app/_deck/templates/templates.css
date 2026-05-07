@@ -13,7 +13,7 @@
   color: var(--wipu-ink);
 }
 .wipu-tpl-intro-emoji {
-  font-size: clamp(64px, 9vw, 120px);
+  font-size: clamp(96px, 13vw, 180px);
   line-height: 1;
   filter: saturate(1.05);
 }
@@ -26,20 +26,28 @@
   font-weight: 500;
 }
 .wipu-tpl-intro-greeting {
-  font-size: clamp(20px, 2.4vw, 30px);
+  font-size: clamp(16px, 2vw, 24px);
   color: var(--wipu-ink-dim);
   letter-spacing: 0;
   font-weight: 400;
 }
 .wipu-tpl-intro-name {
-  font-size: clamp(44px, 7vw, 96px);
+  font-size: clamp(36px, 5.6vw, 76px);
   letter-spacing: -0.015em;
   line-height: 1;
+}
+.wipu-tpl-intro-subtitle {
+  margin: 4px 0 0;
+  font-family: var(--wipu-mono);
+  font-size: clamp(16px, 2vw, 24px);
+  color: var(--wipu-ink-dim);
+  font-weight: 400;
+  letter-spacing: 0;
 }
 .wipu-tpl-intro-note {
   margin: 6px 0 0;
   font-family: var(--wipu-mono);
-  font-size: clamp(12px, 1.1vw, 14px);
+  font-size: clamp(11px, 1vw, 13px);
   color: var(--wipu-ink-faint);
   letter-spacing: 0.04em;
 }
@@ -51,7 +59,9 @@
 
 .wipu-tpl-threeup {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  /* `--wipu-tpl-cols` is set inline by the template based on `blocks.length`.
+     Defaults to 3 so older usages keep working without setting the var. */
+  grid-template-columns: repeat(var(--wipu-tpl-cols, 3), 1fr);
   gap: clamp(28px, 4vw, 56px);
   width: 100%;
   max-width: min(1280px, 92vw);
@@ -62,6 +72,11 @@
   flex-direction: column;
   gap: 14px;
   min-width: 0;
+}
+.wipu-tpl-threeup-text {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 .wipu-tpl-threeup-image {
   background: var(--wipu-bg-elev);
@@ -109,6 +124,60 @@
     grid-template-columns: 1fr;
     gap: clamp(22px, 4vh, 32px);
   }
+}
+
+/* ── Phone variant ──
+   Vertical phone screenshots shown uncropped on the slide background,
+   with smaller, dimmer text below. Used when the image IS the content
+   (not a thumbnail) — e.g. comparing competitor app screens. */
+.wipu-tpl-threeup[data-variant="phone"] {
+  align-items: end;
+  gap: clamp(24px, 3.6vw, 56px);
+  max-width: min(1180px, 90vw);
+}
+.wipu-tpl-threeup[data-variant="phone"] .wipu-tpl-threeup-block {
+  align-items: center;
+  text-align: center;
+  gap: clamp(16px, 2vh, 24px);
+}
+.wipu-tpl-threeup[data-variant="phone"] .wipu-tpl-threeup-image {
+  background: transparent;
+  border-radius: 0;
+  aspect-ratio: auto;
+  width: 100%;
+  height: clamp(360px, 56vh, 620px);
+  overflow: visible;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.wipu-tpl-threeup[data-variant="phone"] .wipu-tpl-threeup-image img,
+.wipu-tpl-threeup[data-variant="phone"] .wipu-tpl-threeup-image video {
+  width: auto;
+  height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+  object-position: bottom center;
+}
+.wipu-tpl-threeup[data-variant="phone"] .wipu-tpl-threeup-text {
+  gap: 4px;
+}
+.wipu-tpl-threeup[data-variant="phone"] .wipu-tpl-threeup-eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  margin-top: 0;
+  order: 1;
+}
+.wipu-tpl-threeup[data-variant="phone"] .wipu-tpl-threeup-body {
+  margin-top: 4px;
+  order: 2;
+}
+.wipu-tpl-threeup[data-variant="phone"] .wipu-tpl-threeup-title {
+  font-size: clamp(14px, 1.3vw, 17px);
+}
+.wipu-tpl-threeup[data-variant="phone"] .wipu-tpl-threeup-body {
+  font-size: clamp(11px, 0.95vw, 13px);
+  color: var(--wipu-ink-faint);
 }
 
 /* ───────── Template 06 — Media + Text ─────────
@@ -510,6 +579,14 @@
 
 /* ───────── Template 02 — Quote ───────── */
 
+.wipu-tpl-quote-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(24px, 3vw, 40px);
+  width: 100%;
+}
 .wipu-tpl-quote {
   text-align: center;
   font-size: clamp(22px, 2.6vw, 36px);
@@ -607,12 +684,112 @@
   color: var(--wipu-ink-dim);
 }
 
+/* ───────── Section header ─────────
+   Three-up section list with one item highlighted and the others
+   dimmed. Stamp position and color are keyed off cityKey; markup
+   reuses .wipu-case-stamp-* draw classes from board.css. */
+
+.wipu-tpl-section {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+.wipu-tpl-section-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(20px, 3.4vh, 40px);
+  z-index: 1;
+}
+.wipu-tpl-section-item {
+  display: grid;
+  grid-template-columns: clamp(40px, 4vw, 56px) 1fr;
+  align-items: baseline;
+  column-gap: clamp(20px, 2.4vw, 32px);
+  color: var(--wipu-ink-faint);
+  transition: color 280ms ease;
+}
+.wipu-tpl-section-item[data-active="true"] {
+  color: var(--wipu-ink);
+}
+.wipu-tpl-section-num {
+  font-family: var(--wipu-mono);
+  font-size: clamp(11px, 0.9vw, 13px);
+  letter-spacing: 0.22em;
+  font-variant-numeric: tabular-nums;
+  color: var(--wipu-ink-faint);
+  padding-top: 0.55em;
+  text-align: right;
+}
+.wipu-tpl-section-item[data-active="true"] .wipu-tpl-section-num {
+  color: var(--wipu-ink-dim);
+}
+.wipu-tpl-section-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.wipu-tpl-section-title {
+  font-size: clamp(24px, 2.6vw, 36px);
+  font-weight: 400;
+  letter-spacing: -0.012em;
+  line-height: 1.15;
+}
+.wipu-tpl-section-item[data-active="true"] .wipu-tpl-section-title {
+  font-weight: 500;
+}
+.wipu-tpl-section-meta {
+  font-family: var(--wipu-mono);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--wipu-ink-dim);
+  margin-top: 2px;
+}
+.wipu-tpl-section .wipu-tpl-section-stamp {
+  position: absolute;
+  width: clamp(140px, 15vw, 200px);
+  opacity: 0.78;
+  z-index: 0;
+  --stamp-rot: -4deg;
+}
+.wipu-tpl-section .wipu-tpl-section-stamp-nyc {
+  top: clamp(120px, 20vh, 240px);
+  right: clamp(120px, 16vw, 280px);
+  bottom: auto;
+  left: auto;
+  color: var(--wipu-terracotta);
+  --stamp-rot: 16deg;
+}
+.wipu-tpl-section .wipu-tpl-section-stamp-california {
+  bottom: clamp(120px, 20vh, 240px);
+  left: clamp(120px, 16vw, 280px);
+  top: auto;
+  right: auto;
+  color: var(--wipu-navy);
+  --stamp-rot: -22deg;
+}
+.wipu-tpl-section .wipu-tpl-section-stamp-zurich {
+  top: clamp(120px, 20vh, 240px);
+  left: clamp(120px, 16vw, 280px);
+  bottom: auto;
+  right: auto;
+  color: var(--wipu-mustard);
+  --stamp-rot: 12deg;
+}
+
 /* ───────── Metric + Quote split ───────── */
 
 .wipu-tpl-mqs {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  align-items: center;
+  align-items: stretch;
   gap: clamp(32px, 5vw, 80px);
   width: 100%;
   max-width: min(1480px, 94vw);
@@ -628,11 +805,20 @@
   text-align: center;
 }
 .wipu-tpl-mqs-right {
-  position: relative;
+  display: flex;
+  align-items: center;
   margin: 0;
   padding: 0 clamp(8px, 2vw, 24px);
   color: var(--wipu-ink);
+}
+/* Inner block — anchors the absolute open-quote mark and lets the
+   right column align its content's optical center to the metric's.
+   Left padding reserves room for the hanging open-quote glyph. */
+.wipu-tpl-mqs-block {
+  position: relative;
+  width: 100%;
   min-width: 0;
+  padding-left: clamp(28px, 3vw, 48px);
 }
 .wipu-tpl-mqs-quote {
   margin: 0;
@@ -849,9 +1035,41 @@
 
 .wipu-tpl-sticky {
   width: 100%;
+  height: 100%;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+}
+.wipu-tpl-sticky:has(.wipu-tpl-sticky-head) {
+  justify-content: flex-start;
+  padding-top: clamp(28px, 5vh, 56px);
+}
+.wipu-tpl-sticky-head {
+  width: min(1180px, 92vw);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: center;
+  align-items: center;
+  margin-bottom: clamp(28px, 6vh, 64px);
+}
+.wipu-tpl-sticky-head-eyebrow {
+  font-family: var(--wipu-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--wipu-ink-dim);
+}
+.wipu-tpl-sticky-head-title {
+  margin: 0;
+  font-family: var(--wipu-mono);
+  font-weight: 500;
+  font-size: clamp(20px, 2.4vw, 28px);
+  letter-spacing: -0.005em;
+  line-height: 1.1;
+  color: var(--wipu-ink);
+  max-width: 22ch;
 }
 .wipu-tpl-sticky-board {
   display: grid;
@@ -865,7 +1083,7 @@
 .wipu-tpl-sticky-card {
   position: relative;
   border-radius: 4px;
-  padding: clamp(22px, 2.4vw, 34px) clamp(20px, 2.2vw, 30px) clamp(20px, 2.2vw, 28px);
+  padding: clamp(28px, 3vw, 42px) clamp(26px, 2.8vw, 38px) clamp(26px, 2.8vw, 36px);
   font-family: var(--wipu-mono);
   box-shadow:
     0 2px 4px -1px rgba(0, 0, 0, 0.18),
@@ -968,19 +1186,51 @@
 
 .wipu-tpl-sticky-title {
   font-family: var(--wipu-mono);
-  font-size: clamp(17px, 1.85vw, 23px);
+  font-size: clamp(19px, 2.1vw, 27px);
   font-weight: 500;
-  line-height: 1.24;
+  line-height: 1.22;
   letter-spacing: -0.01em;
-  margin: 0 0 12px 0;
+  margin: 0 0 14px 0;
 }
 
 .wipu-tpl-sticky-body {
   font-family: var(--wipu-mono);
-  font-size: clamp(13px, 1.05vw, 15px);
+  font-size: clamp(13px, 1.1vw, 16px);
   line-height: 1.55;
   margin: 0;
   opacity: 0.92;
+}
+
+/* Linked cards get a "Read →" affordance pinned to the bottom-right.
+   The arrow translates on hover so the card reads as clickable, not just
+   pinned in place. */
+.wipu-tpl-sticky-card[data-link="true"] {
+  padding-bottom: clamp(54px, 5.4vw, 72px);
+}
+.wipu-tpl-sticky-card[data-link="true"]::after {
+  content: "Read →";
+  position: absolute;
+  right: clamp(24px, 2.8vw, 36px);
+  bottom: clamp(20px, 2.2vw, 28px);
+  font-family: var(--wipu-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  padding: 6px 10px 6px 12px;
+  border-radius: 999px;
+  background: color-mix(in srgb, currentColor 14%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 32%, transparent);
+  transition:
+    transform 220ms cubic-bezier(0.22, 0.8, 0.2, 1),
+    background 220ms ease-out,
+    border-color 220ms ease-out;
+  pointer-events: none;
+}
+.wipu-tpl-sticky-card[data-link="true"][data-revealed="true"]:hover::after,
+.wipu-tpl-sticky-card[data-link="true"][data-revealed="true"]:focus-visible::after {
+  transform: translateX(4px);
+  background: color-mix(in srgb, currentColor 22%, transparent);
+  border-color: color-mix(in srgb, currentColor 50%, transparent);
 }
 
 /* Stack on narrow screens; drop the rotations / offsets so layout is

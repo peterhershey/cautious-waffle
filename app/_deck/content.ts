@@ -38,25 +38,6 @@ export const empathy = {
   ],
 };
 
-// ——— 04. DC ———
-export const dc = {
-  label: "DC YEARS · 03",
-  title: "I cut my teeth\nin Washington, DC.",
-  kicker: "Where I learned to design in complexity.",
-  body: [
-    "My first real design job was at Accenture Federal, building digital experiences for the US Postal Service, the USDA, and other federal agencies. Government work means working within serious constraints: legacy systems, layered stakeholders, regulatory requirements at every turn. It taught me how to move forward when nothing is simple.",
-    "From there I went to the Washington Post, where I helped lead the first homepage redesign in a decade for one of the most-read sites in American journalism. On the side, I was shooting freelance photography on Capitol Hill and working my way through DC's restaurant scene — a city where a Michelin-starred tasting menu and the best half-smoke of your life can be ten minutes apart.",
-    "DC is where I learned to thrive in ambiguity — and it shows up in everything I've done since.",
-  ],
-};
-
-export const dcLogos = [
-  { id: "wapo",      display: "The Washington Post", weight: "serif" as const },
-  { id: "accenture", display: "accenture",           weight: "brand" as const },
-  { id: "usps",      display: "USPS",                weight: "brand" as const },
-  { id: "usda",      display: "USDA",                weight: "brand" as const },
-];
-
 // ——— 05. THE INVITATION ———
 export const invitation = {
   label: "WHAT I DO BEST · 04",

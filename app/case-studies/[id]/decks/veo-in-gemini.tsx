@@ -1,4 +1,5 @@
 import { ProjectAtAGlanceTemplate } from "../../../_deck/templates/ProjectAtAGlanceTemplate";
+import { HoverGif } from "../../../_deck/templates/HoverGif";
 import { ThreeUpTemplate } from "../../../_deck/templates/ThreeUpTemplate";
 import {
   GoalTemplate,
@@ -11,6 +12,7 @@ import {
   type MediaTextMedia,
 } from "../../../_deck/templates/MediaTextTemplate";
 import { VeoHero, VeoMetricHero } from "./VeoHero";
+import { VeoFlowchart } from "./VeoFlowchart";
 import type { CaseStudyDeckEntry } from "../CaseStudyDeck";
 
 const SORA_LANDSCAPE: MediaTextMedia = {
@@ -134,6 +136,11 @@ export const veoInGemini: CaseStudyDeckEntry = {
       ),
     },
     {
+      slug: "06",
+      name: "User flow",
+      content: <VeoFlowchart />,
+    },
+    {
       slug: "15",
       name: "Foundation",
       content: (
@@ -193,6 +200,20 @@ export const veoInGemini: CaseStudyDeckEntry = {
             allow="autoplay; encrypted-media"
           />
         </section>
+      ),
+    },
+    {
+      slug: "results",
+      name: "The results · Divider",
+      content: (
+        <EmojiHeadlineTemplate
+          emojis={["📈"]}
+          title={
+            <>
+              <strong>The results.</strong>
+            </>
+          }
+        />
       ),
     },
     {
@@ -333,13 +354,14 @@ export const veoInGemini: CaseStudyDeckEntry = {
             alignItems: "center",
             justifyContent: "center",
             width: "100%",
-            fontSize: "clamp(44px, 5.5vw, 80px)",
+            fontSize: "clamp(88px, 11vw, 160px)",
             lineHeight: 1,
           }}
         >
-          <span role="img" aria-label="Peace">
-            ✌️
-          </span>
+          <HoverGif
+            src="/portfolio%20transfer/peace%20emoji%20.gif"
+            alt="Peace"
+          />
         </div>
       ),
     },

@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import { CaseStudyScrollContext } from "../[id]/CaseStudyDeck";
 
 export type TimelineStopAnnotation = {
   /** Corner the card sits in. Leader runs diagonally toward the figure. */
@@ -17,6 +18,9 @@ export type TimelineStop = {
   image?: { src: string; alt: string };
   /** Optional 2-up: side-by-side images. Takes precedence over `image`. */
   images?: { src: string; alt: string }[];
+  /** Optional custom node rendered in the figure slot, replacing the
+      image/placeholder entirely. Used for animated stand-ins like Gel. */
+  media?: ReactNode;
   /** Optional callouts pinned to the stop's corners with dotted leaders. */
   annotations?: TimelineStopAnnotation[];
 };
@@ -71,11 +75,16 @@ export function TimelineSample({
   const [active, setActive] = useState(0);
   const n = stops.length;
 
+  // Inside a CaseStudyDeck, the scroll source is the deck container; outside
+  // (e.g. standalone preview routes) it falls back to window.
+  const scrollSource = useContext(CaseStudyScrollContext);
+
   useEffect(() => {
     const section = sectionRef.current;
     const track = trackRef.current;
     const fill = fillRef.current;
     if (!section || !track || !fill) return;
+    const scrollEl: HTMLElement | Window = scrollSource ?? window;
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
     const narrow = window.matchMedia("(max-width: 820px)");
@@ -96,8 +105,12 @@ export function TimelineSample({
         return;
       }
       const rect = section.getBoundingClientRect();
-      const vh = window.innerHeight;
-      const pannable = rect.height - vh;
+      /* Pannable distance is derived from the section's own height (set in
+         svh) rather than window.innerHeight (lvh on mobile). The snap
+         markers are spaced at 100svh; using innerHeight here causes
+         progress to overshoot once the URL bar collapses, which translates
+         the track further left than the snap position warrants. */
+      const pannable = n > 1 ? ((n - 1) / n) * rect.height : 1;
       const scrolled = -rect.top;
       const progress = Math.max(0, Math.min(1, scrolled / pannable));
       const panVw = progress * (n - 1) * 100;
@@ -115,14 +128,14 @@ export function TimelineSample({
       raf = requestAnimationFrame(update);
     };
     update();
-    window.addEventListener("scroll", onScroll, { passive: true });
+    scrollEl.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
     return () => {
-      window.removeEventListener("scroll", onScroll);
+      scrollEl.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
       if (raf) cancelAnimationFrame(raf);
     };
-  }, [n]);
+  }, [n, scrollSource]);
 
   return (
     <section
@@ -160,7 +173,9 @@ export function TimelineSample({
               style={{ flex: `0 0 calc(100% / ${n})` }}
             >
               <figure className="wipu-sample-tl-figure">
-                {stop.images && stop.images.length > 1 ? (
+                {stop.media ? (
+                  stop.media
+                ) : stop.images && stop.images.length > 1 ? (
                   <div
                     className="wipu-sample-tl-images"
                     data-count={stop.images.length}
@@ -221,7 +236,7 @@ export function TimelineSample({
                       const seg = ANNO_PATHS[a.position];
                       return (
                         <path
-                          key={j}
+                          key={`anno-line-${j}`}
                           className="wipu-sample-tl-anno-line"
                           d={seg.d}
                           fill="none"
@@ -238,7 +253,7 @@ export function TimelineSample({
                     const seg = ANNO_PATHS[a.position];
                     return (
                       <span
-                        key={`arrow-${j}`}
+                        key={`anno-arrow-${j}`}
                         className={`wipu-sample-tl-anno-arrow${
                           seg.endsDown ? " is-down" : " is-up"
                         }`}
@@ -252,7 +267,7 @@ export function TimelineSample({
                   })}
                   {stop.annotations.map((a, j) => (
                     <div
-                      key={j}
+                      key={`anno-text-${j}`}
                       className={`wipu-sample-tl-anno wipu-sample-tl-anno-${a.position}`}
                     >
                       {a.text}

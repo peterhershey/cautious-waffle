@@ -19,18 +19,20 @@ export function MetricQuoteSplit({
     <div className="wipu-tpl-mqs">
       <div className="wipu-tpl-mqs-left">{metric}</div>
       <figure className="wipu-tpl-mqs-right">
-        <span className="wipu-tpl-mqs-mark wipu-tpl-mqs-mark-open" aria-hidden>
-          &ldquo;
-        </span>
-        <blockquote className="wipu-tpl-mqs-quote">{quote}</blockquote>
-        <span className="wipu-tpl-mqs-mark wipu-tpl-mqs-mark-close" aria-hidden>
-          &rdquo;
-        </span>
-        {attribution && (
-          <figcaption className="wipu-tpl-mqs-attr">
-            — {attribution}
-          </figcaption>
-        )}
+        <div className="wipu-tpl-mqs-block">
+          <span className="wipu-tpl-mqs-mark wipu-tpl-mqs-mark-open" aria-hidden>
+            &ldquo;
+          </span>
+          <blockquote className="wipu-tpl-mqs-quote">{quote}</blockquote>
+          <span className="wipu-tpl-mqs-mark wipu-tpl-mqs-mark-close" aria-hidden>
+            &rdquo;
+          </span>
+          {attribution && (
+            <figcaption className="wipu-tpl-mqs-attr">
+              — {attribution}
+            </figcaption>
+          )}
+        </div>
       </figure>
     </div>
   );

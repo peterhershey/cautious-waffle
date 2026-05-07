@@ -1575,19 +1575,6 @@ body.wipu-fs-active .wipu-drawtool {
   gap: 12px;
 }
 .wipu-hud-mark { color: #fff; letter-spacing: 0.1em; font-weight: 500; }
-.wipu-theme-toggle {
-  all: unset;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-family: var(--wipu-mono);
-  font-size: 11px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--wipu-ink);
-}
-
 /* ——— PEN TOOL (carried over) ——— */
 .wipu-drawtool {
   position: fixed;

@@ -7,16 +7,18 @@ type Props = {
   eyebrow: string;
   title: ReactNode;
   subtitle?: ReactNode;
+  footer?: ReactNode; // optional secondary content under the subtitle
   children: ReactNode; // the image cluster
 };
 
-export function TextImageSlide({ side, eyebrow, title, subtitle, children }: Props) {
+export function TextImageSlide({ side, eyebrow, title, subtitle, footer, children }: Props) {
   return (
     <div className="wipu-ti" data-side={side}>
       <div className="wipu-ti-text">
         <div className="wipu-ti-eyebrow">{eyebrow}</div>
         <h2 className="wipu-ti-title">{title}</h2>
         {subtitle && <p className="wipu-ti-subtitle">{subtitle}</p>}
+        {footer}
       </div>
       {children}
     </div>

@@ -66,7 +66,7 @@
   font-family: var(--wipu-mono);
   font-weight: 400;
   letter-spacing: 0;
-  min-height: 100vh;
+  min-height: 100svh;
   transition: background-color 240ms ease, color 240ms ease;
 }
 

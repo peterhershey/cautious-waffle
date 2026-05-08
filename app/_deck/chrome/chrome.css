@@ -102,7 +102,7 @@ body[data-hide-deck-chrome="true"] .wipu-chrome {
   scrollbar-width: none;
   padding: 20px 22px;
   font-family: var(--wipu-sans);
-  font-size: 15px;
+  font-size: var(--wipu-fs-body);
   line-height: 1.4;
   letter-spacing: -0.005em;
   color: var(--wipu-ink);
@@ -135,7 +135,7 @@ body[data-hide-deck-chrome="true"] .wipu-chrome {
   align-items: center;
   justify-content: space-between;
   font-family: var(--wipu-mono);
-  font-size: 10px;
+  font-size: var(--wipu-fs-eyebrow);
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--wipu-ink-faint);
@@ -151,7 +151,7 @@ body[data-hide-deck-chrome="true"] .wipu-chrome {
 }
 
 .wipu-corner-panel-hint {
-  font-size: 10px;
+  font-size: var(--wipu-fs-eyebrow);
   letter-spacing: 0.12em;
   color: var(--wipu-ink-faint);
 }
@@ -177,7 +177,7 @@ body[data-hide-deck-chrome="true"] .wipu-chrome {
   border: 1px solid transparent;
   color: var(--wipu-ink-dim);
   font-family: inherit;
-  font-size: 17px;
+  font-size: var(--wipu-fs-body);
   font-weight: 450;
   letter-spacing: -0.01em;
   text-align: left;
@@ -272,7 +272,7 @@ body[data-hide-deck-chrome="true"] .wipu-chrome {
   padding: 0 14px;
   margin-bottom: 6px;
   font-family: var(--wipu-sans);
-  font-size: 12px;
+  font-size: var(--wipu-fs-eyebrow);
   font-weight: 400;
   letter-spacing: 0.005em;
   color: rgba(255, 255, 255, 0.42);
@@ -313,7 +313,7 @@ body[data-hide-deck-chrome="true"] .wipu-chrome {
   display: block;
   width: 100%;
   font-family: var(--wipu-sans);
-  font-size: 19px;
+  font-size: var(--wipu-fs-body);
   font-weight: 350;
   letter-spacing: -0.005em;
   line-height: 1.2;

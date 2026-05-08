@@ -103,6 +103,38 @@ function makeCubicBezier(x1: number, y1: number, x2: number, y2: number) {
 }
 const morphEase = makeCubicBezier(0.22, 0.8, 0.2, 1);
 
+/* Decorative video wrapper. The element starts at opacity 0 so iOS's
+   autoplay-blocked play-button overlay (Low Power Mode etc.) is never
+   visible — we only fade the video in once the `playing` event fires.
+   When autoplay is denied, the underlying tinted box stays visible
+   instead, which matches the morph's color-tint phases. */
+function MorphVideo({ src }: { src: string }) {
+  const ref = useRef<HTMLVideoElement | null>(null);
+  const [shown, setShown] = useState(false);
+  useEffect(() => {
+    const v = ref.current;
+    if (!v) return;
+    const onPlay = () => setShown(true);
+    v.addEventListener("playing", onPlay);
+    const p = v.play();
+    if (p && typeof p.catch === "function") p.catch(() => {});
+    return () => v.removeEventListener("playing", onPlay);
+  }, [src]);
+  return (
+    <video
+      ref={ref}
+      src={src}
+      autoPlay
+      muted
+      loop
+      playsInline
+      preload="metadata"
+      aria-hidden
+      style={{ opacity: shown ? 1 : 0, transition: "opacity 220ms ease" }}
+    />
+  );
+}
+
 export function MediaMorphSlide({
   side,
   eyebrow,
@@ -254,17 +286,15 @@ export function MediaMorphSlide({
         return <div key={i} ref={setRef} className="wipu-morph-fill" />;
       }
       if (item.kind === "video") {
+        const fallbackTone = MORPH_TONES[c.idx % MORPH_TONES.length];
         return (
-          <div key={i} ref={setRef} className="wipu-morph-fill">
-            <video
-              src={item.src}
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="metadata"
-              aria-hidden
-            />
+          <div
+            key={i}
+            ref={setRef}
+            className="wipu-morph-fill"
+            style={{ backgroundColor: `var(--wipu-${fallbackTone})` }}
+          >
+            <MorphVideo src={item.src} />
           </div>
         );
       }

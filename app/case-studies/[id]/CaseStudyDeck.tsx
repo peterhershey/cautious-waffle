@@ -404,7 +404,7 @@ export function CaseStudyDeck({ slides, meta }: CaseStudyDeckProps) {
           </Link>
         </div>
       </CaseStudyScrollContext.Provider>
-      <DeckChrome />
+      <DeckChrome nav />
     </DeckContext.Provider>
   );
 }

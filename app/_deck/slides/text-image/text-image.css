@@ -27,7 +27,7 @@
 .wipu-ti-text {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: var(--wipu-sp-md);
   text-align: left;
 }
 .wipu-ti-eyebrow {
@@ -47,7 +47,7 @@
   white-space: pre-line; /* allow explicit \n breaks from props */
 }
 .wipu-ti-subtitle {
-  margin: 6px 0 0;
+  margin: var(--wipu-sp-2xs) 0 0;
   font-size: var(--wipu-fs-body);
   line-height: 1.5;
   color: var(--wipu-ink-dim);
@@ -59,12 +59,12 @@
    A tight horizontal card: small thumbnail + source eyebrow + headline.
    Sits under the subtitle, visually subordinate to the main copy. */
 .wipu-ti-press {
-  margin-top: 14px;
+  margin-top: var(--wipu-sp-md);
   display: inline-flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--wipu-sp-sm);
   max-width: 360px;
-  padding: 8px 14px 8px 8px;
+  padding: var(--wipu-sp-xs) var(--wipu-sp-sm) var(--wipu-sp-xs) var(--wipu-sp-xs);
   border: 1px solid var(--wipu-rule);
   border-radius: 14px;
   background: var(--wipu-bg-elev);
@@ -223,7 +223,7 @@
   display: block;
 }
 .wipu-ti-single-caption {
-  margin-top: 10px;
+  margin-top: var(--wipu-sp-sm);
   font-family: var(--wipu-mono);
   font-size: var(--wipu-fs-eyebrow);
   letter-spacing: 0.04em;
@@ -233,7 +233,7 @@
 
 /* ───────── Responsive ───────── */
 
-@media (max-width: 760px) {
+@media (max-width: 768px) {
   .wipu-ti {
     grid-template-columns: 1fr;
     align-items: flex-start;

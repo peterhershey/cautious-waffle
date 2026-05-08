@@ -24,7 +24,7 @@ body[data-hide-deck-chrome="true"] .wipu-chrome {
 .wipu-corner {
   position: absolute;
   top: 16px;
-  width: 320px;
+  width: clamp(280px, 90vw, 320px);
   pointer-events: none;
   /* Inside the .wipu-chrome stacking context the SiteFrame uses z-index
      30 — the corners need to sit above it so the panel reveals over,
@@ -59,7 +59,7 @@ body[data-hide-deck-chrome="true"] .wipu-chrome {
   inset: auto;
   top: 6px;
   left: 6px;
-  width: 360px;
+  width: clamp(280px, 90vw, 360px);
   height: 28px;
 }
 
@@ -96,11 +96,11 @@ body[data-hide-deck-chrome="true"] .wipu-chrome {
 .wipu-corner-panel {
   position: absolute;
   top: 0;
-  width: 340px;
+  width: clamp(280px, 90vw, 340px);
   max-height: calc(100vh - 32px);
   overflow-y: auto;
   scrollbar-width: none;
-  padding: 20px 22px;
+  padding: var(--wipu-sp-md) var(--wipu-sp-md);
   font-family: var(--wipu-sans);
   font-size: var(--wipu-fs-body);
   line-height: 1.4;
@@ -139,14 +139,14 @@ body[data-hide-deck-chrome="true"] .wipu-chrome {
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--wipu-ink-faint);
-  margin-bottom: 12px;
+  margin-bottom: var(--wipu-sp-sm);
 }
 
 /* Sub-section header inside a panel — sits between two list groups
    (e.g. Pages above, Slides below). */
 .wipu-corner-panel-head--sub {
-  margin-top: 18px;
-  padding-top: 14px;
+  margin-top: var(--wipu-sp-md);
+  padding-top: var(--wipu-sp-sm);
   border-top: 1px solid var(--glass-border);
 }
 
@@ -170,7 +170,7 @@ body[data-hide-deck-chrome="true"] .wipu-chrome {
 .wipu-navcorner-item {
   display: flex;
   align-items: baseline;
-  gap: 14px;
+  gap: var(--wipu-sp-sm);
   padding: 9px 10px;
   border-radius: 10px;
   background: transparent;
@@ -219,7 +219,7 @@ body[data-hide-deck-chrome="true"] .wipu-chrome {
   display: none;
   overflow-y: auto;
   scrollbar-width: none;
-  padding: 22px 14px;
+  padding: var(--wipu-sp-md) var(--wipu-sp-sm);
   border-radius: 28px;
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.06) inset,
@@ -265,12 +265,12 @@ body[data-hide-deck-chrome="true"] .wipu-chrome {
 }
 
 .wipu-takeover-inner > .wipu-takeover-section + .wipu-takeover-section {
-  margin-top: 18px;
+  margin-top: var(--wipu-sp-md);
 }
 
 .wipu-takeover-section-label {
-  padding: 0 14px;
-  margin-bottom: 6px;
+  padding: 0 var(--wipu-sp-sm);
+  margin-bottom: var(--wipu-sp-2xs);
   font-family: var(--wipu-sans);
   font-size: var(--wipu-fs-eyebrow);
   font-weight: 400;
@@ -321,7 +321,7 @@ body[data-hide-deck-chrome="true"] .wipu-chrome {
   background: transparent;
   border: 0;
   border-radius: 12px;
-  padding: 9px 14px;
+  padding: 9px var(--wipu-sp-sm);
   text-align: left;
   cursor: pointer;
   transition: background-color 140ms ease;

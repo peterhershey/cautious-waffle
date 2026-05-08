@@ -12,7 +12,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 
 export type StickyCardTone =
   | "terracotta"
@@ -181,10 +181,12 @@ export function StickyCardsTemplate({
       )}
       <div
         className="wipu-tpl-sticky-board"
-        style={{
-          gridTemplateColumns: `repeat(${blocks.length}, minmax(0, 1fr))`,
-          maxWidth: `min(${Math.min(blocks.length, 3) * 460 + 120}px, 92vw)`,
-        }}
+        style={
+          {
+            "--sticky-cols": blocks.length,
+            "--sticky-board-max": `${Math.min(blocks.length, 3) * 460 + 120}px`,
+          } as CSSProperties
+        }
       >
         {blocks.map((b, i) => {
           const tone = b.tone ?? DEFAULT_TONES[i % DEFAULT_TONES.length];

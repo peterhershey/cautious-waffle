@@ -436,6 +436,13 @@
 @media (prefers-reduced-motion: reduce) {
   .wipu-anno-callout-svg path { animation: none; }
 }
+/* Hide the goal-style callout on phones — it's tuned to desktop coords. */
+@media (max-width: 768px) {
+  .wipu-anno-callout,
+  .wipu-anno-callout-svg {
+    display: none;
+  }
+}
 
 /* ───────── Template 15 — Emoji Headline ─────────
    Centered emoji row over a single mono headline. Default text reads
@@ -1074,10 +1081,13 @@
 }
 .wipu-tpl-sticky-board {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  /* Column count and max width come from inline CSS vars set by the
+     template (`--sticky-cols`, `--sticky-board-max`), so media queries
+     can still override grid-template-columns at narrow widths. */
+  grid-template-columns: repeat(var(--sticky-cols, 3), minmax(0, 1fr));
   gap: clamp(20px, 3vw, 44px);
   width: 100%;
-  max-width: min(1180px, 92vw);
+  max-width: min(var(--sticky-board-max, 1500px), 92vw);
   align-items: start;
   padding: clamp(40px, 6vh, 80px) 0;
 }
@@ -1242,17 +1252,37 @@
   }
 }
 
-/* Stack on narrow screens; drop the rotations / offsets so layout is
-   readable rather than playful. */
+/* Stack vertically on narrow screens. Cards keep a gentle alternating
+   tilt so they still feel pinned to the board, just one at a time. */
 @media (max-width: 768px) {
   .wipu-tpl-sticky-board {
     grid-template-columns: 1fr;
-    gap: clamp(28px, 4vh, 44px);
+    gap: clamp(36px, 6vh, 56px);
+    max-width: min(420px, 92vw);
+    margin: 0 auto;
+    padding: clamp(28px, 4vh, 56px) 0;
   }
-  .wipu-tpl-sticky-card[data-card-idx="0"][data-revealed="true"],
-  .wipu-tpl-sticky-card[data-card-idx="1"][data-revealed="true"],
+  .wipu-tpl-sticky-card[data-card-idx="0"][data-revealed="true"] {
+    transform: rotate(-1.4deg);
+  }
+  .wipu-tpl-sticky-card[data-card-idx="1"][data-revealed="true"] {
+    transform: rotate(1.6deg);
+  }
   .wipu-tpl-sticky-card[data-card-idx="2"][data-revealed="true"] {
-    transform: rotate(0deg) translateY(0);
+    transform: rotate(-1deg);
+  }
+  /* Touch hover-state lifts: slight scale only, no Y offset (no neighbors). */
+  .wipu-tpl-sticky-card[data-link="true"][data-card-idx="0"][data-revealed="true"]:hover,
+  .wipu-tpl-sticky-card[data-link="true"][data-card-idx="0"][data-revealed="true"]:focus-visible {
+    transform: rotate(-1.4deg) scale(1.01);
+  }
+  .wipu-tpl-sticky-card[data-link="true"][data-card-idx="1"][data-revealed="true"]:hover,
+  .wipu-tpl-sticky-card[data-link="true"][data-card-idx="1"][data-revealed="true"]:focus-visible {
+    transform: rotate(1.6deg) scale(1.01);
+  }
+  .wipu-tpl-sticky-card[data-link="true"][data-card-idx="2"][data-revealed="true"]:hover,
+  .wipu-tpl-sticky-card[data-link="true"][data-card-idx="2"][data-revealed="true"]:focus-visible {
+    transform: rotate(-1deg) scale(1.01);
   }
 }
 

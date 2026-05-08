@@ -240,3 +240,28 @@
 .wipu-anno-label[data-tone="terracotta"] .glyph { color: var(--wipu-terracotta); }
 .wipu-anno-label[data-tone="mint"]       .glyph { color: var(--wipu-mint); }
 .wipu-anno-label[data-tone="mustard"]    .glyph { color: var(--wipu-mustard); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   MOBILE — Hide decorative annotations on phones.
+   The figjam-style overlays (arrows, tape, pins, stamps, scribbles,
+   absolute marker circles, italic captions) are tuned for desktop
+   compositions and just clutter narrow viewports. Inline highlighter
+   marks stay (they wrap text), but their visual band is dropped.
+   ═══════════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .wipu-anno-arrow,
+  .wipu-anno-tape,
+  .wipu-anno-pin,
+  .wipu-anno-stamp,
+  .wipu-anno-scribble,
+  .wipu-anno-circle,
+  .wipu-anno-label {
+    display: none;
+  }
+  .wipu-anno-mark {
+    background: transparent;
+    transform: none;
+    padding: 0;
+    margin: 0;
+  }
+}

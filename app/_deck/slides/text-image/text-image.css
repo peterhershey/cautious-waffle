@@ -239,12 +239,13 @@
     align-items: flex-start;
     gap: clamp(28px, 5vh, 44px);
   }
-  /* On mobile, text always comes first regardless of side */
-  .wipu-ti[data-side="right"] .wipu-ti-text {
-    order: unset;
+  /* On mobile, the image cluster (or single, or morph) always comes first,
+     text always comes second — regardless of the desktop side variant. */
+  .wipu-ti .wipu-ti-text {
+    order: 2;
   }
-  .wipu-ti[data-side="right"] .wipu-ti-cluster {
-    order: unset;
+  .wipu-ti > *:not(.wipu-ti-text) {
+    order: 1;
   }
   .wipu-ti-cluster {
     max-height: 52vh;

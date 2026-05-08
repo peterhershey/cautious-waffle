@@ -1232,6 +1232,14 @@
   background: color-mix(in srgb, currentColor 22%, transparent);
   border-color: color-mix(in srgb, currentColor 50%, transparent);
 }
+/* Touch devices: no hover, so revealed links show the nudged arrow by default. */
+@media (hover: none) {
+  .wipu-tpl-sticky-card[data-link="true"][data-revealed="true"]::after {
+    transform: translateX(4px);
+    background: color-mix(in srgb, currentColor 22%, transparent);
+    border-color: color-mix(in srgb, currentColor 50%, transparent);
+  }
+}
 
 /* Stack on narrow screens; drop the rotations / offsets so layout is
    readable rather than playful. */

@@ -407,6 +407,25 @@
 .field-notes-tile-image[data-bucket="europalette"]:hover::after {
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
 }
+/* Touch devices: there's no hover, so apply the lift by default — and
+   keep the europalette opt-out so it stays quiet there too. */
+@media (hover: none) {
+  .field-notes-tile-image img,
+  .field-notes-tile-image video {
+    filter: brightness(1.06);
+  }
+  .field-notes-tile-image::after {
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12),
+      0 12px 36px -12px rgba(0, 0, 0, 0.6);
+  }
+  .field-notes-tile-image[data-bucket="europalette"] img,
+  .field-notes-tile-image[data-bucket="europalette"] video {
+    filter: none;
+  }
+  .field-notes-tile-image[data-bucket="europalette"]::after {
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  }
+}
 
 /* ───────── Tile: color card ─────────
    Title + body. Bigger sizes only (2x1, 2x2). Title is a punchy claim;

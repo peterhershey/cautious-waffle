@@ -254,6 +254,17 @@
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12),
     0 12px 36px -12px rgba(0, 0, 0, 0.6);
 }
+/* Touch devices: there's no hover, so apply the lift by default. */
+@media (hover: none) {
+  .creator-tile-image img,
+  .creator-tile-image video {
+    filter: brightness(1.06);
+  }
+  .creator-tile-image::after {
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12),
+      0 12px 36px -12px rgba(0, 0, 0, 0.6);
+  }
+}
 
 /* ───────── Tile: color card ───────── */
 

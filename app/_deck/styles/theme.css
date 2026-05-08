@@ -54,7 +54,7 @@
 
   /* Container padding (slide-edge inset). */
   --wipu-pad-x: clamp(20px, 4vw + 4px, 64px);
-  --wipu-pad-y: clamp(24px, 5vh + 4px, 80px);
+  --wipu-pad-y: clamp(24px, 6vh + 4px, 96px);
 
   /* Breakpoints — use these three widths only:
      480px  — phone / tablet boundary

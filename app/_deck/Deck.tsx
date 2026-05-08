@@ -52,7 +52,11 @@ function readHashIndex(): number {
 export function Deck() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const slideRefs = useRef<(HTMLElement | null)[]>([]);
-  const [activeIndex, setActiveIndex] = useState(readHashIndex);
+  // Always start at 0 on first render so SSR and the client's first paint
+  // agree. The hash-derived index is applied in useLayoutEffect below
+  // (synchronously, before paint) so deep links still arrive on the right
+  // slide without a hydration mismatch on data-active.
+  const [activeIndex, setActiveIndex] = useState(0);
   const [immersive, setImmersive] = useState(false);
   const [lastNavKeyAt, setLastNavKeyAt] = useState(0);
 
@@ -69,16 +73,21 @@ export function Deck() {
   const next = useCallback(() => goTo(activeIndex + 1), [activeIndex, goTo]);
   const prev = useCallback(() => goTo(activeIndex - 1), [activeIndex, goTo]);
 
-  // Sync the scroll position to the hash-derived initial slide before paint.
-  // activeIndex is already initialized from the hash via lazy state; this just
-  // moves the scroll container to match.
+  // Apply the hash-derived initial slide synchronously before paint, then
+  // jump the scroll container to match. Reading the hash here (rather than
+  // in useState) keeps SSR and the client's first render in sync so the
+  // data-active markers don't trigger a hydration mismatch.
   useLayoutEffect(() => {
+    const idx = readHashIndex();
+    if (idx === 0) return;
+    setActiveIndex(idx);
     const container = containerRef.current;
-    if (!container || activeIndex === 0) return;
-    container.scrollTo({
-      top: activeIndex * container.clientHeight,
-      behavior: "auto",
-    });
+    if (container) {
+      container.scrollTo({
+        top: idx * container.clientHeight,
+        behavior: "auto",
+      });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- one-shot mount sync only
   }, []);
 

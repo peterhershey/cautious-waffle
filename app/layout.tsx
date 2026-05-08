@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Inter, Fraunces } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 
 const inter = Inter({
@@ -58,12 +57,13 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} ${fraunces.variable} h-full antialiased`}
     >
-      <body className="min-h-full">
-        <Script id="wipu-theme-init" strategy="beforeInteractive">
-          {themeInit}
-        </Script>
-        {children}
-      </body>
+      <head>
+        {/* Theme init runs synchronously before paint to set data-theme
+            on .wipu-root and avoid a flash of the wrong palette. Lives in
+            <head> so React doesn't treat it as a body-rendered <script>. */}
+        <script dangerouslySetInnerHTML={{ __html: themeInit }} />
+      </head>
+      <body className="min-h-full">{children}</body>
     </html>
   );
 }

@@ -51,7 +51,24 @@ export const hero = {
   label: "HERO · 00",
   greeting: "Hi, I’m",
   name: "Peter Hershey",
-  subtitle: "Senior Product Designer & Creator",
+  subtitle: "AI Product Designer & Creator",
+  contacts: [
+    {
+      label: "Instagram",
+      href: "https://www.instagram.com/peterhershey/",
+      tone: "terracotta",
+    },
+    {
+      label: "LinkedIn",
+      href: "https://www.linkedin.com/in/peter-hershey/",
+      tone: "navy",
+    },
+    {
+      label: "Email",
+      href: "mailto:petershershey@gmail.com",
+      tone: "mint",
+    },
+  ],
 } as const;
 
 export const qualifications = {
@@ -103,27 +120,27 @@ export const fieldNotes = {
 
 export const aiNative = {
   label: "AI-NATIVE · 04",
-  title: "🛠️ Always building. Always curious.",
+  title: "🧭 Designing at the frontier.",
   subtitle:
-    "The design field is shifting fast, and generative AI is at the center of it. I’d rather be hands-on with what’s next than watching from the sidelines.",
+    "I design for where AI capabilities are heading, not just where they are today. That means staying close to the models, prototyping in code, and treating AI as a creative partner.",
 } as const;
 
 export const aiInPractice = {
   label: "AI IN PRACTICE · 05",
-  title: "My AI toolkit.",
+  title: "My AI Toolkit",
   blocks: [
-    {
-      eyebrow: "AT WORK",
-      title: "Figma, Antigravity",
-      body: "End-to-end design with Figma and agentic development. From concept to high-fidelity prototype, fast.",
-    },
     {
       eyebrow: "AT HOME",
       title: "Claude Code, Wispr Flow",
       body: "Rethinking my personal workflow for the AI age. Coding with Claude, dictating with Wispr, rebuilding how I work from the ground up.",
     },
     {
-      eyebrow: "GENERATIVE",
+      eyebrow: "AT WORK",
+      title: "Figma, Antigravity, AI Studio",
+      body: "End-to-end design with Figma and agentic development. From concept to high-fidelity prototype, fast.",
+    },
+    {
+      eyebrow: "IN THE LAB",
       title: "TouchDesigner, ComfyUI",
       body: "Using TouchDesigner and real-time diffusion pipelines to create live, interactive generative art experiences. The wildcard in the stack.",
     },
@@ -132,9 +149,9 @@ export const aiInPractice = {
 
 export const empathy = {
   label: "EMPATHY · 07",
-  title: "🌍 The best design research is lived experience.",
+  title: "🌍 Design is empathy. Travel is practice.",
   subtitle:
-    "Nearly fifty countries, some as a tourist, some as a digital nomad. All in service of understanding how other people live. It’s the most valuable thing I bring to my design practice.",
+    "Nearly fifty countries, some as a tourist, some as a digital nomad. Understanding how other people live is the most valuable thing I bring to my design practice, and something I’ve written about for The Washington Post.",
   pressLink: {
     source: "The Washington Post · Travel",
     headline: "My Digital Nomad Visa Tips",
@@ -146,7 +163,7 @@ export const empathy = {
 
 export const closer = {
   label: "FIN · 10",
-  emoji: "✌️",
+  title: "Let’s keep in touch.",
 } as const;
 
 export const cases = {

@@ -149,14 +149,16 @@ function imgSlots(
   return out;
 }
 
-/* Variant A — Mosaic. Quiet scrapbook. A sea of 1x1 squares with sparse
-   accents; reads as a calm, dense pattern. ~69 slots, 64 image. */
+/* Variant A — Mosaic. Quiet scrapbook with sparse hero moments. A field
+   of 1x1 squares broken up by 2x2 anchors and 3x2 wide heroes; reads as
+   a calm, dense pattern with occasional rest stops. ~54 slots, 49 image. */
 export const LAYOUT_MOSAIC: SlotSpec[] = [
-  ...imgSlots("2x2", 4),
+  ...imgSlots("2x2", 6),
+  ...imgSlots("3x2", 3),
   ...CARD_SLOTS,
   ...imgSlots("2x1", 4, [0.05, 0.04, 0.06]),
   ...imgSlots("1x2", 4, [0.05, 0.06, 0.04]),
-  ...imgSlots("1x1", 52, [0.05, 0.07, 0.06, 0.04, 0.08]),
+  ...imgSlots("1x1", 32, [0.05, 0.07, 0.06, 0.04, 0.08]),
 ];
 
 /* Variant B — Editorial. Magazine spread. Big squares + wide 3x2 heroes
@@ -285,42 +287,170 @@ function pickForSlot(
   return null;
 }
 
-/* Stratified shuffle: place the larger slots (anchors, cards — anything
-   not 1x1) at evenly-spaced positions across the array, then fill the
-   gaps with 1x1s in random order. Combined with grid-auto-flow:dense,
-   this keeps every viewport-height "page" visually mixed instead of
-   leaving long tails of small squares clumped together. */
+/* Stratified shuffle: place colored cards first at evenly-spaced
+   positions across the full array (with wobble bounded so cards land
+   at least CARD_MIN_GAP slots apart — never adjacent), then place
+   non-1x1 image anchors across the remaining gaps, then fill what's
+   left with 1x1s. This keeps cards paced through the page so two
+   text cards never sit side-by-side, while still mixing every
+   viewport-height "page" visually. */
+const CARD_MIN_GAP = 3;
 function stratifiedSlotShuffle(slots: readonly SlotSpec[], rand: () => number): SlotSpec[] {
-  const big = fisherYates(
-    slots.filter((s) => s.size !== "1x1"),
+  const cards = fisherYates(slots.filter((s) => s.kind === "card"), rand);
+  const bigImgs = fisherYates(
+    slots.filter((s) => s.kind === "image" && s.size !== "1x1"),
     rand,
   );
   const small = fisherYates(
-    slots.filter((s) => s.size === "1x1"),
+    slots.filter((s) => s.kind === "image" && s.size === "1x1"),
     rand,
   );
-  const total = big.length + small.length;
-  if (big.length === 0) return small;
+  const total = cards.length + bigImgs.length + small.length;
+  if (total === 0) return [];
   const out: (SlotSpec | undefined)[] = new Array(total).fill(undefined);
-  const stride = total / big.length;
-  // Tiny per-slot wobble so adjacent renders don't land bigs at identical
-  // indices — keeps the pattern feeling alive when shuffle is hit.
-  const offsetJitter = (stride - 1) * 0.4;
-  for (let i = 0; i < big.length; i++) {
-    const wobble = (rand() * 2 - 1) * offsetJitter;
-    const target = Math.max(
-      0,
-      Math.min(total - 1, Math.floor((i + 0.5) * stride + wobble)),
-    );
-    let idx = target;
-    while (out[idx]) idx = (idx + 1) % total; // collision → next slot
-    out[idx] = big[i];
-  }
+
+  const place = (
+    items: readonly SlotSpec[],
+    indices: readonly number[],
+    minGap: number,
+  ): void => {
+    if (items.length === 0 || indices.length === 0) return;
+    const stride = indices.length / items.length;
+    // Keep `stride - 2*wobble >= minGap` so two stratified items can
+    // never land closer than `minGap` slots apart in the index pool.
+    const maxWobble = Math.max(0, (stride - minGap) / 2);
+    for (let i = 0; i < items.length; i++) {
+      const wobble = (rand() * 2 - 1) * maxWobble;
+      const targetPos = Math.max(
+        0,
+        Math.min(
+          indices.length - 1,
+          Math.floor((i + 0.5) * stride + wobble),
+        ),
+      );
+      let pos = targetPos;
+      while (out[indices[pos]]) pos = (pos + 1) % indices.length;
+      out[indices[pos]] = items[i];
+    }
+  };
+
+  // Cards first, across the whole array.
+  const allIndices = Array.from({ length: total }, (_, i) => i);
+  place(cards, allIndices, CARD_MIN_GAP);
+
+  // Big image anchors next, into whatever gaps remain.
+  const gapAfterCards: number[] = [];
+  for (let i = 0; i < total; i++) if (!out[i]) gapAfterCards.push(i);
+  // Modest gap (1) for image anchors — they're allowed near each other,
+  // we just want them stratified so smalls don't clump.
+  place(bigImgs, gapAfterCards, 1);
+
+  // 1x1s fill the rest in shuffled order.
   let s = 0;
   for (let i = 0; i < total; i++) {
     if (!out[i]) out[i] = small[s++];
   }
   return out as SlotSpec[];
+}
+
+/* Tile dimensions in grid cells (matches the CSS span rules). */
+const SIZE_DIM: Record<TileSize, { w: number; h: number }> = {
+  "1x1": { w: 1, h: 1 },
+  "2x1": { w: 2, h: 1 },
+  "1x2": { w: 1, h: 2 },
+  "2x2": { w: 2, h: 2 },
+  "3x2": { w: 3, h: 2 },
+};
+
+const FIT_COLS = 7;
+
+/* Pre-fit the stratified slot order against the desktop 7-col grid so
+   the CSS auto-flow:row layout never leaves stranded empty cells. We
+   walk the grid row-by-row; when the queue's next slot doesn't fit the
+   remaining row width, we pull a smaller NON-CARD slot from later in
+   the queue forward to fill the gap. Cards are never reordered, which
+   preserves the stratified card spacing (CARD_MIN_GAP). */
+function fitToGrid(slots: readonly SlotSpec[]): SlotSpec[] {
+  const cols = FIT_COLS;
+  const queue = slots.slice();
+  const out: SlotSpec[] = [];
+  const occ: boolean[][] = [];
+
+  const isOcc = (r: number, c: number): boolean => !!occ[r]?.[c];
+  const setOcc = (r: number, c: number) => {
+    if (!occ[r]) occ[r] = new Array(cols).fill(false);
+    occ[r][c] = true;
+  };
+  const fits = (slot: SlotSpec, r: number, c: number): boolean => {
+    const { w, h } = SIZE_DIM[slot.size];
+    if (c + w > cols) return false;
+    for (let i = 0; i < h; i++)
+      for (let j = 0; j < w; j++) if (isOcc(r + i, c + j)) return false;
+    return true;
+  };
+  const place = (slot: SlotSpec, r: number, c: number) => {
+    out.push(slot);
+    const { w, h } = SIZE_DIM[slot.size];
+    for (let i = 0; i < h; i++) for (let j = 0; j < w; j++) setOcc(r + i, c + j);
+  };
+
+  let row = 0;
+  let col = 0;
+  // Bound the loop so a pathological input can't spin forever; the
+  // grid never needs more iterations than (slot count * cols).
+  let safety = slots.length * cols + cols;
+  while (queue.length > 0 && safety-- > 0) {
+    while (isOcc(row, col)) {
+      col++;
+      if (col >= cols) {
+        col = 0;
+        row++;
+      }
+    }
+    if (fits(queue[0], row, col)) {
+      const s = queue.shift()!;
+      const w = SIZE_DIM[s.size].w;
+      place(s, row, col);
+      col += w;
+      if (col >= cols) {
+        col = 0;
+        row++;
+      }
+      continue;
+    }
+    // queue[0] doesn't fit at the current head. Look for a later
+    // non-card slot that does — never pull cards forward.
+    let pulled = -1;
+    for (let i = 1; i < queue.length; i++) {
+      const cand = queue[i];
+      if (cand.kind === "card") continue;
+      if (fits(cand, row, col)) {
+        pulled = i;
+        break;
+      }
+    }
+    if (pulled >= 0) {
+      const s = queue.splice(pulled, 1)[0];
+      const w = SIZE_DIM[s.size].w;
+      place(s, row, col);
+      col += w;
+      if (col >= cols) {
+        col = 0;
+        row++;
+      }
+      continue;
+    }
+    // Nothing fits at this position — advance one cell. Eventually the
+    // head wraps to the next row where queue[0] should fit.
+    col++;
+    if (col >= cols) {
+      col = 0;
+      row++;
+    }
+  }
+  // Append any leftovers (shouldn't happen, but never drop tiles).
+  while (queue.length > 0) out.push(queue.shift()!);
+  return out;
 }
 
 function altFromSrc(src: string): string {
@@ -353,7 +483,7 @@ export function buildTiles(
   const cap = opts.cap ?? PER_BUCKET_CAP;
   const pattern = opts.pattern ?? LAYOUT_MOSAIC;
   const pool = buildPool(buckets, cap, rand);
-  const slots = stratifiedSlotShuffle(pattern, rand);
+  const slots = fitToGrid(stratifiedSlotShuffle(pattern, rand));
   const out: Tile[] = [];
   for (const slot of slots) {
     if (slot.kind === "card") {

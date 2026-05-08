@@ -17,7 +17,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 28px;
+  gap: var(--wipu-sp-lg);
   text-align: center;
   transition: opacity 260ms ease, transform 320ms cubic-bezier(0.22, 0.8, 0.2, 1);
 }
@@ -49,8 +49,8 @@
   appearance: none;
   background: transparent;
   border: none;
-  padding: 18px;
-  margin-top: 12px;
+  padding: var(--wipu-sp-md);
+  margin-top: var(--wipu-sp-sm);
   cursor: pointer;
   color: var(--wipu-ink);
   transition: transform 220ms cubic-bezier(0.22, 0.8, 0.2, 1),
@@ -129,7 +129,7 @@
   grid-template-columns: repeat(7, 1fr);
   grid-auto-rows: minmax(0, 1fr);
   grid-auto-flow: dense;
-  gap: 12px;
+  gap: var(--wipu-sp-sm);
   padding: clamp(16px, 3vw, 28px);
   padding-bottom: clamp(88px, 10vh, 128px); /* room for X button */
   max-width: 1800px;
@@ -168,13 +168,13 @@
 }
 
 /* Narrower viewports — collapse to fewer columns, relax aspect constraints */
-@media (max-width: 960px) {
+@media (max-width: 1024px) {
   .creator-grid { grid-template-columns: repeat(4, 1fr); }
   .creator-tile-2x2 { grid-column: span 2; grid-row: span 2; }
   .creator-tile-3x2 { grid-column: span 3; grid-row: span 2; aspect-ratio: 3 / 2; }
 }
-@media (max-width: 600px) {
-  .creator-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+@media (max-width: 768px) {
+  .creator-grid { grid-template-columns: repeat(2, 1fr); gap: var(--wipu-sp-sm); }
   .creator-tile-2x2,
   .creator-tile-2x1,
   .creator-tile-3x2 { grid-column: span 2; grid-row: span 1; aspect-ratio: 2 / 1; }
@@ -264,8 +264,8 @@
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-end;
-  padding: clamp(14px, 2.4vw, 22px);
-  gap: 10px;
+  padding: var(--wipu-sp-md);
+  gap: var(--wipu-sp-sm);
   text-align: left;
 }
 .creator-card-emoji {

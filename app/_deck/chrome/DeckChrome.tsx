@@ -5,12 +5,17 @@ import { DeckFrame } from "./DeckFrame";
 import { NavCorner } from "./NavCorner";
 import { NudgeBar } from "./NudgeBar";
 
-export function DeckChrome() {
+export type DeckChromeProps = {
+  /** Render the page nav corner. Off on the home deck for now. */
+  nav?: boolean;
+};
+
+export function DeckChrome({ nav = false }: DeckChromeProps) {
   const { immersive } = useDeck();
   return (
     <div className="wipu-chrome" data-immersive={immersive ? "true" : undefined}>
       <DeckFrame />
-      <NavCorner />
+      {nav && <NavCorner />}
       <NudgeBar />
     </div>
   );

@@ -1183,16 +1183,6 @@
   --tone-line: color-mix(in srgb, var(--wipu-navy) 70%, var(--wipu-ink-faint));
 }
 
-/* Light-theme pass — when sample.css flips to the cream theme, the
-   default-tone hover swaps so the node fill is dark ink and the text
-   reads in cream. Other tones retain their saturated fills which work
-   in both themes. */
-[data-theme="light"] .wpd-flow-node[data-active="true"][data-tone="default"],
-.wpd-flow-svg [data-theme="light"] .wpd-flow-node[data-active="true"][data-tone="default"] {
-  --tone-fill: var(--wipu-ink);
-  --tone-text: var(--wipu-bg);
-}
-
 @media (max-width: 760px) {
   .wpd-flow-svg {
     max-height: none;

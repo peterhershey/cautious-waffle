@@ -9,18 +9,28 @@ import { StickyCardsTemplate } from "../templates/StickyCardsTemplate";
 import { ThreeUpTemplate } from "../templates/ThreeUpTemplate";
 import { TypeOnText } from "../templates/TypeOnText";
 import { HoverGif } from "../templates/HoverGif";
+import {
+  hero,
+  qualifications,
+  aiNative,
+  aiInPractice,
+  empathy,
+  cases,
+  closer,
+  fieldNotes,
+} from "@/app/content";
 
 function HeroSlide() {
   return (
     <IntroTemplate
       emoji={<HoverGif src="/portfolio%20transfer/chocolate%20emoji.gif" />}
-      greeting={<>Hi, I&rsquo;m</>}
+      greeting={hero.greeting}
       name={
         <TypeOnText perCharMs={140} wordPauseMs={320}>
-          Peter Hershey
+          {hero.name}
         </TypeOnText>
       }
-      subtitle="AI Product Designer & Creator"
+      subtitle={hero.subtitle}
     />
   );
 }
@@ -49,81 +59,31 @@ const AI_ART_VIDEOS: MediaMorphMedia[] = [
 
 function AiNativeSlide() {
   return (
-    <>
-      <MediaMorphSlide
-        side="left"
-        eyebrow="AI-NATIVE · 04"
-        title={<>🤖 AI native by default.</>}
-        subtitle="Designing with the most advanced AI tools available. Building the ones that don't exist yet."
-        media={AI_ART_VIDEOS}
-        phaseMs={4500}
-      />
-      {/* Goal-template-style callout below the morphing media's bottom-left
-          corner, with a Manhattan leader rising up into the media. */}
-      <div
-        className="wipu-anno-callout"
-        style={{
-          position: "absolute",
-          bottom: "8vh",
-          left: "48vw",
-          width: "clamp(220px, 22vw, 300px)",
-        }}
-        aria-hidden
-      >
-        Shown at Noisebridge & The Gray Area
-      </div>
-      <svg
-        className="wipu-anno-callout-svg"
-        style={{
-          position: "absolute",
-          bottom: "calc(8vh + 60px)",
-          left: "48vw",
-          width: 300,
-          height: 100,
-        }}
-        viewBox="0 0 300 100"
-        preserveAspectRatio="none"
-        aria-hidden
-      >
-        <defs>
-          <marker
-            id="wipu-anno-callout-arrow-ain"
-            viewBox="0 0 10 10"
-            refX="5"
-            refY="5"
-            markerWidth="5"
-            markerHeight="5"
-            orient="auto-start-reverse"
-          >
-            <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor" />
-          </marker>
-        </defs>
-        <path
-          d="M 80 96 V 60 H 220 V 4"
-          markerEnd="url(#wipu-anno-callout-arrow-ain)"
-        />
-      </svg>
-    </>
+    <MediaMorphSlide
+      side="left"
+      eyebrow={aiNative.label}
+      title={aiNative.title}
+      subtitle={aiNative.subtitle}
+      media={AI_ART_VIDEOS}
+      phaseMs={4500}
+    />
   );
 }
 
 function AiInPracticeSlide() {
+  const [work, home, realtime] = aiInPractice.blocks;
   return (
     <ThreeUpTemplate
       blocks={[
         {
-          eyebrow: "AT WORK",
-          title: "Google DeepMind",
-          body: "Designing the multimodal future of Gemini — Live Video, Visual Overlays, and the input framework underneath them all.",
+          ...work,
           image: {
             src: "/portfolio%20transfer/antigravity.jpg",
             alt: "Antigravity — Google DeepMind's agentic IDE",
           },
         },
         {
-          eyebrow: "AT HOME",
-          title: "Coding",
-          body: "Building with Claude Code — prototypes, weird tools, this site. Code my way to the answer instead of wireframing it.",
+          ...home,
           image: {
             src: "/portfolio%20transfer/claude-code.webp",
             alt: "Claude Code — pixel-block logo",
@@ -131,9 +91,7 @@ function AiInPracticeSlide() {
           },
         },
         {
-          eyebrow: "REAL-TIME · GENERATIVE",
-          title: "TouchDesigner",
-          body: "Generative AI as a creative material — interactive scenes, audio-reactive visuals, things that respond to a room.",
+          ...realtime,
           video: {
             src: "/portfolio%20transfer/aiart/skulls.mov",
             alt: "Real-time generative AI — pop-art skulls",
@@ -148,13 +106,13 @@ function EmpathySlide() {
   return (
     <TextImageSlide
       side="left"
-      eyebrow="SEEING PEOPLE · 07"
-      title={"Design is empathy.\nTravel is practice."}
-      subtitle="Nearly fifty countries. Seeing how other people live is the most important thing a designer can do."
+      eyebrow={empathy.label}
+      title={empathy.title}
+      subtitle={empathy.subtitle}
       footer={
         <a
           className="wipu-ti-press"
-          href="https://www.washingtonpost.com/travel/tips/digital-nomad-visa-tips/"
+          href={empathy.pressLink.url}
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -168,9 +126,9 @@ function EmpathySlide() {
             />
           </div>
           <div className="wipu-ti-press-meta">
-            <span className="wipu-ti-press-source">The Washington Post · Travel</span>
+            <span className="wipu-ti-press-source">{empathy.pressLink.source}</span>
             <span className="wipu-ti-press-headline">
-              My Digital Nomad Visa Tips <span className="wipu-ti-press-arrow" aria-hidden>↗</span>
+              {empathy.pressLink.headline} <span className="wipu-ti-press-arrow" aria-hidden>↗</span>
             </span>
           </div>
         </a>
@@ -181,35 +139,42 @@ function EmpathySlide() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/portfolio%20transfer/travel/stp.png"
-            alt="Three friends in front of Pico Cão Grande, São Tomé"
+            alt={empathy.photoAlt}
             draggable={false}
           />
         </div>
         <div className="wipu-ti-single-caption">
-          Pico Cão Grande, São Tomé
+          {empathy.photoCaption}
         </div>
       </div>
     </TextImageSlide>
   );
 }
 
+function CloserSlide() {
+  return (
+    <div className="wipu-tpl-intro">
+      <div className="wipu-tpl-intro-emoji" aria-hidden>
+        {closer.emoji}
+      </div>
+    </div>
+  );
+}
+
 function QualificationsSlide() {
+  const [previously, currently] = qualifications.blocks;
   return (
     <ThreeUpTemplate
       blocks={[
         {
-          eyebrow: "PREVIOUSLY",
-          title: "Design Lead @ The Washington Post",
-          body: "Led product design across the homepage, article reading experience, and the editorial tools that fed them.",
+          ...previously,
           image: {
             src: "/portfolio%20transfer/field%20notes/product/washington-post-homepage.gif",
             alt: "Washington Post homepage redesign",
           },
         },
         {
-          eyebrow: "CURRENTLY",
-          title: "Senior AI Product Designer @ Google DeepMind",
-          body: "Designing the multimodal future of Gemini — Live Video, Visual Overlays, and the input framework underneath them all.",
+          ...currently,
           image: {
             src: "/portfolio%20transfer/gemini_visualoverlays_commercial_2.gif",
             alt: "Gemini Visual Overlays — what it feels like when a model can look at what you're looking at.",
@@ -230,59 +195,49 @@ export type SlideDef = {
 export const SLIDES: SlideDef[] = [
   {
     id: "hero",
-    label: "INDEX · 00",
+    label: hero.label,
     render: () => <HeroSlide />,
   },
   {
     id: "about",
-    label: "CAREER · 01",
+    label: qualifications.label,
     render: () => <QualificationsSlide />,
   },
   {
     id: "field-notes",
-    label: "FIELD NOTES · 03",
+    label: fieldNotes.label,
     render: () => <FieldNotesSlide />,
   },
   {
     id: "ai-native",
-    label: "AI-NATIVE · 04",
+    label: aiNative.label,
     render: () => <AiNativeSlide />,
   },
   {
     id: "ai-in-practice",
-    label: "AI · IN PRACTICE · 05",
+    label: aiInPractice.label,
     render: () => <AiInPracticeSlide />,
   },
   {
     id: "empathy",
-    label: "SEEING PEOPLE · 07",
+    label: empathy.label,
     render: () => <EmpathySlide />,
   },
   {
     id: "cases",
-    label: "CASE STUDIES · 09",
+    label: cases.label,
     render: () => (
       <StickyCardsTemplate
-        eyebrow="CASE STUDIES · 09"
-        title="Selected work."
+        eyebrow={cases.label}
+        title={cases.title}
         autoReveal
-        blocks={[
-          {
-            eyebrow: "2025 · Google DeepMind",
-            title: "Teaching Gemini to See",
-            body: "Evolving Gemini Live into a multimodal conversational product.",
-            tone: "terracotta",
-            href: "/case-studies/teaching-gemini-to-see",
-          },
-          {
-            eyebrow: "2025 · Google DeepMind",
-            title: "Everyone's a Director",
-            body: "Creating the interface for Google's most advanced video generation model.",
-            tone: "mint",
-            href: "/case-studies/veo-in-gemini",
-          },
-        ]}
+        blocks={cases.blocks.map((b) => ({ ...b }))}
       />
     ),
+  },
+  {
+    id: "closer",
+    label: closer.label,
+    render: () => <CloserSlide />,
   },
 ];

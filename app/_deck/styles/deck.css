@@ -27,7 +27,30 @@
   align-items: center;
   justify-content: center;
   position: relative;
-  padding: clamp(24px, 5vw, 96px);
+  padding: var(--wipu-pad-y) var(--wipu-pad-x);
+}
+
+/* Mobile (touch) only: native scroll with proximity snap. The JS
+   touch-swipe handler in Deck.tsx is skipped on these devices via
+   isCoarsePointer(), so this CSS is the entire snap mechanism on
+   phones / touch tablets. Proximity (not mandatory) so a tall slide
+   can rest mid-content without being yanked back to a snap edge. */
+@media (hover: none) and (pointer: coarse) {
+  .wipu-deck { scroll-snap-type: y proximity; }
+  .wipu-slide { scroll-snap-align: start; }
+}
+
+/* All seven slides live in the DOM at once. Pause every CSS animation
+   on slides that aren't currently active — kills idle-zoom on dozens
+   of tile images, gel-blob loops, dotted-arrow march, callout zebra,
+   and any other forever-running keyframe whose offscreen work was
+   eating CPU/GPU. The active slide animates normally; transitions are
+   left alone so things like card reveals still play. */
+.wipu-slide:not([data-active="true"]),
+.wipu-slide:not([data-active="true"]) *,
+.wipu-slide:not([data-active="true"]) *::before,
+.wipu-slide:not([data-active="true"]) *::after {
+  animation-play-state: paused !important;
 }
 
 /* ───────── Placeholder slide content ───────── */
@@ -36,41 +59,41 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: var(--wipu-sp-md);
   text-align: center;
   color: var(--wipu-ink);
 }
 .wipu-slide-placeholder-num {
   font-family: var(--wipu-mono);
-  font-size: clamp(14px, 1.4vw, 16px);
+  font-size: var(--wipu-fs-meta);
   color: var(--wipu-ink-faint);
   letter-spacing: 0.24em;
 }
 .wipu-slide-placeholder-title {
   font-family: var(--wipu-mono);
   font-weight: 500;
-  font-size: clamp(28px, 5vw, 56px);
+  font-size: var(--wipu-fs-h1);
   line-height: 1.1;
   letter-spacing: -0.01em;
   max-width: 16ch;
 }
 .wipu-slide-placeholder-hint {
   font-family: var(--wipu-mono);
-  font-size: clamp(12px, 1vw, 13px);
+  font-size: var(--wipu-fs-eyebrow);
   color: var(--wipu-ink-dim);
   letter-spacing: 0.18em;
   text-transform: uppercase;
 }
 .wipu-slide-placeholder-links {
-  margin-top: 28px;
+  margin-top: var(--wipu-sp-lg);
   display: flex;
-  gap: 16px;
+  gap: var(--wipu-sp-md);
 }
 .wipu-slide-placeholder-link {
   font-family: var(--wipu-mono);
-  font-size: 14px;
+  font-size: var(--wipu-fs-meta);
   color: var(--wipu-ink);
-  padding: 10px 18px;
+  padding: var(--wipu-sp-sm) var(--wipu-sp-md);
   border: 1px solid var(--wipu-rule-strong);
   border-radius: 8px;
   text-decoration: none;
@@ -106,24 +129,24 @@
 .wipu-quals-block {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--wipu-sp-xs);
 }
 .wipu-quals-eyebrow {
-  font-size: clamp(12px, 1.05vw, 14px);
+  font-size: var(--wipu-fs-eyebrow);
   letter-spacing: 0.24em;
   text-transform: uppercase;
   color: var(--wipu-ink-faint);
   font-weight: 500;
 }
 .wipu-quals-title {
-  font-size: clamp(28px, 4.2vw, 52px);
+  font-size: var(--wipu-fs-h1);
   font-weight: 500;
   line-height: 1.08;
   letter-spacing: -0.012em;
   color: var(--wipu-ink);
 }
 .wipu-quals-org {
-  font-size: clamp(16px, 1.6vw, 22px);
+  font-size: var(--wipu-fs-h3);
   color: var(--wipu-ink-dim);
   letter-spacing: -0.004em;
 }
@@ -131,12 +154,12 @@
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  column-gap: 12px;
-  row-gap: 6px;
-  font-size: clamp(13px, 1.2vw, 16px);
+  column-gap: var(--wipu-sp-sm);
+  row-gap: var(--wipu-sp-2xs);
+  font-size: var(--wipu-fs-body);
   color: var(--wipu-ink);
   letter-spacing: 0;
-  padding-top: 6px;
+  padding-top: var(--wipu-sp-2xs);
   border-top: 1px solid var(--wipu-rule);
   width: 100%;
 }
@@ -169,11 +192,11 @@
 .wipu-ainative-block {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--wipu-sp-xs);
 }
 
 .wipu-ainative-eyebrow {
-  font-size: clamp(12px, 1.05vw, 14px);
+  font-size: var(--wipu-fs-eyebrow);
   letter-spacing: 0.24em;
   text-transform: uppercase;
   color: var(--wipu-ink-faint);
@@ -181,7 +204,7 @@
 }
 
 .wipu-ainative-title {
-  font-size: clamp(24px, 3.6vw, 44px);
+  font-size: var(--wipu-fs-h2);
   font-weight: 500;
   line-height: 1.14;
   letter-spacing: -0.012em;
@@ -189,7 +212,7 @@
 }
 
 .wipu-ainative-title--md {
-  font-size: clamp(16px, 1.7vw, 22px);
+  font-size: var(--wipu-fs-h3);
   color: var(--wipu-ink-dim);
   letter-spacing: -0.004em;
   font-weight: 400;
@@ -197,7 +220,7 @@
 }
 
 .wipu-ainative-title--sm {
-  font-size: clamp(13px, 1.2vw, 16px);
+  font-size: var(--wipu-fs-body);
   color: var(--wipu-ink-faint);
   font-weight: 400;
   line-height: 1.6;
@@ -206,18 +229,18 @@
 .wipu-ainative-tagline {
   display: flex;
   align-items: baseline;
-  padding-top: 6px;
+  padding-top: var(--wipu-sp-2xs);
   border-top: 1px solid var(--wipu-rule);
   width: 100%;
 }
 .wipu-ainative-tagline p {
   margin: 0;
-  font-size: clamp(13px, 1.2vw, 16px);
+  font-size: var(--wipu-fs-body);
   color: var(--wipu-ink);
   letter-spacing: 0;
 }
 .wipu-ainative-arrow {
   color: var(--wipu-ink-faint);
-  margin: 0 4px;
+  margin: 0 var(--wipu-sp-2xs);
 }
 

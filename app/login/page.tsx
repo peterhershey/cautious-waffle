@@ -1,6 +1,7 @@
 import "../_deck/styles/theme.css";
 import "../_deck/styles/glass.css";
 import "./login.css";
+import { login } from "../content";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
@@ -9,9 +10,11 @@ function pickString(v: string | string[] | undefined): string | undefined {
   return v;
 }
 
+const DEFAULT_LANDING = "/#s/hero";
+
 function safeNext(next: string | undefined): string {
-  if (!next) return "/";
-  if (!next.startsWith("/") || next.startsWith("//")) return "/";
+  if (!next) return DEFAULT_LANDING;
+  if (!next.startsWith("/") || next.startsWith("//")) return DEFAULT_LANDING;
   return next;
 }
 
@@ -28,8 +31,8 @@ export default async function LoginPage({
     <div className="wipu-root wpd-login-page" data-theme="dark">
       <div className="wpd-login-card glass">
         <div>
-          <div className="wpd-login-eyebrow">What&rsquo;s Peter doing</div>
-          <h1 className="wpd-login-title">Enter the password to continue.</h1>
+          <div className="wpd-login-eyebrow">{login.eyebrow}</div>
+          <h1 className="wpd-login-title">{login.title}</h1>
         </div>
         <form
           className="wpd-login-form"
@@ -42,21 +45,21 @@ export default async function LoginPage({
             className="wpd-login-input"
             name="password"
             type="password"
-            placeholder="Password"
+            placeholder={login.passwordPlaceholder}
             autoFocus
             required
           />
           <button className="wpd-login-submit" type="submit">
-            Continue
+            {login.submit}
           </button>
           {errored && (
             <p className="wpd-login-error" role="alert">
-              That password didn&rsquo;t match.
+              {login.error}
             </p>
           )}
         </form>
         <p className="wpd-login-foot">
-          Private portfolio. Ask Peter for the password.
+          {login.foot}
         </p>
       </div>
     </div>

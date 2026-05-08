@@ -164,9 +164,14 @@ export function MediaMorphSlide({
     }
 
     let raf = 0;
+    let visible = true;
+    let pausedAt = 0;
+    let pausedFor = 0;
     const start = performance.now();
     const tick = () => {
-      const elapsed = (performance.now() - start) / phaseMs;
+      raf = 0;
+      if (!visible) return; // halt the chain; IO will re-arm on re-entry
+      const elapsed = (performance.now() - start - pausedFor) / phaseMs;
       const phaseIdx = Math.floor(elapsed);
       const localT = elapsed - phaseIdx;
 
@@ -204,7 +209,37 @@ export function MediaMorphSlide({
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
+
+    // Pause the morph rAF when the slide leaves the viewport, resume on
+    // re-entry. Tracking pausedFor keeps the morph phase continuous so
+    // the layout doesn't jump when the user scrolls back to AI Native.
+    const host = refA.current?.parentElement ?? null;
+    let io: IntersectionObserver | null = null;
+    if (host) {
+      io = new IntersectionObserver(
+        ([entry]) => {
+          const nowVisible = entry.intersectionRatio > 0.25;
+          if (nowVisible === visible) return;
+          visible = nowVisible;
+          if (!visible) {
+            pausedAt = performance.now();
+            if (raf) cancelAnimationFrame(raf);
+            raf = 0;
+          } else {
+            if (pausedAt) pausedFor += performance.now() - pausedAt;
+            pausedAt = 0;
+            if (!raf) raf = requestAnimationFrame(tick);
+          }
+        },
+        { threshold: [0, 0.25, 0.5, 0.75, 1] },
+      );
+      io.observe(host);
+    }
+
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+      io?.disconnect();
+    };
   }, [phaseMs]);
 
   const renderLayerContent = (

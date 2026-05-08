@@ -27,6 +27,17 @@
   border-bottom: 1px dashed var(--wipu-rule);
 }
 
+/* Mobile (touch) only: native scroll with proximity snap. The JS
+   touch-swipe handler in CaseStudyDeck is skipped on these devices,
+   so this CSS provides the snap behavior. Slides here are
+   `min-height: 100svh` (can overflow), and proximity lets the visitor
+   rest mid-slide while still snapping to a slide top when they
+   coast close to one. */
+@media (hover: none) and (pointer: coarse) {
+  .wipu-sample-root { scroll-snap-type: y proximity; }
+  .wipu-sample-slide { scroll-snap-align: start; }
+}
+
 .wipu-sample-slide-label {
   position: absolute;
   top: 40px;

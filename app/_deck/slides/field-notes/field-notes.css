@@ -41,8 +41,8 @@
   display: inline-flex;
   flex-direction: column;
   align-items: center;
-  gap: 22px;
-  padding: 12px;
+  gap: var(--wipu-sp-md);
+  padding: var(--wipu-sp-sm);
   background: none;
   border: none;
   color: var(--wipu-ink);
@@ -124,8 +124,8 @@
 
 .field-notes-portal-icon {
   position: relative;
-  font-size: clamp(72px, 9vw, 112px);
-  line-height: 1;
+  font-size: var(--wipu-fs-emoji);
+  line-height: 1.05;
   transform: scale(calc(1 + var(--dwell) * 0.18))
     rotate(calc(var(--dwell) * -6deg));
   filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.25));
@@ -133,7 +133,7 @@
 
 .field-notes-portal-lbl {
   font-family: var(--wipu-mono);
-  font-size: 12px;
+  font-size: var(--wipu-fs-eyebrow);
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--wipu-ink-dim);
@@ -224,7 +224,7 @@
      pair-based breathing (an expander grows while a same-row shrinker
      contracts), row totals stay balanced and tiles never jump rows. */
   grid-auto-flow: row;
-  gap: 12px;
+  gap: var(--wipu-sp-sm);
   padding: clamp(16px, 3vw, 28px);
   padding-bottom: clamp(88px, 10vh, 128px); /* room for dock */
   max-width: 1800px;
@@ -292,13 +292,13 @@
   }
 }
 
-@media (max-width: 960px) {
+@media (max-width: 1024px) {
   .field-notes-grid { grid-template-columns: repeat(4, 1fr); }
   .field-notes-tile-2x2 { grid-column: span 2; grid-row: span 2; }
   .field-notes-tile-3x2 { grid-column: span 3; grid-row: span 2; aspect-ratio: 3 / 2; }
 }
-@media (max-width: 600px) {
-  .field-notes-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+@media (max-width: 768px) {
+  .field-notes-grid { grid-template-columns: repeat(2, 1fr); gap: var(--wipu-sp-sm); }
   .field-notes-tile-2x2,
   .field-notes-tile-2x1,
   .field-notes-tile-3x2 { grid-column: span 2; grid-row: span 1; aspect-ratio: 2 / 1; }
@@ -335,24 +335,10 @@
    inner element with object-fit: cover and is opaque, so once it
    paints it fully covers the skeleton — no JS toggle needed. */
 .field-notes-tile-image {
+  /* The gel-loading shroud (below) replaces the previous skeleton sweep
+     as the pre-image visual; bg-color stays as a final fallback if the
+     gel ever fails to render (e.g. very old browsers without filter). */
   background-color: var(--wipu-bg-elev);
-  background-image: linear-gradient(
-    115deg,
-    transparent 32%,
-    color-mix(in srgb, var(--wipu-ink) 7%, transparent) 50%,
-    transparent 68%
-  );
-  background-size: 220% 100%;
-  background-repeat: no-repeat;
-  background-position: 200% 0;
-  animation: field-notes-skeleton 2400ms linear infinite;
-}
-@keyframes field-notes-skeleton {
-  from { background-position: 200% 0; }
-  to { background-position: -120% 0; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .field-notes-tile-image { animation: none; }
 }
 /* Image tile: inner has 10% overshoot in each direction so the parallax
    translate never reveals the tile background. */
@@ -372,15 +358,96 @@
 }
 .field-notes-tile-image img,
 .field-notes-tile-image video {
+  position: relative;
+  z-index: 1;
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
   user-select: none;
-  transition: filter 220ms ease;
+  /* Media starts hidden under the gel-loading shroud (below); on
+     onLoad/onLoadedData the parent flips data-loaded="true" and the
+     opacity transition reveals the image. Lazy loading gates these
+     events to viewport entry, so the reveals cascade as the user
+     scrolls. */
+  opacity: 0;
+  transition: filter 220ms ease, opacity 620ms ease;
   animation: wipu-idle-zoom 11s ease-in-out infinite alternate;
   /* Each tile gets a different phase so the grid doesn't breathe in unison */
   animation-delay: calc(var(--i, 0) * -0.7s);
+}
+.field-notes-tile-image[data-loaded="true"] img,
+.field-notes-tile-image[data-loaded="true"] video {
+  opacity: 1;
+}
+
+/* ───────── Gel loading shroud ─────────
+   Adapted from the case study's "Gel" pattern (app/case-studies/_shared/
+   gel.css) — a deep purple radial-gradient base with two blurred blobs
+   drifting on offset timings via mix-blend-mode: screen. Sits inside
+   each image tile until the media loads; fades out once data-loaded
+   flips. Per-tile animation-delay (driven by --i) keeps the field of
+   tiles desynced so the page doesn't pulse in unison. */
+.field-notes-tile-gel {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  background: radial-gradient(
+    120% 100% at 30% 20%,
+    #2a1244 0%,
+    #110522 60%,
+    #0a0214 100%
+  );
+  isolation: isolate;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 720ms ease 60ms;
+}
+.field-notes-tile-image[data-loaded="true"] .field-notes-tile-gel {
+  opacity: 0;
+}
+.field-notes-tile-gel::before,
+.field-notes-tile-gel::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(28px);
+  mix-blend-mode: screen;
+  will-change: transform, opacity;
+}
+.field-notes-tile-gel::before {
+  width: 75%;
+  height: 75%;
+  background: #6b3fb5;
+  top: -12%;
+  left: -10%;
+  animation: wipu-fn-gel-a 9.4s ease-in-out infinite;
+  animation-delay: calc(var(--i, 0) * -200ms);
+}
+.field-notes-tile-gel::after {
+  width: 60%;
+  height: 60%;
+  background: #d0a8ff;
+  bottom: -14%;
+  right: -8%;
+  animation: wipu-fn-gel-b 11.7s ease-in-out infinite;
+  animation-delay: calc(var(--i, 0) * -300ms);
+}
+@keyframes wipu-fn-gel-a {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.85; }
+  33%      { transform: translate(20%, 12%) scale(1.18); opacity: 0.95; }
+  66%      { transform: translate(-8%, 24%) scale(0.92); opacity: 0.78; }
+}
+@keyframes wipu-fn-gel-b {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.78; }
+  40%      { transform: translate(-18%, -10%) scale(1.1); opacity: 0.9; }
+  70%      { transform: translate(10%, 8%) scale(0.95); opacity: 0.7; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .field-notes-tile-gel::before,
+  .field-notes-tile-gel::after { animation: none; }
 }
 .field-notes-tile-image::after {
   content: "";
@@ -407,6 +474,25 @@
 .field-notes-tile-image[data-bucket="europalette"]:hover::after {
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
 }
+/* Touch devices: there's no hover, so apply the lift by default — and
+   keep the europalette opt-out so it stays quiet there too. */
+@media (hover: none) {
+  .field-notes-tile-image img,
+  .field-notes-tile-image video {
+    filter: brightness(1.06);
+  }
+  .field-notes-tile-image::after {
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12),
+      0 12px 36px -12px rgba(0, 0, 0, 0.6);
+  }
+  .field-notes-tile-image[data-bucket="europalette"] img,
+  .field-notes-tile-image[data-bucket="europalette"] video {
+    filter: none;
+  }
+  .field-notes-tile-image[data-bucket="europalette"]::after {
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  }
+}
 
 /* ───────── Tile: color card ─────────
    Title + body. Bigger sizes only (2x1, 2x2). Title is a punchy claim;
@@ -426,14 +512,14 @@
 .field-notes-card-title {
   font-family: var(--wipu-mono);
   font-weight: 600;
-  font-size: clamp(20px, 2vw, 28px);
-  line-height: 1.1;
+  font-size: var(--wipu-fs-h3);
+  line-height: 1.15;
   letter-spacing: -0.01em;
 }
 .field-notes-card-body {
   font-family: var(--wipu-mono);
   font-weight: 400;
-  font-size: clamp(13px, 1.05vw, 15px);
+  font-size: var(--wipu-fs-meta);
   line-height: 1.45;
   letter-spacing: -0.005em;
   margin: 0;
@@ -443,7 +529,7 @@
 /* 2x1 cards are wider but shorter — keep title slightly smaller so the
    body has room without crowding. */
 .field-notes-tile-card.field-notes-tile-2x1 .field-notes-card-title {
-  font-size: clamp(18px, 1.6vw, 22px);
+  font-size: var(--wipu-fs-h3);
 }
 
 .field-notes-tone-terracotta {
@@ -496,8 +582,8 @@
   margin: 0;
   font-family: var(--wipu-mono);
   font-weight: 500;
-  font-size: clamp(48px, 8vw, 116px);
-  line-height: 0.95;
+  font-size: var(--wipu-fs-display);
+  line-height: 1;
   letter-spacing: -0.025em;
   display: flex;
   flex-direction: column;
@@ -523,7 +609,7 @@
   margin: clamp(20px, 2vh, 32px) 0 0;
   font-family: var(--wipu-mono);
   font-weight: 400;
-  font-size: clamp(14px, 1.15vw, 17px);
+  font-size: var(--wipu-fs-body);
   line-height: 1.5;
   letter-spacing: -0.005em;
   color: var(--wipu-ink-dim);
@@ -536,11 +622,11 @@
   opacity: 0;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .field-notes-header {
-    padding: 40px 20px 24px;
+    padding: var(--wipu-sp-xl) var(--wipu-sp-md) var(--wipu-sp-lg);
   }
-  .field-notes-header-title { font-size: clamp(40px, 13vw, 64px); }
+  .field-notes-header-title { font-size: var(--wipu-fs-h1); }
 }
 
 /* ───────── Dock (HUD pill) ─────────
@@ -556,7 +642,7 @@
   z-index: 210;
   display: inline-flex;
   align-items: center;
-  gap: 14px;
+  gap: var(--wipu-sp-md);
   opacity: 0;
   transition:
     opacity 320ms ease 200ms,
@@ -570,8 +656,8 @@
 .field-notes-dock-btn {
   appearance: none;
   border: 0;
-  width: 64px;
-  height: 64px;
+  width: 84px;
+  height: 84px;
   border-radius: 999px;
   color: #fff;
   background: linear-gradient(180deg, #1f1f1f 0%, #050505 100%);
@@ -601,8 +687,8 @@
   outline-offset: 2px;
 }
 .field-notes-dock-btn svg {
-  width: 24px;
-  height: 24px;
+  width: 30px;
+  height: 30px;
   stroke: currentColor;
   fill: none;
   stroke-width: 1.75;
@@ -610,10 +696,71 @@
   stroke-linejoin: round;
 }
 
-@media (max-width: 600px) {
-  .field-notes-dock { gap: 12px; }
-  .field-notes-dock-btn { width: 56px; height: 56px; }
-  .field-notes-dock-btn svg { width: 22px; height: 22px; }
+@media (max-width: 768px) {
+  .field-notes-dock { gap: var(--wipu-sp-sm); }
+  .field-notes-dock-btn { width: 68px; height: 68px; }
+  .field-notes-dock-btn svg { width: 26px; height: 26px; }
+}
+
+/* ───────── Variant switcher (HUD chip, bottom-left) ─────────
+   Sibling of the dock; mirrors the dock's HUD-pill material so the two
+   reads as one family. Three pill buttons; the active one fills, others
+   stay dim text. Fades in with the overlay. */
+
+.field-notes-variant-switcher {
+  position: fixed;
+  left: clamp(16px, 3vw, 28px);
+  bottom: clamp(28px, 5vh, 48px);
+  z-index: 210;
+  display: inline-flex;
+  align-items: center;
+  padding: 4px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #1f1f1f 0%, #050505 100%);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 10px 24px rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 320ms ease 200ms,
+    transform 360ms cubic-bezier(0.22, 0.8, 0.2, 1) 200ms;
+}
+.field-notes-overlay[data-state="open"] .field-notes-variant-switcher {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.field-notes-variant-btn {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.55);
+  font-family: var(--wipu-mono);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  padding: 8px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    color 200ms ease,
+    background-color 200ms ease;
+}
+.field-notes-variant-btn:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
+.field-notes-variant-btn[data-active="true"] {
+  color: #0a0a0a;
+  background: #f5f5f5;
+}
+.field-notes-variant-btn:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.55);
+  outline-offset: 2px;
+}
+
+@media (max-width: 768px) {
+  .field-notes-variant-switcher { padding: 3px; }
+  .field-notes-variant-btn { padding: 6px 10px; font-size: 12px; }
 }
 
 /* ───────── Tidal Scroll reveal ───────── */

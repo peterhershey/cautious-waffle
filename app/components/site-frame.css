@@ -67,6 +67,38 @@
   left: 22px;
 }
 
+/* Mobile rails — hidden on desktop, swapped in for the corner frame
+   under 640px so the slide content can use the full horizontal space. */
+.site-frame-rail {
+  position: absolute;
+  left: 22px;
+  right: 22px;
+  display: none;
+  white-space: nowrap;
+  overflow: hidden;
+  transition:
+    color 600ms ease-out,
+    text-shadow 600ms ease-out;
+}
+.site-frame-rail > div {
+  white-space: pre;
+}
+.site-frame-rail > div > span {
+  display: inline-block;
+}
+.site-frame-rail.is-scrambling {
+  color: var(--wipu-ink);
+  text-shadow: 0 0 4px color-mix(in srgb, var(--wipu-ink) 28%, transparent);
+  transition:
+    color 80ms linear,
+    text-shadow 80ms linear;
+}
+.site-frame-top-rail { top: 14px; }
+.site-frame-bottom-rail {
+  bottom: 14px;
+  text-align: right;
+}
+
 /* Hide the frame entirely when a route signals it (e.g., prototype slides
    take the full viewport). */
 body[data-hide-site-frame="true"] .site-frame {
@@ -78,10 +110,15 @@ body[data-hide-site-frame="true"] .site-frame {
   .site-frame {
     font-size: 10px;
   }
+  /* Swap corners → rails on phones. */
+  .site-frame-tl,
   .site-frame-tr,
   .site-frame-bl,
   .site-frame-br {
     display: none;
+  }
+  .site-frame-rail {
+    display: block;
   }
 }
 

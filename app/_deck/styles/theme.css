@@ -33,6 +33,34 @@
   --wipu-frame-radius: 10px;
   --wipu-note-radius: 3px;
 
+  /* Mobile-first type scale — clamp from ~375px to ~1440px viewport.
+     Use these tokens instead of hand-rolled clamp() in slide CSS. */
+  --wipu-fs-eyebrow: clamp(11px, 0.9vw + 8px, 13px);
+  --wipu-fs-meta:    clamp(12px, 1vw + 8px, 14px);
+  --wipu-fs-body:    clamp(15px, 0.6vw + 13px, 18px);
+  --wipu-fs-h3:      clamp(18px, 1vw + 14px, 24px);
+  --wipu-fs-h2:      clamp(22px, 2vw + 14px, 36px);
+  --wipu-fs-h1:      clamp(30px, 4vw + 14px, 64px);
+  --wipu-fs-display: clamp(40px, 6vw + 14px, 96px);
+  --wipu-fs-emoji:   clamp(64px, 9vw + 24px, 160px);
+
+  /* Spacing scale — small fixed steps and clamped responsive steps. */
+  --wipu-sp-2xs: 4px;
+  --wipu-sp-xs:  8px;
+  --wipu-sp-sm:  clamp(10px, 1vw + 6px, 14px);
+  --wipu-sp-md:  clamp(14px, 1.5vw + 8px, 22px);
+  --wipu-sp-lg:  clamp(20px, 2.5vw + 10px, 40px);
+  --wipu-sp-xl:  clamp(28px, 4vw + 12px, 64px);
+
+  /* Container padding (slide-edge inset). */
+  --wipu-pad-x: clamp(20px, 4vw + 4px, 64px);
+  --wipu-pad-y: clamp(24px, 6vh + 4px, 96px);
+
+  /* Breakpoints — use these three widths only:
+     480px  — phone / tablet boundary
+     768px  — tablet / small laptop boundary
+     1024px — laptop / desktop boundary */
+
   background: var(--wipu-bg);
   color: var(--wipu-ink);
   font-family: var(--wipu-mono);
@@ -40,22 +68,6 @@
   letter-spacing: 0;
   min-height: 100vh;
   transition: background-color 240ms ease, color 240ms ease;
-}
-
-.wipu-root[data-theme="light"] {
-  --wipu-bg: #f1ece2;
-  --wipu-bg-elev: #ffffff;
-  --wipu-ink: #15150f;
-  --wipu-ink-dim: #504a40;
-  --wipu-ink-faint: #8a8478;
-  --wipu-rule: #d4cdbe;
-  --wipu-rule-strong: #a89f8c;
-
-  --wipu-terracotta: #d05d35;
-  --wipu-mint: #6cc88d;
-  --wipu-mustard: #d9b440;
-  --wipu-rose: #a85c66;
-  --wipu-navy: #2640e2;
 }
 
 .wipu-root * { box-sizing: border-box; }

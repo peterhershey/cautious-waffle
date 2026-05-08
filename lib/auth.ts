@@ -61,9 +61,14 @@ export async function verifyPassword(submitted: string): Promise<boolean> {
   }
 }
 
-/** Validate a user-supplied `next` redirect target — same-origin paths only. */
+/** Default landing for a freshly-authed user — the hero slide of the home deck. */
+export const DEFAULT_LANDING = "/#s/hero";
+
+/** Validate a user-supplied `next` redirect target — same-origin paths only.
+ *  A bare "/" collapses to the default landing (the hero slide) so the
+ *  post-login experience always opens on the intended first slide. */
 export function safeNextPath(next: string | null | undefined): string {
-  if (!next) return "/";
-  if (!next.startsWith("/") || next.startsWith("//")) return "/";
+  if (!next || next === "/") return DEFAULT_LANDING;
+  if (!next.startsWith("/") || next.startsWith("//")) return DEFAULT_LANDING;
   return next;
 }

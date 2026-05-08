@@ -6,7 +6,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 28px;
+  gap: var(--wipu-sp-lg);
   width: 100%;
   height: 100%;
   margin: 0;
@@ -56,7 +56,7 @@
 .wipu-movie-embed-title {
   text-align: center;
   font-family: var(--wipu-mono);
-  font-size: clamp(12px, 1vw, 14px);
+  font-size: var(--wipu-fs-meta);
   font-weight: 400;
   line-height: 1.5;
   letter-spacing: 0.01em;

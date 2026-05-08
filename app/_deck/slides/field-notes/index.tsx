@@ -2,14 +2,23 @@
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useDeck } from "../../Deck";
+import { fieldNotes } from "@/app/content";
 import { BUCKETS } from "./manifest.generated";
 import {
   INITIAL_TILES,
+  LAYOUT_VARIANTS,
   buildTiles,
   registerAspect,
   type Tile,
   type TileSize,
+  type VariantId,
 } from "./tiles";
+import { VariantSwitcher } from "./VariantSwitcher";
+
+const VARIANT_STORAGE_KEY = "field-notes-variant";
+const VARIANT_IDS: readonly VariantId[] = ["mosaic", "editorial", "salon"];
+const isVariantId = (v: string | null): v is VariantId =>
+  v !== null && (VARIANT_IDS as readonly string[]).includes(v);
 
 const SHUFFLE_FLIP_MS = 620;
 /* Faint overshoot — playful, not springy. ~3% past the target. */
@@ -75,6 +84,11 @@ export function FieldNotesSlide() {
   const [state, setState] = useState<OverlayState>("closed");
   const [isActive, setIsActive] = useState(readSlideActive);
   const [tiles, setTiles] = useState<Tile[]>(() => INITIAL_TILES);
+  /* Layout variant — controls which LAYOUT_VARIANTS pattern feeds buildTiles.
+     SSR + first client render use "mosaic" (matches INITIAL_TILES). After
+     mount we hydrate from localStorage; any preference change persists and
+     triggers a tile rebuild. */
+  const [variant, setVariant] = useState<VariantId>("mosaic");
   // Per-slot breathing phase. Lives separately from `tiles` so that
   // a pulse mutation only re-renders the affected TileCard and does
   // NOT re-trigger the shuffle FLIP useLayoutEffect (which depends on
@@ -119,12 +133,15 @@ export function FieldNotesSlide() {
   }, [breathing]);
 
   // Track data-active via MutationObserver so isActive is a real subscription,
-  // not a synchronous DOM read during render.
+  // not a synchronous DOM read during render. Seed from the current attribute
+  // so a slide mounted while already active doesn't miss the initial state —
+  // the observer only fires on changes.
   useEffect(() => {
     const el = document.querySelector<HTMLElement>(
       `[data-slide-id="${SLIDE_ID}"]`,
     );
     if (!el) return;
+    setIsActive(el.dataset.active === "true");
     const obs = new MutationObserver(() => {
       setIsActive(el.dataset.active === "true");
     });
@@ -173,9 +190,9 @@ export function FieldNotesSlide() {
     // Clear any in-flight breaths so we don't FLIP from a half-expanded
     // pre-state; the breathing scheduler will repopulate over time.
     setBreathing({});
-    setTiles(buildTiles(BUCKETS));
+    setTiles(buildTiles(BUCKETS, { pattern: LAYOUT_VARIANTS[variant] }));
     overlayRef.current?.scrollTo({ top: 0, behavior: "smooth" });
-  }, []);
+  }, [variant]);
 
   /* FLIP — runs after the shuffle re-render. Compares each tile's
      current rect to the captured one, sets an inverse transform so the
@@ -457,13 +474,27 @@ export function FieldNotesSlide() {
     };
   }, [state]);
 
-  /* SSR uses INITIAL_TILES (seeded, deterministic). After hydration we
-     resample the buckets with Math.random so the first open already
-     looks fresh — and so the post-mount paint matches what subsequent
-     shuffles will produce. */
+  /* Hydrate variant from localStorage on mount. SSR + first client render
+     use "mosaic" so there's no hydration mismatch — the saved preference,
+     if any, is applied here in a post-mount effect. */
   useEffect(() => {
-    setTiles(buildTiles(BUCKETS));
+    if (typeof window === "undefined") return;
+    const saved = window.localStorage.getItem(VARIANT_STORAGE_KEY);
+    if (isVariantId(saved) && saved !== variant) setVariant(saved);
+    // Run once — subsequent variant changes flow through the persist effect.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  /* SSR uses INITIAL_TILES (seeded, deterministic). After hydration we
+     resample the buckets with Math.random for the active variant — so the
+     first open already looks fresh, and switching variants later rebuilds
+     immediately. Also persists preference to localStorage. */
+  useEffect(() => {
+    setTiles(buildTiles(BUCKETS, { pattern: LAYOUT_VARIANTS[variant] }));
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(VARIANT_STORAGE_KEY, variant);
+    }
+  }, [variant]);
 
   /* ── Hover-dwell portal trigger ─────────────────────────────────────
      Hovering the folder mounts the gallery overlay underneath, masked by
@@ -1048,12 +1079,12 @@ export function FieldNotesSlide() {
         >
           <header ref={headerRef} className="field-notes-header" aria-hidden={state !== "open"}>
             <h1 className="field-notes-header-title">
-              <span>What else</span>
-              <span>have I been</span>
-              <span>making?</span>
+              {fieldNotes.header.title.map((line) => (
+                <span key={line}>{line}</span>
+              ))}
             </h1>
             <p className="field-notes-header-sub">
-              Sample placeholder — short descriptor sentence about what&rsquo;s in the gallery.
+              {fieldNotes.header.subtitle}
             </p>
           </header>
           <div className="field-notes-grid">
@@ -1072,6 +1103,11 @@ export function FieldNotesSlide() {
               />
             ))}
           </div>
+          <VariantSwitcher
+            variant={variant}
+            onChange={setVariant}
+            hidden={state !== "open"}
+          />
           <div
             className="field-notes-dock"
             aria-hidden={state !== "open"}
@@ -1122,6 +1158,12 @@ function TileCard({
   innerRef: (el: HTMLDivElement | null) => void;
 }) {
   const sizeClass = `field-notes-tile-${tile.size}`;
+  /* Gel-loading state — image/video starts hidden behind a purple noise
+     shroud (the case-study Gel pattern, scoped to per-tile). When media
+     finishes loading we flip data-loaded; CSS fades the shroud out and
+     the media in. Combined with lazy loading the result cascades down
+     the page as the user scrolls. */
+  const [loaded, setLoaded] = useState(false);
   if (tile.kind === "image") {
     const innerStyle: React.CSSProperties = { ["--i" as string]: index } as React.CSSProperties;
     const isVideo = /\.(mp4|mov|webm)$/i.test(tile.src);
@@ -1141,8 +1183,10 @@ function TileCard({
         style={innerStyle}
         data-bucket={tile.bucket}
         data-breathing={breathing}
+        data-loaded={loaded ? "true" : "false"}
       >
         <div ref={innerRef} className="field-notes-tile-inner">
+          <div className="field-notes-tile-gel" aria-hidden />
           {isVideo ? (
             <video
               src={tile.src}
@@ -1154,6 +1198,7 @@ function TileCard({
               draggable={false}
               style={mediaStyle}
               onLoadedMetadata={onVideoMeta}
+              onLoadedData={() => setLoaded(true)}
             />
           ) : (
             // eslint-disable-next-line @next/next/no-img-element
@@ -1163,6 +1208,7 @@ function TileCard({
               loading="lazy"
               draggable={false}
               style={mediaStyle}
+              onLoad={() => setLoaded(true)}
             />
           )}
         </div>

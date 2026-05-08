@@ -1,0 +1,121 @@
+/* Soft paywall for locked case studies. Newspaper-style: first slide
+   is fully visible, paywall reveals as the visitor scrolls. */
+
+@import "../../login/login.css";
+
+.wpd-cs-teaser-root {
+  /* Inherits .wipu-sample-root: 100svh tall, owns its own scroll. */
+}
+
+/* The paywall is a normal-flow block that follows the first slide.
+   The visitor must scroll past the hero to encounter it — that scroll
+   action is what makes the gradient feel like a wall sliding up from
+   below, like a magazine paywall. */
+.wpd-cs-paywall {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(40px, 8vh, 96px) clamp(20px, 4vw, 48px);
+}
+
+/* A soft fade at the top of the paywall section — sits at the
+   slide/paywall boundary and gives a subtle "you've crossed into
+   locked territory" feel without changing the underlying bg color. */
+.wpd-cs-paywall-fade {
+  position: absolute;
+  top: -120px;
+  left: 0;
+  right: 0;
+  height: 200px;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 0%,
+    color-mix(in srgb, var(--wipu-bg) 70%, transparent) 50%,
+    var(--wipu-bg) 100%
+  );
+  pointer-events: none;
+}
+
+.wpd-cs-paywall-card {
+  position: relative;
+  pointer-events: auto;
+  width: 100%;
+  max-width: 560px;
+  padding: clamp(20px, 3vh, 28px) clamp(20px, 3vw, 28px);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.wpd-cs-paywall-text {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.wpd-cs-paywall-eyebrow {
+  font-family: var(--wipu-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--wipu-ink-dim);
+}
+
+.wpd-cs-paywall-title {
+  margin: 0;
+  font-family: var(--wipu-mono);
+  font-size: clamp(16px, 1.4vw + 12px, 20px);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--wipu-ink);
+  line-height: 1.3;
+}
+
+.wpd-cs-paywall-form {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+}
+
+.wpd-cs-paywall-input {
+  /* Inherits .wpd-login-input. Tweaks for inline horizontal layout. */
+  height: 42px;
+}
+
+.wpd-cs-paywall-submit {
+  /* Inherits .wpd-login-submit. */
+  height: 42px;
+  padding: 0 20px;
+  white-space: nowrap;
+}
+
+.wpd-cs-paywall-foot {
+  margin: 0;
+  font-family: var(--wipu-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--wipu-ink-faint);
+}
+
+.wpd-cs-paywall-back {
+  color: var(--wipu-ink-dim);
+  text-decoration: none;
+}
+.wpd-cs-paywall-back:hover {
+  color: var(--wipu-ink);
+}
+
+@media (max-width: 600px) {
+  .wpd-cs-paywall {
+    min-height: 50svh;
+    padding: clamp(32px, 6vh, 56px) 16px clamp(20px, 4vh, 32px);
+  }
+  .wpd-cs-paywall-form {
+    grid-template-columns: 1fr;
+  }
+  .wpd-cs-paywall-card {
+    gap: 14px;
+  }
+}

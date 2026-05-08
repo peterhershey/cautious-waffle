@@ -233,6 +233,35 @@ const BL_VARIANTS: Pattern[] = [
   ),
 ];
 
+// Mobile rails — single-row horizontal traces shown at top/bottom in
+// place of the L-shaped corner frame. Same scramble logic, just less
+// visual real estate so the slide content can breathe on phones.
+function buildMobileTop(
+  label: string | undefined,
+  num: string | undefined,
+  variant: number,
+): Pattern {
+  const head = label ? (num ? `${num}  ${label}` : label) : null;
+  const v = variant % 4;
+  let rail: string;
+  if (v === 0) rail = `─●───○───●───○───●───○──~~`;
+  else if (v === 1) rail = `┌──●──○──●──○──●──○──~~`;
+  else if (v === 2) rail = `●─┬─○─●─○─●─○─●─○─●──~~`;
+  else rail = `══════════════════════~~`;
+  const rows = head ? [head, rail] : [rail];
+  return rows.map((row) => [...row].map((ch) => g(ch)));
+}
+
+function buildMobileBottom(variant: number): Pattern {
+  const v = variant % 4;
+  let rail: string;
+  if (v === 0) rail = `~~──○───●───○───●───○───●─`;
+  else if (v === 1) rail = `~~──●──○──●──○──●──○──┘`;
+  else if (v === 2) rail = `~~──●─○─●─○─●─○─●─○─●─┴─`;
+  else rail = `~~══════════════════════`;
+  return [[...rail].map((ch) => g(ch))];
+}
+
 type CornerKey = "tr" | "br" | "bl";
 
 // Always include TL. Cycle through pairs of the outer three for spontaneity.
@@ -321,6 +350,8 @@ export function SiteFrame({ label, num, scrambleKey = 0 }: SiteFrameProps) {
 
   const tlPattern = buildTL(label, num, variant);
   const outerPair = OUTER_PAIRS[variant % OUTER_PAIRS.length];
+  const mobileTopPattern = buildMobileTop(label, num, variant);
+  const mobileBottomPattern = buildMobileBottom(variant);
 
   const cornerClass = (key: string) =>
     [
@@ -371,6 +402,29 @@ export function SiteFrame({ label, num, scrambleKey = 0 }: SiteFrameProps) {
           />
         </div>
       )}
+      {/* Mobile-only horizontal rails. Hidden on desktop via CSS; replace
+          the corner frame on phones so the slide content can use the full
+          horizontal space. */}
+      <div
+        className={`site-frame-rail site-frame-top-rail${isScrambling ? " is-scrambling" : ""}`}
+      >
+        <RenderedPattern
+          pattern={mobileTopPattern}
+          progress={progress}
+          tick={tick}
+          seed={variant * 11 + 4}
+        />
+      </div>
+      <div
+        className={`site-frame-rail site-frame-bottom-rail${isScrambling ? " is-scrambling" : ""}`}
+      >
+        <RenderedPattern
+          pattern={mobileBottomPattern}
+          progress={progress}
+          tick={tick}
+          seed={variant * 11 + 5}
+        />
+      </div>
     </div>
   );
 }

@@ -27,8 +27,11 @@ export function HudSurface({
     if (!el) return;
 
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const coarse = window.matchMedia("(pointer: coarse)").matches;
-    if (reduce || coarse) return;
+    /* Skip the parallax wiring on devices with no hover pointer — the
+       listeners would burn cycles tracking taps that don't drive the
+       effect anyway. */
+    const noHover = window.matchMedia("(hover: none)").matches;
+    if (reduce || noHover) return;
 
     const target = { mx: 0.5, my: 0.5, intensity: 0 };
     const current = { mx: 0.5, my: 0.5, intensity: 0 };

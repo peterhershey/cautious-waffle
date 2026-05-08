@@ -21,17 +21,37 @@ export type ThreeUpTemplateProps = {
   blocks: ThreeUpBlock[];
   /** "phone" = vertical phone screenshots shown uncropped, no frame, smaller text. */
   variant?: "default" | "phone";
+  /** Block title scale. "sm" reduces it for long titles that need one line. */
+  titleScale?: "default" | "sm";
+  /** Optional small eyebrow line above the heading. */
+  eyebrow?: ReactNode;
+  /** Optional h1 heading rendered above the blocks. */
+  title?: ReactNode;
 };
 
-export function ThreeUpTemplate({ blocks, variant = "default" }: ThreeUpTemplateProps) {
+export function ThreeUpTemplate({
+  blocks,
+  variant = "default",
+  titleScale = "default",
+  eyebrow,
+  title,
+}: ThreeUpTemplateProps) {
   const colsStyle = { "--wipu-tpl-cols": blocks.length } as CSSProperties;
   return (
-    <div
-      className="wipu-tpl-threeup"
-      data-variant={variant}
-      style={colsStyle}
-    >
-      {blocks.map((b, i) => (
+    <div className="wipu-tpl-threeup-wrap">
+      {(eyebrow || title) && (
+        <div className="wipu-tpl-threeup-head">
+          {eyebrow && <div className="wipu-tpl-threeup-head-eyebrow">{eyebrow}</div>}
+          {title && <h1 className="wipu-tpl-threeup-head-title">{title}</h1>}
+        </div>
+      )}
+      <div
+        className="wipu-tpl-threeup"
+        data-variant={variant}
+        data-title-scale={titleScale}
+        style={colsStyle}
+      >
+        {blocks.map((b, i) => (
         <div key={i} className="wipu-tpl-threeup-block">
           {(b.video || b.image) && (
             <div className="wipu-tpl-threeup-image">
@@ -70,6 +90,7 @@ export function ThreeUpTemplate({ blocks, variant = "default" }: ThreeUpTemplate
           </div>
         </div>
       ))}
+      </div>
     </div>
   );
 }

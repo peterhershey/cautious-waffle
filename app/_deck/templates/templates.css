@@ -51,11 +51,97 @@
   color: var(--wipu-ink-faint);
   letter-spacing: 0.04em;
 }
+.wipu-tpl-intro-contacts {
+  list-style: none;
+  margin: var(--wipu-sp-sm) 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: clamp(14px, 2vw, 28px);
+  font-family: var(--wipu-mono);
+  font-size: var(--wipu-fs-body);
+}
+.wipu-tpl-intro-contact {
+  --tone-bg: var(--wipu-terracotta);
+  --tone-ink: var(--wipu-terracotta-ink);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  min-height: 44px;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--wipu-ink);
+  border: 2px solid var(--tone-bg);
+  text-decoration: none;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  transition: background-color 140ms ease, color 140ms ease, transform 140ms ease, box-shadow 140ms ease;
+}
+.wipu-tpl-intro-contact[data-tone="mint"] {
+  --tone-bg: var(--wipu-mint);
+  --tone-ink: var(--wipu-mint-ink);
+}
+.wipu-tpl-intro-contact[data-tone="mustard"] {
+  --tone-bg: var(--wipu-mustard);
+  --tone-ink: var(--wipu-mustard-ink);
+}
+.wipu-tpl-intro-contact[data-tone="rose"] {
+  --tone-bg: var(--wipu-rose);
+  --tone-ink: var(--wipu-rose-ink);
+}
+.wipu-tpl-intro-contact[data-tone="navy"] {
+  --tone-bg: var(--wipu-navy);
+  --tone-ink: var(--wipu-navy-ink);
+}
+.wipu-tpl-intro-contact:hover {
+  background: var(--tone-bg);
+  color: var(--tone-ink);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--tone-bg) 35%, transparent);
+}
+.wipu-tpl-intro-contact:focus-visible {
+  outline: 2px solid var(--wipu-ink);
+  outline-offset: 3px;
+}
 
 /* ───────── Template 04 — Three-Up ─────────
    Three parallel blocks side-by-side. Each block has a placeholder
    image area on top, text below (eyebrow + title + body). Text sits
    directly on the slide background — no card frame. */
+
+.wipu-tpl-threeup-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+.wipu-tpl-threeup-head {
+  width: min(1180px, 92vw);
+  display: flex;
+  flex-direction: column;
+  gap: var(--wipu-sp-2xs);
+  text-align: center;
+  align-items: center;
+  margin-bottom: clamp(28px, 6vh, 64px);
+}
+.wipu-tpl-threeup-head-eyebrow {
+  font-family: var(--wipu-mono);
+  font-size: var(--wipu-fs-eyebrow);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--wipu-ink-dim);
+}
+.wipu-tpl-threeup-head-title {
+  margin: 0;
+  font-family: var(--wipu-mono);
+  font-weight: 500;
+  font-size: var(--wipu-fs-h2);
+  letter-spacing: -0.005em;
+  line-height: 1.15;
+  color: var(--wipu-ink);
+}
 
 .wipu-tpl-threeup {
   display: grid;
@@ -64,7 +150,7 @@
   grid-template-columns: repeat(var(--wipu-tpl-cols, 3), 1fr);
   gap: clamp(28px, 4vw, 56px);
   width: 100%;
-  max-width: min(1280px, 92vw);
+  max-width: min(1120px, 86vw);
   margin: 0 auto;
 }
 .wipu-tpl-threeup-block {
@@ -110,6 +196,10 @@
   letter-spacing: -0.01em;
   margin: 0;
   color: var(--wipu-ink);
+}
+.wipu-tpl-threeup[data-title-scale="sm"] .wipu-tpl-threeup-title {
+  font-size: clamp(15px, 0.6vw + 13px, 19px);
+  line-height: 1.3;
 }
 .wipu-tpl-threeup-body {
   font-family: var(--wipu-mono);

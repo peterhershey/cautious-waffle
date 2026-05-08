@@ -31,6 +31,7 @@ function HeroSlide() {
         </TypeOnText>
       }
       subtitle={hero.subtitle}
+      contacts={hero.contacts}
     />
   );
 }
@@ -49,7 +50,6 @@ const AI_ART_VIDEOS: MediaMorphMedia[] = [
   "sculpture2.0.mp4",
   "svd_xt_1_1-film_3x_00003.mp4",
   "svd_xt-film_3x_00013.mp4",
-  "Untitled video - Made with Clipchamp (1).mp4",
   "Untitled video - Made with Clipchamp (3).mp4",
   "wayne.mp4",
 ].map((name) => ({
@@ -71,17 +71,12 @@ function AiNativeSlide() {
 }
 
 function AiInPracticeSlide() {
-  const [work, home, realtime] = aiInPractice.blocks;
+  const [home, work, lab] = aiInPractice.blocks;
   return (
     <ThreeUpTemplate
+      eyebrow={aiInPractice.label}
+      title={aiInPractice.title}
       blocks={[
-        {
-          ...work,
-          image: {
-            src: "/portfolio%20transfer/antigravity.jpg",
-            alt: "Antigravity — Google DeepMind's agentic IDE",
-          },
-        },
         {
           ...home,
           image: {
@@ -91,7 +86,14 @@ function AiInPracticeSlide() {
           },
         },
         {
-          ...realtime,
+          ...work,
+          image: {
+            src: "/portfolio%20transfer/antigravity.jpg",
+            alt: "Antigravity — Google DeepMind's agentic IDE",
+          },
+        },
+        {
+          ...lab,
           video: {
             src: "/portfolio%20transfer/aiart/skulls.mov",
             alt: "Real-time generative AI — pop-art skulls",
@@ -153,11 +155,13 @@ function EmpathySlide() {
 
 function CloserSlide() {
   return (
-    <div className="wipu-tpl-intro">
-      <div className="wipu-tpl-intro-emoji" aria-hidden>
-        {closer.emoji}
-      </div>
-    </div>
+    <IntroTemplate
+      emoji={
+        <HoverGif src="/portfolio%20transfer/peace%20emoji%20.gif" alt="Peace" />
+      }
+      name={closer.title}
+      contacts={hero.contacts}
+    />
   );
 }
 
@@ -165,6 +169,7 @@ function QualificationsSlide() {
   const [previously, currently] = qualifications.blocks;
   return (
     <ThreeUpTemplate
+      titleScale="sm"
       blocks={[
         {
           ...previously,

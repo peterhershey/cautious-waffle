@@ -83,11 +83,14 @@ export function Deck() {
     if (idx === 0) return;
     setActiveIndex(idx);
     const container = containerRef.current;
+    const target = slideRefs.current[idx];
     if (container) {
-      container.scrollTo({
-        top: idx * container.clientHeight,
-        behavior: "auto",
-      });
+      // Use the slide's actual offsetTop instead of `idx * clientHeight`:
+      // on mobile, slides can grow taller than the visible viewport, so
+      // index-times-clientHeight lands mid-wrong-slide. offsetTop is
+      // correct on both mobile and desktop.
+      const top = target ? target.offsetTop : idx * container.clientHeight;
+      container.scrollTo({ top, behavior: "auto" });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- one-shot mount sync only
   }, []);

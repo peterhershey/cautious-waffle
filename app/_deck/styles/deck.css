@@ -34,10 +34,17 @@
    touch-swipe handler in Deck.tsx is skipped on these devices via
    isCoarsePointer(), so this CSS is the entire snap mechanism on
    phones / touch tablets. Proximity (not mandatory) so a tall slide
-   can rest mid-content without being yanked back to a snap edge. */
+   can rest mid-content without being yanked back to a snap edge.
+   `height: auto; min-height: 100svh` lets a slide grow taller than
+   the visible viewport so all of its content is reachable via native
+   scroll — desktop keeps the fixed 100svh slide above. */
 @media (hover: none) and (pointer: coarse) {
   .wipu-deck { scroll-snap-type: y proximity; }
-  .wipu-slide { scroll-snap-align: start; }
+  .wipu-slide {
+    scroll-snap-align: start;
+    height: auto;
+    min-height: 100svh;
+  }
 }
 
 /* All seven slides live in the DOM at once. Pause every CSS animation

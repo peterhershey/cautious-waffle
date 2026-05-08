@@ -71,12 +71,18 @@
 /* ——— SLIDE (full-viewport presentation frame) ——— */
 .wipu-slide {
   position: relative;
-  min-height: 100vh;
+  min-height: 100svh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: var(--wipu-pad-y) var(--wipu-pad-x);
-  overflow: hidden;
+}
+/* Desktop only: clip annotations (arrows, tape, scribbles, stamps) that
+   extend past the slide bounds. Annotations are display:none under 768px,
+   so on mobile clipping has no purpose and only traps content overflow
+   when a slide is taller than the visible viewport (iOS toolbar). */
+@media (hover: hover) and (pointer: fine) {
+  .wipu-slide { overflow: hidden; }
 }
 
 /* Every slide shows a tiny label top-left (reference pattern) */

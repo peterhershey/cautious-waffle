@@ -70,22 +70,6 @@
   transition: background-color 240ms ease, color 240ms ease;
 }
 
-.wipu-root[data-theme="light"] {
-  --wipu-bg: #f1ece2;
-  --wipu-bg-elev: #ffffff;
-  --wipu-ink: #15150f;
-  --wipu-ink-dim: #504a40;
-  --wipu-ink-faint: #8a8478;
-  --wipu-rule: #d4cdbe;
-  --wipu-rule-strong: #a89f8c;
-
-  --wipu-terracotta: #d05d35;
-  --wipu-mint: #6cc88d;
-  --wipu-mustard: #d9b440;
-  --wipu-rose: #a85c66;
-  --wipu-navy: #2640e2;
-}
-
 .wipu-root * { box-sizing: border-box; }
 
 .wipu-root a {

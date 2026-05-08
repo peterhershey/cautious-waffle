@@ -17,9 +17,9 @@ export const BUCKETS: Record<string, readonly ManifestEntry[]> = {
     {"src":"/portfolio%20transfer/field%20notes/cine/beingandbecoming2.gif","w":600,"h":451},
     {"src":"/portfolio%20transfer/field%20notes/cine/beingbecoming.gif","w":518,"h":382},
     {"src":"/portfolio%20transfer/field%20notes/cine/dutchovenfinds2.gif","w":600,"h":451},
-    {"src":"/portfolio%20transfer/field%20notes/cine/elsalvador.mp4"},
-    {"src":"/portfolio%20transfer/field%20notes/cine/hardgroove2.mov"},
-    {"src":"/portfolio%20transfer/field%20notes/cine/papercut.gif","w":600,"h":415},
+    {"src":"/portfolio%20transfer/field%20notes/cine/elsalvador_compressed.mp4"},
+    {"src":"/portfolio%20transfer/field%20notes/cine/hardgroove2_compressed.mov"},
+    {"src":"/portfolio%20transfer/field%20notes/cine/papercut_compressed.gif","w":600,"h":415},
   ],
   "europalette": [
     {"src":"/portfolio%20transfer/field%20notes/europalette/IMG_0035.jpeg","w":4032,"h":4032},
@@ -74,6 +74,16 @@ export const BUCKETS: Record<string, readonly ManifestEntry[]> = {
     {"src":"/portfolio%20transfer/field%20notes/me/IMG_8141.jpeg","w":4032,"h":3024},
     {"src":"/portfolio%20transfer/field%20notes/me/IMG_9175.jpeg","w":3024,"h":4032},
   ],
+  "photography": [
+    {"src":"/portfolio%20transfer/field%20notes/photography/ChefWing_PeterHershey_05.jpeg","w":1798,"h":1199},
+    {"src":"/portfolio%20transfer/field%20notes/photography/DorjeeMomo_Illuminasia_02.jpeg","w":1199,"h":799},
+    {"src":"/portfolio%20transfer/field%20notes/photography/IMG_2904.jpeg","w":1798,"h":1199},
+    {"src":"/portfolio%20transfer/field%20notes/photography/IMG_2976.jpeg","w":1798,"h":1199},
+    {"src":"/portfolio%20transfer/field%20notes/photography/PeterHershey_HongKongNightMarket_31.jpeg","w":1799,"h":1199},
+    {"src":"/portfolio%20transfer/field%20notes/photography/PeterHershey_HongKongNightMarket_41.jpeg","w":1798,"h":1199},
+    {"src":"/portfolio%20transfer/field%20notes/photography/Screenshot%202026-05-07%20at%209.44.18%E2%80%AFPM.png","w":1374,"h":914},
+    {"src":"/portfolio%20transfer/field%20notes/photography/Screenshot%202026-05-07%20at%209.44.40%E2%80%AFPM.png","w":1306,"h":880},
+  ],
   "product": [
     {"src":"/portfolio%20transfer/field%20notes/product/content_pack_multiple.png","w":959,"h":647},
     {"src":"/portfolio%20transfer/field%20notes/product/ezgif-5-c7973400e6.gif","w":639,"h":480},
@@ -86,4 +96,4 @@ export const BUCKETS: Record<string, readonly ManifestEntry[]> = {
   ],
 } as const;
 
-export const BUCKET_KEYS = ["ai explorations","cine","europalette","hong kong","me","product"] as const;
+export const BUCKET_KEYS = ["ai explorations","cine","europalette","hong kong","me","photography","product"] as const;

@@ -22,6 +22,7 @@ import {
   containerSurface,
   springScrollTo,
 } from "../../_deck/scroll/springScroll";
+import { isCoarsePointer } from "../../_deck/scroll/touchDetect";
 
 export type CaseStudySlide = {
   /** Template slug (matches `app/templates/meta.ts`) — used for the corner label only. */
@@ -230,9 +231,12 @@ function useCaseStudySpringNav(
     return () => container.removeEventListener("wheel", onWheel);
   }, [bumpNavKey, springTo, container]);
 
-  // Touch swipe on the container.
+  // Touch swipe on the container. Skipped on touch devices — native
+  // scroll + CSS scroll-snap (sample.css) does the work, so a finger
+  // swipe inside a tall slide doesn't get hijacked into a slide change.
   useEffect(() => {
     if (!container) return;
+    if (isCoarsePointer()) return;
     let startY = 0;
     let startT = 0;
     let allow = true;

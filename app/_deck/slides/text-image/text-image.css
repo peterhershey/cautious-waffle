@@ -39,7 +39,7 @@
 }
 .wipu-ti-title {
   margin: 0;
-  font-size: var(--wipu-fs-h1);
+  font-size: clamp(26px, 3.4vw + 12px, 54px);
   font-weight: 500;
   line-height: 1.06;
   letter-spacing: -0.012em;

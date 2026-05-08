@@ -37,16 +37,6 @@ export const metadata: Metadata = {
   },
 };
 
-const themeInit = `
-(function(){try{
-  var saved = localStorage.getItem('wipu-theme');
-  var prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
-  var t = saved || (prefersLight ? 'light' : 'dark');
-  var r = document.querySelector('.wipu-root');
-  if(r) r.setAttribute('data-theme', t);
-}catch(e){}})();
-`;
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -57,12 +47,6 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} ${fraunces.variable} h-full antialiased`}
     >
-      <head>
-        {/* Theme init runs synchronously before paint to set data-theme
-            on .wipu-root and avoid a flash of the wrong palette. Lives in
-            <head> so React doesn't treat it as a body-rendered <script>. */}
-        <script dangerouslySetInnerHTML={{ __html: themeInit }} />
-      </head>
       <body className="min-h-full">{children}</body>
     </html>
   );

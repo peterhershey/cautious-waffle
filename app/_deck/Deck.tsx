@@ -12,6 +12,7 @@ import {
 import { SLIDES } from "./slides";
 import { DeckChrome } from "./chrome/DeckChrome";
 import { useDeckScroll } from "./scroll/useDeckScroll";
+import { isCoarsePointer } from "./scroll/touchDetect";
 
 export type DeckContextSlide = { id: string; label: string };
 
@@ -202,10 +203,13 @@ export function Deck() {
     return () => document.removeEventListener("keydown", onKey);
   }, [activeIndex, goTo, bumpNavKey]);
 
-  // Touch swipe (vertical) for mobile
+  // Touch swipe (vertical). On touch devices we skip this entirely
+  // and let native scroll + CSS scroll-snap drive the experience —
+  // see the (hover: none) and (pointer: coarse) block in deck.css.
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
+    if (isCoarsePointer()) return;
     let startY = 0;
     let startT = 0;
     let allow = true;

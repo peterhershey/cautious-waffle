@@ -1,4 +1,3 @@
-import Script from "next/script";
 import { IBM_Plex_Mono } from "next/font/google";
 import "../_deck/styles/theme.css";
 import "../_deck/styles/glass.css";
@@ -18,16 +17,6 @@ const plexMono = IBM_Plex_Mono({
   weight: ["400", "500", "600"],
 });
 
-const themeInit = `
-(function(){try{
-  var saved = localStorage.getItem('wipu-theme');
-  var prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
-  var t = saved || (prefersLight ? 'light' : 'dark');
-  var r = document.querySelector('.wipu-root');
-  if(r) r.setAttribute('data-theme', t);
-}catch(e){}})();
-`;
-
 export default function CaseStudiesLayout({
   children,
 }: {
@@ -36,14 +25,8 @@ export default function CaseStudiesLayout({
   return (
     <div
       className={`${plexMono.variable} wipu-root`}
-      data-theme="dark"
       suppressHydrationWarning
     >
-      <Script
-        id="wipu-theme-init"
-        strategy="afterInteractive"
-        dangerouslySetInnerHTML={{ __html: themeInit }}
-      />
       {children}
     </div>
   );

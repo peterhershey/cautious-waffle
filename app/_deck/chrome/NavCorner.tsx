@@ -4,27 +4,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { useDeck } from "../Deck";
+import { nav } from "@/app/content";
 
-/* Cross-page nav. Hard-coded for now — the portfolio's surface area is
-   small enough that a registry would be overkill. Add entries here as
-   pages graduate from the archive. */
-const PAGES: { href: string; label: string; matchPrefix?: string }[] = [
-  { href: "/", label: "Home" },
-  {
-    href: "/case-studies/teaching-gemini-to-see",
-    label: "Teaching Gemini to See",
-    matchPrefix: "/case-studies/teaching-gemini-to-see",
-  },
-  {
-    href: "/case-studies/veo-in-gemini",
-    label: "Everyone's a Director",
-    matchPrefix: "/case-studies/veo-in-gemini",
-  },
-  { href: "/templates", label: "Templates", matchPrefix: "/templates" },
-  { href: "/archive", label: "Archive", matchPrefix: "/archive" },
-];
+/* Page list comes from app/content.ts. Add entries there as new pages
+   graduate from the archive. */
+type Page = { href: string; label: string; matchPrefix?: string };
 
-function isPageActive(pathname: string, page: (typeof PAGES)[number]): boolean {
+function isPageActive(pathname: string, page: Page): boolean {
   if (page.matchPrefix) return pathname.startsWith(page.matchPrefix);
   return pathname === page.href;
 }
@@ -101,7 +87,7 @@ export function NavCorner() {
           <div className="wipu-takeover-section">
             <div className="wipu-takeover-section-label">Pages</div>
             <ul className="wipu-navcorner-list">
-              {PAGES.map((page, i) => {
+              {nav.pages.map((page, i) => {
                 const active = isPageActive(pathname, page);
                 return (
                   <li

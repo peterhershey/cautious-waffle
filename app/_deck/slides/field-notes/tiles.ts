@@ -1,3 +1,4 @@
+import { fieldNotes } from "@/app/content";
 import { BUCKETS, type ManifestEntry } from "./manifest.generated";
 
 export type TileSize = "1x1" | "2x1" | "1x2" | "2x2" | "3x2";
@@ -35,9 +36,10 @@ export type Tile = ImageTile | CardTile;
      • europalette → 1x1 slots only, rendered without parallax
      • gif/video (motion) → biased toward 2x2 anchors
      • everything else → fallback */
-export const PER_BUCKET_CAP = 10;
+export const PER_BUCKET_CAP = 16;
 const BUCKET_CAP_OVERRIDES: Record<string, number> = {
   product: Infinity,
+  "ai explorations": Infinity,
 };
 const EUROPALETTE_BUCKET = "europalette";
 const MOTION_RE = /\.(gif|mp4|mov|webm)$/i;
@@ -81,65 +83,36 @@ export function registerAspect(src: string, w: number, h: number): void {
   if (!ASPECTS.has(src)) ASPECTS.set(src, classifyAspect(w, h));
 }
 
-/* ── Cards ────────────────────────────────────────────────────────── */
-export const CARDS: CardTile[] = [
-  {
-    kind: "card",
-    title: "Sample card title",
-    body: "Short descriptor sentence — placeholder copy until the real framing lands.",
-    tone: "terracotta",
-    size: "2x2",
-    rate: 0,
-  },
-  {
-    kind: "card",
-    title: "Another sample card",
-    body: "A medium-sized note. Punchy claim plus a single sentence underneath.",
-    tone: "mint",
-    size: "2x1",
-    rate: 0,
-  },
-  {
-    kind: "card",
-    title: "Third placeholder",
-    body: "Replace this with real copy once the structure is decided.",
-    tone: "mustard",
-    size: "2x1",
-    rate: 0,
-  },
-  {
-    kind: "card",
-    title: "Bigger sample",
-    body: "Two-by-two — more room for a longer descriptor when the title earns it.",
-    tone: "rose",
-    size: "2x2",
-    rate: 0,
-  },
-  {
-    kind: "card",
-    title: "Fifth slot",
-    body: "Medium card. Easy to swap for real content later.",
-    tone: "navy",
-    size: "2x1",
-    rate: 0,
-  },
-  {
-    kind: "card",
-    title: "Sixth slot",
-    body: "Last placeholder — drop in the real copy when ready.",
-    tone: "terracotta",
-    size: "2x1",
-    rate: 0,
-  },
+/* ── Cards ──────────────────────────────────────────────────────────
+   Card prose lives in app/content.ts; layout (tone, size, rate) stays
+   here. Order matches content.fieldNotes.cards by index. */
+const CARD_LAYOUT: { tone: CardTile["tone"]; size: CardSize; rate: number }[] = [
+  { tone: "terracotta", size: "2x2", rate: 0 },
+  { tone: "mint", size: "2x1", rate: 0 },
+  { tone: "mustard", size: "2x1", rate: 0 },
+  { tone: "rose", size: "2x2", rate: 0 },
+  { tone: "navy", size: "2x1", rate: 0 },
 ];
 
-/* ── Layout pattern ───────────────────────────────────────────────────
-   Image slots are 1x1 squares by default — the "rest" state of the
-   gallery. Five `2x2` anchor slots stay always-large for visual
-   skeleton. Cards keep their 2x1 / 2x2 sizes. Tiles temporarily expand
-   to 2x1 (landscape) or 1x2 (portrait) at runtime via the breathing
-   scheduler in index.tsx; that is a render-time effect, not a layout
-   property. */
+export const CARDS: CardTile[] = fieldNotes.cards.map((card, i) => ({
+  kind: "card",
+  title: card.title,
+  body: card.body,
+  ...CARD_LAYOUT[i],
+}));
+
+/* ── Layout patterns ──────────────────────────────────────────────────
+   Three named variants. Each is a SlotSpec[]; the picker pipeline is
+   identical, only the input mix changes. Cards always occupy the same
+   five slots (defined in CARDS via CARD_LAYOUT). The 7-col grid uses
+   grid-auto-flow:row (not dense) so that the breathing scheduler can
+   pair same-row 1x1+2x1 swaps without tiles jumping rows; this means
+   over-using 2-wide tiles strands column 7. All variants keep ≥3 2x1
+   and ≥22 1x1 so breathing always has eligible rows.
+
+   IMPORTANT: card slots come first (ordered cardIdx 0..4) because the
+   stratifiedSlotShuffle in index treats every non-1x1 the same; what
+   matters for layout is the count and size mix, not the array order. */
 export type SlotSpec =
   | {
       kind: "image";
@@ -154,66 +127,69 @@ export type SlotSpec =
       rate: number;
     };
 
-export const LAYOUT_PATTERN: SlotSpec[] = [
-  // Five 2x2 anchor slots — always large.
-  { kind: "image", size: "2x2", rate: 0 },
-  { kind: "image", size: "2x2", rate: 0 },
-  { kind: "image", size: "2x2", rate: 0 },
-  { kind: "image", size: "2x2", rate: 0 },
-  { kind: "image", size: "2x2", rate: 0 },
-  // Card slots
+const CARD_SLOTS: SlotSpec[] = [
   { kind: "card", size: "2x2", rate: 0, cardIdx: 0 },
   { kind: "card", size: "2x1", rate: 0, cardIdx: 1 },
   { kind: "card", size: "2x1", rate: 0, cardIdx: 2 },
   { kind: "card", size: "2x2", rate: 0, cardIdx: 3 },
   { kind: "card", size: "2x1", rate: 0, cardIdx: 4 },
-  { kind: "card", size: "2x1", rate: 0, cardIdx: 5 },
-  // Medium image slots — landscape (2x1) and portrait (1x2). Stratified
-  // alongside the 1x1 sea below for visual rhythm. Landscape mediums
-  // also serve as paired shrinkers for breathing pulses (a 1x1 grows to
-  // 2x1 in the same row as a 2x1 shrinking to 1x1, so row totals stay
-  // balanced and nothing jumps rows).
-  { kind: "image", size: "2x1", rate: 0.05 },
-  { kind: "image", size: "2x1", rate: 0.04 },
-  { kind: "image", size: "2x1", rate: 0.06 },
-  { kind: "image", size: "2x1", rate: 0.05 },
-  { kind: "image", size: "2x1", rate: 0.04 },
-  { kind: "image", size: "2x1", rate: 0.06 },
-  { kind: "image", size: "1x2", rate: 0.05 },
-  { kind: "image", size: "1x2", rate: 0.06 },
-  { kind: "image", size: "1x2", rate: 0.04 },
-  { kind: "image", size: "1x2", rate: 0.05 },
-  // 1x1 image sea — primary breath candidates.
-  { kind: "image", size: "1x1", rate: 0.05 },
-  { kind: "image", size: "1x1", rate: 0.07 },
-  { kind: "image", size: "1x1", rate: 0.06 },
-  { kind: "image", size: "1x1", rate: 0.04, objectPosition: "center bottom" },
-  { kind: "image", size: "1x1", rate: 0.05 },
-  { kind: "image", size: "1x1", rate: 0.06 },
-  { kind: "image", size: "1x1", rate: 0.07 },
-  { kind: "image", size: "1x1", rate: 0.04 },
-  { kind: "image", size: "1x1", rate: 0.05 },
-  { kind: "image", size: "1x1", rate: 0.06 },
-  { kind: "image", size: "1x1", rate: 0.08 },
-  { kind: "image", size: "1x1", rate: 0.04 },
-  { kind: "image", size: "1x1", rate: 0.07 },
-  { kind: "image", size: "1x1", rate: 0.06 },
-  { kind: "image", size: "1x1", rate: 0.05 },
-  { kind: "image", size: "1x1", rate: 0.07 },
-  { kind: "image", size: "1x1", rate: 0.04 },
-  { kind: "image", size: "1x1", rate: 0.06 },
-  { kind: "image", size: "1x1", rate: 0.08 },
-  { kind: "image", size: "1x1", rate: 0.05 },
-  { kind: "image", size: "1x1", rate: 0.06 },
-  { kind: "image", size: "1x1", rate: 0.04 },
-  { kind: "image", size: "1x1", rate: 0.07 },
-  { kind: "image", size: "1x1", rate: 0.05 },
-  { kind: "image", size: "1x1", rate: 0.06 },
-  { kind: "image", size: "1x1", rate: 0.07 },
-  { kind: "image", size: "1x1", rate: 0.04 },
-  { kind: "image", size: "1x1", rate: 0.05 },
-  { kind: "image", size: "1x1", rate: 0.06 },
 ];
+
+/* Helper — emit N image slots of a given size with a rotating parallax
+   rate for visual variety. Reduces row noise compared to hand-listing. */
+function imgSlots(
+  size: TileSize,
+  count: number,
+  rates: number[] = [0],
+): SlotSpec[] {
+  const out: SlotSpec[] = [];
+  for (let i = 0; i < count; i++) {
+    out.push({ kind: "image", size, rate: rates[i % rates.length] });
+  }
+  return out;
+}
+
+/* Variant A — Mosaic. Quiet scrapbook. A sea of 1x1 squares with sparse
+   accents; reads as a calm, dense pattern. ~69 slots, 64 image. */
+export const LAYOUT_MOSAIC: SlotSpec[] = [
+  ...imgSlots("2x2", 4),
+  ...CARD_SLOTS,
+  ...imgSlots("2x1", 4, [0.05, 0.04, 0.06]),
+  ...imgSlots("1x2", 4, [0.05, 0.06, 0.04]),
+  ...imgSlots("1x1", 52, [0.05, 0.07, 0.06, 0.04, 0.08]),
+];
+
+/* Variant B — Editorial. Magazine spread. Big squares + wide 3x2 heroes
+   dominate; only a handful of small tiles. Each image earns more weight.
+   ~38 slots, 33 image. */
+export const LAYOUT_EDITORIAL: SlotSpec[] = [
+  ...imgSlots("2x2", 8),
+  ...imgSlots("3x2", 4),
+  ...CARD_SLOTS,
+  ...imgSlots("2x1", 3, [0.05, 0.04, 0.06]),
+  ...imgSlots("1x2", 3, [0.05, 0.06, 0.04]),
+  ...imgSlots("1x1", 15, [0.05, 0.07, 0.06, 0.04]),
+];
+
+/* Variant C — Salon. Full mixture, every size in active rotation. Heavy
+   on landscape AND portrait mediums plus a couple 3x2 heroes; 1x1s are
+   connective tissue, not the dominant element. ~61 slots, 56 image. */
+export const LAYOUT_SALON: SlotSpec[] = [
+  ...imgSlots("2x2", 5),
+  ...imgSlots("3x2", 2),
+  ...CARD_SLOTS,
+  ...imgSlots("2x1", 11, [0.05, 0.04, 0.06]),
+  ...imgSlots("1x2", 10, [0.05, 0.06, 0.04]),
+  ...imgSlots("1x1", 28, [0.05, 0.07, 0.06, 0.04, 0.08]),
+];
+
+export type VariantId = "mosaic" | "editorial" | "salon";
+
+export const LAYOUT_VARIANTS: Record<VariantId, SlotSpec[]> = {
+  mosaic: LAYOUT_MOSAIC,
+  editorial: LAYOUT_EDITORIAL,
+  salon: LAYOUT_SALON,
+};
 
 /* ── PRNG ───────────────────────────────────────────────────────────── */
 function mulberry32(seed: number): () => number {
@@ -371,12 +347,13 @@ function bucketFromSrc(src: string): string | undefined {
 /* Build a fresh Tile[] for one render. */
 export function buildTiles(
   buckets: Record<string, readonly ManifestEntry[]> = BUCKETS,
-  opts: { cap?: number; rand?: () => number } = {},
+  opts: { cap?: number; rand?: () => number; pattern?: SlotSpec[] } = {},
 ): Tile[] {
   const rand = opts.rand ?? Math.random;
   const cap = opts.cap ?? PER_BUCKET_CAP;
+  const pattern = opts.pattern ?? LAYOUT_MOSAIC;
   const pool = buildPool(buckets, cap, rand);
-  const slots = stratifiedSlotShuffle(LAYOUT_PATTERN, rand);
+  const slots = stratifiedSlotShuffle(pattern, rand);
   const out: Tile[] = [];
   for (const slot of slots) {
     if (slot.kind === "card") {

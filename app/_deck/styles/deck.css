@@ -30,6 +30,16 @@
   padding: var(--wipu-pad-y) var(--wipu-pad-x);
 }
 
+/* Mobile (touch) only: native scroll with proximity snap. The JS
+   touch-swipe handler in Deck.tsx is skipped on these devices via
+   isCoarsePointer(), so this CSS is the entire snap mechanism on
+   phones / touch tablets. Proximity (not mandatory) so a tall slide
+   can rest mid-content without being yanked back to a snap edge. */
+@media (hover: none) and (pointer: coarse) {
+  .wipu-deck { scroll-snap-type: y proximity; }
+  .wipu-slide { scroll-snap-align: start; }
+}
+
 /* All seven slides live in the DOM at once. Pause every CSS animation
    on slides that aren't currently active — kills idle-zoom on dozens
    of tile images, gel-blob loops, dotted-arrow march, callout zebra,

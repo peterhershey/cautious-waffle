@@ -56,7 +56,7 @@
 .wipu-movie-embed-title {
   text-align: center;
   font-family: var(--wipu-mono);
-  font-size: clamp(12px, 1vw, 14px);
+  font-size: var(--wipu-fs-meta);
   font-weight: 400;
   line-height: 1.5;
   letter-spacing: 0.01em;

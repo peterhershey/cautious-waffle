@@ -124,8 +124,8 @@
 
 .field-notes-portal-icon {
   position: relative;
-  font-size: clamp(72px, 9vw, 112px);
-  line-height: 1;
+  font-size: var(--wipu-fs-emoji);
+  line-height: 1.05;
   transform: scale(calc(1 + var(--dwell) * 0.18))
     rotate(calc(var(--dwell) * -6deg));
   filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.25));
@@ -133,7 +133,7 @@
 
 .field-notes-portal-lbl {
   font-family: var(--wipu-mono);
-  font-size: 12px;
+  font-size: var(--wipu-fs-eyebrow);
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--wipu-ink-dim);
@@ -426,14 +426,14 @@
 .field-notes-card-title {
   font-family: var(--wipu-mono);
   font-weight: 600;
-  font-size: clamp(20px, 2vw, 28px);
-  line-height: 1.1;
+  font-size: var(--wipu-fs-h3);
+  line-height: 1.15;
   letter-spacing: -0.01em;
 }
 .field-notes-card-body {
   font-family: var(--wipu-mono);
   font-weight: 400;
-  font-size: clamp(13px, 1.05vw, 15px);
+  font-size: var(--wipu-fs-meta);
   line-height: 1.45;
   letter-spacing: -0.005em;
   margin: 0;
@@ -443,7 +443,7 @@
 /* 2x1 cards are wider but shorter — keep title slightly smaller so the
    body has room without crowding. */
 .field-notes-tile-card.field-notes-tile-2x1 .field-notes-card-title {
-  font-size: clamp(18px, 1.6vw, 22px);
+  font-size: var(--wipu-fs-h3);
 }
 
 .field-notes-tone-terracotta {
@@ -496,8 +496,8 @@
   margin: 0;
   font-family: var(--wipu-mono);
   font-weight: 500;
-  font-size: clamp(48px, 8vw, 116px);
-  line-height: 0.95;
+  font-size: var(--wipu-fs-display);
+  line-height: 1;
   letter-spacing: -0.025em;
   display: flex;
   flex-direction: column;
@@ -523,7 +523,7 @@
   margin: clamp(20px, 2vh, 32px) 0 0;
   font-family: var(--wipu-mono);
   font-weight: 400;
-  font-size: clamp(14px, 1.15vw, 17px);
+  font-size: var(--wipu-fs-body);
   line-height: 1.5;
   letter-spacing: -0.005em;
   color: var(--wipu-ink-dim);
@@ -540,7 +540,7 @@
   .field-notes-header {
     padding: 40px 20px 24px;
   }
-  .field-notes-header-title { font-size: clamp(40px, 13vw, 64px); }
+  .field-notes-header-title { font-size: var(--wipu-fs-h1); }
 }
 
 /* ───────── Dock (HUD pill) ─────────

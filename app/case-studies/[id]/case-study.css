@@ -1551,3 +1551,413 @@
     animation: none;
   }
 }
+
+/* ============================================================
+   FORTRAN coding-form title slide (Teaching Gemini to See · 01b)
+   ============================================================
+   Vintage IBM-style coding sheet — cream paper, green-ink rules,
+   typewriter content. Lives in a dark slide so the sheet reads
+   as a paper document on a desk. */
+
+/* Self-contained FORTRAN slide — owns the viewport edge-to-edge. */
+.wipu-sample-slide.wpd-fortran-slide {
+  padding: 0;
+  border-bottom: none;
+}
+
+.wpd-fortran {
+  --fortran-paper: #ecead7;
+  --fortran-paper-edge: #d8d3b8;
+  --fortran-ink: #1f5b3a;
+  --fortran-ink-soft: #3a7355;
+  --fortran-ink-faint: #6c9985;
+  --fortran-grid: #6aa680;
+  --fortran-grid-soft: rgba(106, 166, 128, 0.42);
+  --fortran-type: #2a2520;
+  --fortran-type-soft: #4a3f33;
+
+  width: 100%;
+  height: 100svh;
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+  padding: 0;
+  background: var(--fortran-paper);
+}
+
+.wpd-fortran-sheet {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: var(--fortran-paper);
+  color: var(--fortran-type);
+  font-family: var(--wipu-mono);
+  padding: clamp(16px, 1.8vw, 32px) clamp(20px, 2.6vw, 48px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-height: 0;
+}
+
+/* Paper grain — a stack of layered noise/halftones suggesting old
+   stock. Multiply blend on a cream base preserves the legibility
+   of the green ink and typewriter text. */
+.wpd-fortran-paper-grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 14% 10%, rgba(180, 160, 110, 0.18), transparent 55%),
+    radial-gradient(ellipse at 92% 90%, rgba(140, 120, 80, 0.16), transparent 60%),
+    radial-gradient(circle at 30% 80%, rgba(120, 90, 50, 0.08), transparent 40%),
+    repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.018) 0px,
+      rgba(0, 0, 0, 0.018) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+  mix-blend-mode: multiply;
+  opacity: 0.85;
+}
+
+/* ---- Header block (top forms + title row) ---- */
+
+.wpd-fortran-head {
+  position: relative;
+  border: 1.5px solid var(--fortran-ink);
+  background: var(--fortran-paper);
+}
+
+.wpd-fortran-head-row {
+  display: grid;
+  grid-template-columns: 2.4fr 1.6fr 0.9fr 0.7fr;
+  border-bottom: 1.5px solid var(--fortran-ink);
+}
+
+.wpd-fortran-title-row {
+  display: grid;
+  grid-template-columns: 2.4fr 1.4fr 0.9fr 0.7fr;
+  align-items: stretch;
+}
+/* Match the title row to the header row's column count visually:
+   collapse the 4 columns to (title spans 1) + punch + ident. */
+.wpd-fortran-title-row {
+  grid-template-columns: 1.4fr 1.5fr 1.1fr;
+}
+
+.wpd-fortran-cell {
+  position: relative;
+  padding: 8px 12px 10px;
+  border-right: 1.5px solid var(--fortran-ink);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 44px;
+}
+.wpd-fortran-cell:last-child { border-right: none; }
+
+.wpd-fortran-cell-label {
+  font-size: clamp(9px, 0.75vw, 12px);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fortran-ink);
+  font-weight: 600;
+  line-height: 1;
+}
+.wpd-fortran-cell-value {
+  font-family: var(--wipu-mono);
+  font-size: clamp(15px, 1.3vw, 22px);
+  color: var(--fortran-type);
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  /* Typewriter feel: slight off-baseline, ink-soaked weight. */
+  font-weight: 500;
+  text-shadow: 0 0.5px 0 rgba(0, 0, 0, 0.15);
+}
+.wpd-fortran-cell-value--sm {
+  font-size: clamp(12px, 0.95vw, 16px);
+}
+
+/* Title row: big "FORTRAN Coding Form" sits in its own cell. */
+.wpd-fortran-title {
+  margin: 0;
+  padding: 14px 20px 16px;
+  font-family: var(--wipu-sans);
+  font-size: clamp(22px, 2.6vw, 42px);
+  font-weight: 700;
+  letter-spacing: 0.005em;
+  color: var(--fortran-ink);
+  border-right: 1.5px solid var(--fortran-ink);
+  display: flex;
+  align-items: center;
+  /* Serif accent — IBM Plex Mono fallback handles this if no serif. */
+  font-style: normal;
+}
+.wpd-fortran-title::first-letter {
+  letter-spacing: 0;
+}
+
+.wpd-fortran-punch {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  border-right: 1.5px solid var(--fortran-ink);
+}
+.wpd-fortran-punch-left {
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-right: 1.5px solid var(--fortran-ink);
+  background: var(--fortran-paper);
+}
+.wpd-fortran-punch-left .wpd-fortran-cell-label {
+  font-size: clamp(8px, 0.7vw, 11px);
+}
+.wpd-fortran-punch-right {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+}
+.wpd-fortran-punch-cell {
+  padding: 6px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  justify-content: center;
+}
+.wpd-fortran-punch-cell + .wpd-fortran-punch-cell {
+  border-top: 1.5px solid var(--fortran-ink);
+}
+
+.wpd-fortran-cell--ident {
+  border-right: none;
+}
+
+/* ---- Column-header strip ---- */
+
+.wpd-fortran-column-head {
+  display: grid;
+  grid-template-columns: clamp(80px, 8vw, 140px) clamp(32px, 3vw, 44px) 1fr clamp(120px, 10vw, 180px);
+  border-left: 1.5px solid var(--fortran-ink);
+  border-right: 1.5px solid var(--fortran-ink);
+  border-bottom: 1.5px solid var(--fortran-ink);
+  background: var(--fortran-paper);
+}
+.wpd-fortran-col {
+  padding: 6px 8px;
+  border-right: 1.5px solid var(--fortran-ink);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  min-height: 38px;
+}
+.wpd-fortran-col:last-child { border-right: none; }
+.wpd-fortran-col-label {
+  font-size: clamp(8px, 0.65vw, 10px);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fortran-ink);
+  font-weight: 600;
+  line-height: 1;
+  text-align: center;
+}
+.wpd-fortran-col-label--sub {
+  margin-top: 2px;
+}
+.wpd-fortran-col-label--vertical {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  letter-spacing: 0.18em;
+  font-size: clamp(7px, 0.55vw, 9px);
+}
+
+/* ---- Column-number ruler ---- */
+
+.wpd-fortran-ruler {
+  display: grid;
+  grid-template-columns: clamp(80px, 8vw, 140px) clamp(32px, 3vw, 44px) 1fr clamp(120px, 10vw, 180px);
+  border-left: 1.5px solid var(--fortran-ink);
+  border-right: 1.5px solid var(--fortran-ink);
+  border-bottom: 1.5px solid var(--fortran-ink);
+  background: var(--fortran-paper);
+  font-size: clamp(8px, 0.7vw, 11px);
+  color: var(--fortran-ink);
+  font-weight: 600;
+  line-height: 1;
+  min-height: 22px;
+}
+.wpd-fortran-ruler-col {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+  border-right: 1px dashed var(--fortran-grid-soft);
+}
+.wpd-fortran-ruler-col:last-child { border-right: none; }
+.wpd-fortran-ruler-col--cont { justify-content: center; padding: 0; }
+.wpd-fortran-ruler-tick {
+  display: inline-block;
+}
+
+/* ---- Body grid ---- */
+
+.wpd-fortran-body {
+  border-left: 1.5px solid var(--fortran-ink);
+  border-right: 1.5px solid var(--fortran-ink);
+  border-bottom: 1.5px solid var(--fortran-ink);
+  background: var(--fortran-paper);
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.wpd-fortran-row {
+  display: grid;
+  grid-template-columns: clamp(80px, 8vw, 140px) clamp(32px, 3vw, 44px) 1fr clamp(120px, 10vw, 180px);
+  border-bottom: 1px solid var(--fortran-grid);
+  min-height: 0;
+  flex: 1 1 0;
+  align-items: center;
+  position: relative;
+}
+.wpd-fortran-row:last-child { border-bottom: none; }
+
+.wpd-fortran-row::before {
+  content: attr(data-row);
+  position: absolute;
+  left: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: clamp(8px, 0.65vw, 10px);
+  color: var(--fortran-ink-soft);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.wpd-fortran-row-num,
+.wpd-fortran-row-cont,
+.wpd-fortran-row-stmt,
+.wpd-fortran-row-ident {
+  padding: 0 10px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  border-right: 1px solid var(--fortran-grid);
+}
+.wpd-fortran-row-stmt {
+  /* 66-column FORTRAN STATEMENT region — faint vertical column rules. */
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent 0,
+    transparent calc((100% / 66) - 1px),
+    var(--fortran-grid-soft) calc((100% / 66) - 1px),
+    var(--fortran-grid-soft) calc(100% / 66)
+  );
+  padding: 0 6px;
+}
+.wpd-fortran-row-num {
+  justify-content: center;
+  padding-left: 24px;
+}
+.wpd-fortran-row-cont {
+  justify-content: center;
+  padding: 0;
+}
+.wpd-fortran-row-ident {
+  border-right: none;
+  justify-content: flex-start;
+}
+
+.wpd-fortran-mark {
+  font-family: var(--wipu-mono);
+  font-size: clamp(13px, 1.2vw, 19px);
+  color: var(--fortran-type);
+  letter-spacing: 0.04em;
+  line-height: 1;
+  font-weight: 500;
+  text-shadow: 0 0.5px 0 rgba(0, 0, 0, 0.18);
+  /* Hand-typed ink imperfection — micro-jitter per character cluster. */
+  display: inline-block;
+  transform: translateY(-0.5px);
+}
+.wpd-fortran-mark--c {
+  color: var(--fortran-ink);
+  font-weight: 700;
+}
+.wpd-fortran-mark--stmt {
+  text-transform: uppercase;
+  white-space: pre;
+}
+.wpd-fortran-mark--ident {
+  font-size: clamp(11px, 0.9vw, 14px);
+  color: var(--fortran-type-soft);
+  letter-spacing: 0.1em;
+}
+
+/* Typing caret — blinks while a line is being typed. The block-shaped
+   caret echoes the IBM 029 keypunch carriage indicator. */
+.wpd-fortran-caret {
+  display: inline-block;
+  width: 0.5em;
+  height: 1em;
+  background: var(--fortran-type);
+  margin-left: 2px;
+  vertical-align: -0.12em;
+  animation: wpd-fortran-caret-blink 0.9s steps(2, start) infinite;
+}
+@keyframes wpd-fortran-caret-blink {
+  to { visibility: hidden; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wpd-fortran-caret { animation: none; opacity: 0; }
+}
+
+/* ---- Footer microcopy ---- */
+
+.wpd-fortran-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 8px 4px 0;
+  font-size: clamp(8px, 0.65vw, 10px);
+  letter-spacing: 0.08em;
+  color: var(--fortran-ink-soft);
+  text-transform: uppercase;
+}
+.wpd-fortran-footer-stamp {
+  font-weight: 700;
+  color: var(--fortran-ink);
+  letter-spacing: 0.12em;
+}
+
+/* Smaller viewports: relax internal grid + minimum heights. */
+@media (max-width: 768px) {
+  .wpd-fortran-sheet { transform: none; padding: 10px; }
+  .wpd-fortran-head-row { grid-template-columns: 1.4fr 1fr 0.7fr 0.6fr; }
+  .wpd-fortran-title-row { grid-template-columns: 1fr 1.2fr 0.9fr; }
+  .wpd-fortran-column-head,
+  .wpd-fortran-ruler,
+  .wpd-fortran-row { grid-template-columns: 60px 28px 1fr 90px; }
+  .wpd-fortran-mark { font-size: 11px; }
+  .wpd-fortran-mark--ident { font-size: 9px; }
+}
+
+@media (max-width: 480px) {
+  .wpd-fortran-cell-value { font-size: 12px; }
+  .wpd-fortran-cell-value--sm { font-size: 10px; }
+  .wpd-fortran-title { font-size: 18px; padding: 8px 10px; }
+  .wpd-fortran-column-head,
+  .wpd-fortran-ruler,
+  .wpd-fortran-row { grid-template-columns: 46px 22px 1fr 70px; }
+  .wpd-fortran-row-num { padding-left: 16px; }
+  .wpd-fortran-mark { font-size: 10px; }
+  .wpd-fortran-mark--ident { font-size: 8px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wpd-fortran-sheet { transform: none; }
+}

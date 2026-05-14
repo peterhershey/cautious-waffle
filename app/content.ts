@@ -65,7 +65,10 @@ export const hero = {
     },
     {
       label: "Email",
-      href: "mailto:petershershey@gmail.com",
+      // Address is assembled client-side from these base64 parts via
+      // <EmailLink> so the literal string never lands in static HTML.
+      // See app/components/EmailLink.tsx.
+      email: { user: "cGV0ZXJzaGVyc2hleQ==", domain: "Z21haWwuY29t" },
       tone: "mint",
     },
   ],

@@ -5,6 +5,7 @@
    - sample presentation slide 01 (IntroSlide) */
 
 import type { ReactNode } from "react";
+import { EmailLink } from "@/app/components/EmailLink";
 
 export type IntroContactTone =
   | "terracotta"
@@ -15,8 +16,13 @@ export type IntroContactTone =
 
 export type IntroContact = {
   label: string;
-  href: string;
+  /** Required for normal links. Omit when `email` is set — EmailLink
+   *  assembles its href client-side. */
+  href?: string;
   tone?: IntroContactTone;
+  /** When set, the contact renders via <EmailLink> with parts decoded
+   *  client-side. Keeps the address out of the SSR HTML. */
+  email?: { user: string; domain: string };
 };
 
 export type IntroTemplateProps = {
@@ -52,13 +58,27 @@ export function IntroTemplate({ emoji, greeting, name, subtitle, note, contacts 
       {contacts && contacts.length > 0 && (
         <ul className="wipu-tpl-intro-contacts">
           {contacts.map((c) => {
-            const isExternal = !c.href.startsWith("mailto:");
+            if (c.email) {
+              return (
+                <li key={c.label}>
+                  <EmailLink
+                    className="wipu-tpl-intro-contact"
+                    tone={c.tone ?? "terracotta"}
+                    label={c.label}
+                    user={c.email.user}
+                    domain={c.email.domain}
+                  />
+                </li>
+              );
+            }
+            const href = c.href ?? "#";
+            const isExternal = !href.startsWith("mailto:");
             return (
-              <li key={c.href}>
+              <li key={href}>
                 <a
                   className="wipu-tpl-intro-contact"
                   data-tone={c.tone ?? "terracotta"}
-                  href={c.href}
+                  href={href}
                   {...(isExternal
                     ? { target: "_blank", rel: "noopener noreferrer" }
                     : {})}

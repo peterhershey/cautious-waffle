@@ -188,6 +188,16 @@
 .field-notes-overlay[data-state="opening"] { opacity: 0; }
 .field-notes-overlay[data-state="open"] { opacity: 1; }
 .field-notes-overlay[data-state="closing"] { opacity: 0; transition-duration: 360ms; }
+/* Closed but mounted: the overlay is pre-painted while the slide is
+   active so the first open is paint-free. It sits position:fixed at
+   z-index 200, so without this it silently captures wheel/click —
+   the deck's wheel-hijack sees data-allow-scroll and bails, then
+   overscroll-behavior:contain traps the user on the slide. Make it
+   pointer-transparent while closed; the portal trigger lives outside
+   the overlay so hover still works. */
+.field-notes-overlay[data-state="closed"] {
+  pointer-events: none;
+}
 
 /* ── Portal preview ────────────────────────────────────────────────
    While the user hovers the folder, the overlay is mounted underneath
@@ -292,6 +302,51 @@
   }
 }
 
+/* ───────── Hue-style ambient glow ─────────
+   While a tile is expanded by the breathing pulse, surround it with a
+   soft warm halo — a Philips Hue lamp casting ambient light on the
+   dark background. The animation handles fade-IN and a subtle in-place
+   pulse during the hold; the fade-OUT is delegated to the box-shadow
+   transition declared on `.field-notes-tile` (kicks in when the
+   `data-breathing` attribute is removed and the animation selector
+   stops matching). Total visible glow window therefore lasts roughly
+   the breathing hold (~3s) plus the 1.5s tail.
+   Only the EXPANDER sizes (2x1 / 1x2) glow — the shrinker (1x1) does
+   not, since it is contracting, not being highlighted. */
+@keyframes field-notes-hue-glow {
+  0% {
+    box-shadow:
+      0 0 0 0 rgba(255, 195, 135, 0),
+      0 0 0 0 rgba(255, 165, 105, 0);
+  }
+  40% {
+    box-shadow:
+      0 0 70px 6px rgba(255, 195, 135, 0.34),
+      0 0 142px 18px rgba(255, 165, 105, 0.18);
+  }
+  68% {
+    box-shadow:
+      0 0 84px 10px rgba(255, 200, 140, 0.42),
+      0 0 162px 24px rgba(255, 165, 105, 0.24);
+  }
+  100% {
+    box-shadow:
+      0 0 72px 7px rgba(255, 195, 135, 0.36),
+      0 0 146px 18px rgba(255, 165, 105, 0.20);
+  }
+}
+.field-notes-tile-image[data-breathing="2x1"],
+.field-notes-tile-image[data-breathing="1x2"] {
+  animation: field-notes-hue-glow 3000ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .field-notes-tile-image[data-breathing="2x1"],
+  .field-notes-tile-image[data-breathing="1x2"] {
+    animation: none;
+    box-shadow: none;
+  }
+}
+
 @media (max-width: 1024px) {
   .field-notes-grid { grid-template-columns: repeat(4, 1fr); }
   .field-notes-tile-2x2 { grid-column: span 2; grid-row: span 2; }
@@ -310,22 +365,32 @@
 .field-notes-tile {
   border-radius: 26px;
   overflow: hidden;
-  /* Explosion transitions */
+  /* Explosion transitions. The third list entry (box-shadow) is the
+     fade-OUT for the Hue-style breathing-pulse glow — see the keyframe
+     animation below. Box-shadow is none in both closed and open states,
+     so its transition only fires when the breathing animation removes
+     itself, gracefully fading the halo back to none. */
   opacity: 0;
   transform: scale(0.42);
   transform-origin: center;
-  transition-property: opacity, transform;
-  transition-duration: 320ms;
-  transition-timing-function: cubic-bezier(0.22, 0.8, 0.2, 1);
-  transition-delay: calc(var(--i, 0) * 8ms);
+  transition-property: opacity, transform, box-shadow;
+  transition-duration: 320ms, 320ms, 1500ms;
+  transition-timing-function:
+    cubic-bezier(0.22, 0.8, 0.2, 1),
+    cubic-bezier(0.22, 0.8, 0.2, 1),
+    cubic-bezier(0.4, 0, 0.2, 1);
+  transition-delay: calc(var(--i, 0) * 8ms), calc(var(--i, 0) * 8ms), 0ms;
   will-change: opacity, transform;
 }
 .field-notes-overlay[data-state="open"] .field-notes-tile {
   opacity: 1;
   transform: scale(1);
-  transition-duration: 920ms;
-  transition-timing-function: cubic-bezier(0.34, 1.42, 0.64, 1);
-  transition-delay: calc(var(--i, 0) * 46ms);
+  transition-duration: 920ms, 920ms, 1500ms;
+  transition-timing-function:
+    cubic-bezier(0.34, 1.42, 0.64, 1),
+    cubic-bezier(0.34, 1.42, 0.64, 1),
+    cubic-bezier(0.4, 0, 0.2, 1);
+  transition-delay: calc(var(--i, 0) * 46ms), calc(var(--i, 0) * 46ms), 0ms;
 }
 
 /* ───────── Tile: image ───────── */
@@ -379,6 +444,18 @@
 .field-notes-tile-image[data-loaded="true"] img,
 .field-notes-tile-image[data-loaded="true"] video {
   opacity: 1;
+}
+/* The overlay is pre-mounted while the slide is active, so the user's
+   first hover doesn't pay the tile-mount paint cost. While the overlay
+   is still closed and not being previewed, freeze the per-tile idle
+   animations (ken-burns zoom, gel shroud blobs) so they don't burn
+   GPU on content nobody can see. They resume the moment the overlay
+   becomes visible. */
+.field-notes-overlay[data-state="closed"] .field-notes-tile-image img,
+.field-notes-overlay[data-state="closed"] .field-notes-tile-image video,
+.field-notes-overlay[data-state="closed"] .field-notes-tile-gel::before,
+.field-notes-overlay[data-state="closed"] .field-notes-tile-gel::after {
+  animation-play-state: paused;
 }
 
 /* ───────── Gel loading shroud ─────────
@@ -700,67 +777,6 @@
   .field-notes-dock { gap: var(--wipu-sp-sm); }
   .field-notes-dock-btn { width: 68px; height: 68px; }
   .field-notes-dock-btn svg { width: 26px; height: 26px; }
-}
-
-/* ───────── Variant switcher (HUD chip, bottom-left) ─────────
-   Sibling of the dock; mirrors the dock's HUD-pill material so the two
-   reads as one family. Three pill buttons; the active one fills, others
-   stay dim text. Fades in with the overlay. */
-
-.field-notes-variant-switcher {
-  position: fixed;
-  left: clamp(16px, 3vw, 28px);
-  bottom: clamp(28px, 5vh, 48px);
-  z-index: 210;
-  display: inline-flex;
-  align-items: center;
-  padding: 4px;
-  border-radius: 999px;
-  background: linear-gradient(180deg, #1f1f1f 0%, #050505 100%);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.06) inset,
-    0 10px 24px rgba(0, 0, 0, 0.35);
-  opacity: 0;
-  transform: translateY(14px);
-  transition:
-    opacity 320ms ease 200ms,
-    transform 360ms cubic-bezier(0.22, 0.8, 0.2, 1) 200ms;
-}
-.field-notes-overlay[data-state="open"] .field-notes-variant-switcher {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.field-notes-variant-btn {
-  appearance: none;
-  border: 0;
-  background: transparent;
-  color: rgba(255, 255, 255, 0.55);
-  font-family: var(--wipu-mono);
-  font-size: 13px;
-  letter-spacing: 0.04em;
-  padding: 8px 14px;
-  border-radius: 999px;
-  cursor: pointer;
-  transition:
-    color 200ms ease,
-    background-color 200ms ease;
-}
-.field-notes-variant-btn:hover {
-  color: rgba(255, 255, 255, 0.9);
-}
-.field-notes-variant-btn[data-active="true"] {
-  color: #0a0a0a;
-  background: #f5f5f5;
-}
-.field-notes-variant-btn:focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.55);
-  outline-offset: 2px;
-}
-
-@media (max-width: 768px) {
-  .field-notes-variant-switcher { padding: 3px; }
-  .field-notes-variant-btn { padding: 6px 10px; font-size: 12px; }
 }
 
 /* ───────── Tidal Scroll reveal ───────── */

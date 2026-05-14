@@ -27,6 +27,10 @@ import {
 } from "../../_shared/MultimodalCarousel";
 import type { CaseStudyDeckEntry } from "../CaseStudyDeck";
 import { EyeAscii } from "./EyeAscii";
+import {
+  FortranCodingSheet,
+  FortranShippedSheet,
+} from "./FortranCodingSheet";
 
 const MULTIMODAL_USE_CASES: MultimodalCase[] = [
   {
@@ -65,10 +69,30 @@ const TIMELINE_STOPS: TimelineStop[] = [
     tint: "navy",
     title: "Assistant",
     date: "PRE-2024",
-    image: {
-      src: "/portfolio%20transfer/case%20study%20live%20video/ss_assistant.jpg",
-      alt: "Google Assistant — the era before Gemini",
-    },
+    media: (
+      <div className="wpd-tl-video-stage">
+        <div
+          className="wpd-tl-video-glow"
+          aria-hidden
+          style={{
+            backgroundImage:
+              "url(https://i.ytimg.com/vi/ARA0AxrnHdM/hqdefault.jpg)",
+          }}
+        />
+        <div
+          className="wpd-tl-video-frame"
+          role="img"
+          aria-label="Google Assistant launch — the era before Gemini"
+        >
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/ARA0AxrnHdM?autoplay=1&mute=1&loop=1&playlist=ARA0AxrnHdM&controls=0&rel=0&playsinline=1&modestbranding=1&showinfo=0"
+            title="Google Assistant launch — the era before Gemini"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+          />
+        </div>
+      </div>
+    ),
   },
   {
     tint: "terracotta",
@@ -148,18 +172,6 @@ const SECTIONS: [SectionHeaderItem, SectionHeaderItem, SectionHeaderItem] = [
     title: "Realtime Video",
     meta: "Zürich · January 2025",
   },
-];
-
-const SHIPPED_ITEMS: { emoji: string; label: string }[] = [
-  { emoji: "📹", label: "Gemini Live Video" },
-  { emoji: "🎬", label: "Veo in Gemini" },
-  { emoji: "🖼️", label: "Visual Overlays" },
-  { emoji: "🎨", label: "Gemini x 4G" },
-  { emoji: "💬", label: "AI Salon" },
-  { emoji: "🔊", label: "Audio Overviews" },
-  { emoji: "🚀", label: "Multimodal Launcher" },
-  { emoji: "🐣", label: "Gemini App" },
-  { emoji: "🛟", label: "Floaty + Screen Context" },
 ];
 
 const NYC_EXPLORATIONS_STOPS: TimelineStop[] = [
@@ -252,24 +264,23 @@ export const teachingGeminiToSee: CaseStudyDeckEntry = {
       ),
     },
     {
-      slug: "03",
-      name: "What I shipped at Gemini",
+      slug: "01b",
+      name: "Hero · Coding Form",
+      selfContained: true,
       content: (
-        <div className="wipu-cs-shipped">
-          <h2 className="wipu-cs-shipped-title">
-            Features I&apos;ve shipped at Gemini
-          </h2>
-          <ul className="wipu-cs-shipped-list">
-            {SHIPPED_ITEMS.map((it) => (
-              <li key={it.label} className="wipu-cs-shipped-item">
-                <span className="wipu-cs-shipped-emoji" aria-hidden>
-                  {it.emoji}
-                </span>
-                <span>{it.label}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <section className="wipu-sample-slide wpd-fortran-slide" data-cs-slide-content="fortran">
+          <FortranCodingSheet />
+        </section>
+      ),
+    },
+    {
+      slug: "03",
+      name: "What I shipped · Coding Form",
+      selfContained: true,
+      content: (
+        <section className="wipu-sample-slide wpd-fortran-slide" data-cs-slide-content="fortran">
+          <FortranShippedSheet />
+        </section>
       ),
     },
     {
@@ -580,7 +591,7 @@ export const teachingGeminiToSee: CaseStudyDeckEntry = {
             />
             <div className="wipu-sample-video-frame">
               <iframe
-                src="https://www.youtube-nocookie.com/embed/SAWOLJRjBt0?rel=0&playsinline=1&start=291"
+                src="https://www.youtube-nocookie.com/embed/SAWOLJRjBt0?rel=0&playsinline=1&start=291&autoplay=1&mute=1"
                 title="Multimodal Launcher at Samsung Galaxy Unpacked 2025"
                 className="wipu-sample-video-iframe"
                 loading="lazy"

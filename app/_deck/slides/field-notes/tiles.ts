@@ -101,18 +101,17 @@ export const CARDS: CardTile[] = fieldNotes.cards.map((card, i) => ({
   ...CARD_LAYOUT[i],
 }));
 
-/* ── Layout patterns ──────────────────────────────────────────────────
-   Three named variants. Each is a SlotSpec[]; the picker pipeline is
-   identical, only the input mix changes. Cards always occupy the same
-   five slots (defined in CARDS via CARD_LAYOUT). The 7-col grid uses
-   grid-auto-flow:row (not dense) so that the breathing scheduler can
-   pair same-row 1x1+2x1 swaps without tiles jumping rows; this means
-   over-using 2-wide tiles strands column 7. All variants keep ≥3 2x1
-   and ≥22 1x1 so breathing always has eligible rows.
+/* ── Layout pattern ───────────────────────────────────────────────────
+   Single layout (Editorial). Cards always occupy the same five slots
+   (defined in CARDS via CARD_LAYOUT). The 7-col grid uses
+   grid-auto-flow:row (not dense) so the breathing scheduler can pair
+   same-row 1x1+2x1 swaps without tiles jumping rows; this means
+   over-using 2-wide tiles strands column 7. Keep ≥3 2x1 and ≥22 1x1 so
+   breathing always has eligible rows.
 
    IMPORTANT: card slots come first (ordered cardIdx 0..4) because the
-   stratifiedSlotShuffle in index treats every non-1x1 the same; what
-   matters for layout is the count and size mix, not the array order. */
+   stratifiedSlotShuffle treats every non-1x1 the same; what matters
+   for layout is the count and size mix, not the array order. */
 export type SlotSpec =
   | {
       kind: "image";
@@ -149,21 +148,9 @@ function imgSlots(
   return out;
 }
 
-/* Variant A — Mosaic. Quiet scrapbook with sparse hero moments. A field
-   of 1x1 squares broken up by 2x2 anchors and 3x2 wide heroes; reads as
-   a calm, dense pattern with occasional rest stops. ~54 slots, 49 image. */
-export const LAYOUT_MOSAIC: SlotSpec[] = [
-  ...imgSlots("2x2", 6),
-  ...imgSlots("3x2", 3),
-  ...CARD_SLOTS,
-  ...imgSlots("2x1", 4, [0.05, 0.04, 0.06]),
-  ...imgSlots("1x2", 4, [0.05, 0.06, 0.04]),
-  ...imgSlots("1x1", 32, [0.05, 0.07, 0.06, 0.04, 0.08]),
-];
-
-/* Variant B — Editorial. Magazine spread. Big squares + wide 3x2 heroes
-   dominate; only a handful of small tiles. Each image earns more weight.
-   ~38 slots, 33 image. */
+/* Editorial layout — magazine spread. Big squares + wide 3x2 heroes
+   dominate; a handful of small tiles for rhythm. Each image earns more
+   weight. ~38 slots, 33 image. */
 export const LAYOUT_EDITORIAL: SlotSpec[] = [
   ...imgSlots("2x2", 8),
   ...imgSlots("3x2", 4),
@@ -172,26 +159,6 @@ export const LAYOUT_EDITORIAL: SlotSpec[] = [
   ...imgSlots("1x2", 3, [0.05, 0.06, 0.04]),
   ...imgSlots("1x1", 15, [0.05, 0.07, 0.06, 0.04]),
 ];
-
-/* Variant C — Salon. Full mixture, every size in active rotation. Heavy
-   on landscape AND portrait mediums plus a couple 3x2 heroes; 1x1s are
-   connective tissue, not the dominant element. ~61 slots, 56 image. */
-export const LAYOUT_SALON: SlotSpec[] = [
-  ...imgSlots("2x2", 5),
-  ...imgSlots("3x2", 2),
-  ...CARD_SLOTS,
-  ...imgSlots("2x1", 11, [0.05, 0.04, 0.06]),
-  ...imgSlots("1x2", 10, [0.05, 0.06, 0.04]),
-  ...imgSlots("1x1", 28, [0.05, 0.07, 0.06, 0.04, 0.08]),
-];
-
-export type VariantId = "mosaic" | "editorial" | "salon";
-
-export const LAYOUT_VARIANTS: Record<VariantId, SlotSpec[]> = {
-  mosaic: LAYOUT_MOSAIC,
-  editorial: LAYOUT_EDITORIAL,
-  salon: LAYOUT_SALON,
-};
 
 /* ── PRNG ───────────────────────────────────────────────────────────── */
 function mulberry32(seed: number): () => number {
@@ -481,7 +448,7 @@ export function buildTiles(
 ): Tile[] {
   const rand = opts.rand ?? Math.random;
   const cap = opts.cap ?? PER_BUCKET_CAP;
-  const pattern = opts.pattern ?? LAYOUT_MOSAIC;
+  const pattern = opts.pattern ?? LAYOUT_EDITORIAL;
   const pool = buildPool(buckets, cap, rand);
   const slots = fitToGrid(stratifiedSlotShuffle(pattern, rand));
   const out: Tile[] = [];

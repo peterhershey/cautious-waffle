@@ -219,7 +219,11 @@ img.wipu-sample-tl-image {
   max-height: 60svh;
 }
 .wipu-sample-tl-images img.wipu-sample-tl-image {
-  flex: 1 1 0;
+  /* Auto basis (not 0) so each img sizes to its intrinsic aspect; flex
+     shrink fits them together within the figure. Equal-width basis (1 1 0)
+     forced object-fit letterboxing on off-aspect bitmaps and the rounded
+     mask sat on the empty letterbox rather than the bitmap corners. */
+  flex: 0 1 auto;
   min-width: 0;
   max-height: 60svh;
 }
@@ -232,6 +236,51 @@ img.wipu-sample-tl-image {
     rgba(255, 255, 255, 0.1) 0%,
     transparent 65%
   );
+}
+/* Video stand-in for a timeline figure slot. Outer stage carries the
+   blurred Philips-Hue glow (cannot live inside the frame because the
+   frame clips with overflow:hidden for the rounded mask). Inner frame
+   holds the iframe with overscan to push YouTube's pillarbox bars off
+   the visible area — tweak --zoom if the video's natural aspect needs
+   more or less overscan. */
+.wpd-tl-video-stage {
+  position: relative;
+  isolation: isolate;
+  width: min(1080px, 78vw);
+  aspect-ratio: 16 / 9;
+  max-height: 60svh;
+  --zoom: 1.35;
+}
+.wpd-tl-video-glow {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-position: 50%;
+  background-size: cover;
+  filter: blur(112px) saturate(1.5);
+  opacity: 0.55;
+  border-radius: 40px;
+  transform: scale(1.18) translateY(5%);
+}
+.wpd-tl-video-frame {
+  position: absolute;
+  inset: 0;
+  border-radius: 40px;
+  overflow: hidden;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+  background: #000;
+}
+.wpd-tl-video-frame > iframe {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+  transform: translate(-50%, -50%) scale(var(--zoom));
+  transform-origin: center;
 }
 .wipu-sample-tl-image[data-tint="terracotta"] {
   background: linear-gradient(135deg, #7a2e15 0%, #1f1410 100%);

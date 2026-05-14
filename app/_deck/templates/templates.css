@@ -898,6 +898,15 @@
   align-items: center;
   justify-content: center;
   min-width: 0;
+  /* Optical-center nudge: the giant stroke number top-weights the
+     left column, so geometric centering reads low next to the quote.
+     Lift slightly so the eye lands at the same height on both sides. */
+  transform: translateY(-2.5vh);
+}
+@media (max-width: 1024px) {
+  .wipu-tpl-mqs-left {
+    transform: none;
+  }
 }
 .wipu-tpl-mqs-left .wipu-sample-heroMetric {
   text-align: center;

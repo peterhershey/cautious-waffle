@@ -9,7 +9,10 @@ export const COOKIE_NAME = "wpd_auth";
 const COOKIE_MARKER = "wpd_auth_v1";
 
 function getSecret(): string {
-  const secret = process.env.SITE_PASSWORD;
+  /* Trimmed: a stray space or newline riding along on a pasted env var value
+   * would otherwise reject every correct password, indistinguishably from a
+   * wrong one. A whitespace-only value now throws rather than gating on "". */
+  const secret = process.env.SITE_PASSWORD?.trim();
   if (!secret) throw new Error("SITE_PASSWORD env var is not set");
   return secret;
 }
@@ -55,7 +58,7 @@ export async function verifyCookie(value: string | undefined): Promise<boolean> 
 
 export async function verifyPassword(submitted: string): Promise<boolean> {
   try {
-    return timingSafeEqual(submitted, getSecret());
+    return timingSafeEqual(submitted.trim(), getSecret());
   } catch {
     return false;
   }

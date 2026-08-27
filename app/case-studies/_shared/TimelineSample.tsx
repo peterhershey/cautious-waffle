@@ -35,9 +35,61 @@ const ANNO_PATHS: Record<
 > = {
   tl: { d: "M 15 17 V 26 H 32 V 34", endX: 32, endY: 34, endsDown: true },
   tr: { d: "M 85 17 V 26 H 68 V 34", endX: 68, endY: 34, endsDown: true },
-  bl: { d: "M 15 83 V 74 H 32 V 66", endX: 32, endY: 66, endsDown: false },
-  br: { d: "M 85 83 V 74 H 68 V 66", endX: 68, endY: 66, endsDown: false },
+  bl: { d: "M 15 79 V 74 H 32 V 66", endX: 32, endY: 66, endsDown: false },
+  br: { d: "M 85 79 V 74 H 68 V 66", endX: 68, endY: 66, endsDown: false },
 };
+
+/* Media box in stop-relative percentage space (matches the 0–100
+   viewBox the annotation svg stretches over). */
+type MediaBox = { l: number; t: number; r: number; b: number };
+
+type AnnoDir = "down" | "up" | "left" | "right";
+type AnnoSeg = { d: string; endX: number; endY: number; dir: AnnoDir };
+
+/* The static ANNO_PATHS end-columns (32% / 68%) assume a full-width
+   16:10 figure. Narrow media (e.g. a portrait phone recording) leaves
+   the arrow floating in empty space beside it — so when the media box
+   has been measured, re-aim the leader at the media: keep the static
+   path while its end column hits the media; otherwise run the rail
+   horizontally and point at the media's near edge from the side. */
+function annoPath(
+  position: TimelineStopAnnotation["position"],
+  box?: MediaBox,
+): AnnoSeg {
+  const f = ANNO_PATHS[position];
+  const fallback: AnnoSeg = { ...f, dir: f.endsDown ? "down" : "up" };
+  if (!box || box.r <= box.l) return fallback;
+  if (f.endX >= box.l + 4 && f.endX <= box.r - 4) return fallback;
+
+  const isLeft = position === "tl" || position === "bl";
+  const top = position === "tl" || position === "tr";
+  const startX = isLeft ? 15 : 85;
+  const startY = top ? 17 : 79;
+  const railY = top ? 26 : 74;
+
+  if (railY > box.t + 3 && railY < box.b - 3) {
+    // Side approach: rail height crosses the media — stop just short of
+    // its near edge and point into it.
+    const endX = isLeft ? box.l - 1.5 : box.r + 1.5;
+    return {
+      d: `M ${startX} ${startY} V ${railY} H ${endX}`,
+      endX,
+      endY: railY,
+      dir: isLeft ? "right" : "left",
+    };
+  }
+
+  // Rail clears the media vertically — keep the vertical drop but pull
+  // the end column inside the media's horizontal span.
+  const inset = Math.min(8, (box.r - box.l) * 0.2);
+  const endX = isLeft ? box.l + inset : box.r - inset;
+  return {
+    d: `M ${startX} ${startY} V ${railY} H ${endX} V ${f.endY}`,
+    endX,
+    endY: f.endY,
+    dir: fallback.dir,
+  };
+}
 
 const DEFAULT_STOPS: TimelineStop[] = [
   { tint: "terracotta", title: "Lorem Ipsum", date: "FEB 2024" },
@@ -73,7 +125,64 @@ export function TimelineSample({
   const trackRef = useRef<HTMLDivElement | null>(null);
   const fillRef = useRef<HTMLSpanElement | null>(null);
   const [active, setActive] = useState(0);
+  const [mediaBoxes, setMediaBoxes] = useState<Record<number, MediaBox>>({});
   const n = stops.length;
+
+  /* Measure each annotated stop's media box so leaders can aim at it.
+     offset* values are untransformed layout space — the same space the
+     annotation svg stretches over, and immune to the inactive figure's
+     scale(0.86). Lazy imgs / metadata-preloaded videos re-measure on load. */
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    const stopEls = Array.from(
+      track.querySelectorAll<HTMLElement>(".wipu-sample-tl-stop"),
+    );
+
+    const measure = () => {
+      const next: Record<number, MediaBox> = {};
+      stopEls.forEach((el, i) => {
+        if (!stops[i]?.annotations?.length) return;
+        const media = el.querySelector<HTMLElement>(
+          ".wipu-sample-tl-images, .wipu-sample-tl-image",
+        );
+        if (!media || !media.offsetWidth) return;
+        let l = 0;
+        let t = 0;
+        let node: HTMLElement | null = media;
+        while (node && node !== el) {
+          l += node.offsetLeft;
+          t += node.offsetTop;
+          node = node.offsetParent as HTMLElement | null;
+        }
+        const w = el.offsetWidth;
+        const h = el.offsetHeight;
+        if (node !== el || !w || !h) return;
+        next[i] = {
+          l: (l / w) * 100,
+          t: (t / h) * 100,
+          r: ((l + media.offsetWidth) / w) * 100,
+          b: ((t + media.offsetHeight) / h) * 100,
+        };
+      });
+      setMediaBoxes(next);
+    };
+
+    measure();
+    window.addEventListener("resize", measure);
+    const mediaEls = Array.from(track.querySelectorAll("img, video"));
+    mediaEls.forEach((m) => {
+      m.addEventListener("load", measure);
+      m.addEventListener("loadedmetadata", measure);
+    });
+    return () => {
+      window.removeEventListener("resize", measure);
+      mediaEls.forEach((m) => {
+        m.removeEventListener("load", measure);
+        m.removeEventListener("loadedmetadata", measure);
+      });
+    };
+  }, [stops]);
 
   // Inside a CaseStudyDeck, the scroll source is the deck container; outside
   // (e.g. standalone preview routes) it falls back to window.
@@ -180,29 +289,58 @@ export function TimelineSample({
                     className="wipu-sample-tl-images"
                     data-count={stop.images.length}
                   >
-                    {stop.images.map((img, j) => (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        key={j}
-                        className="wipu-sample-tl-image"
-                        src={img.src}
-                        alt={img.alt}
-                        loading={i === 0 ? "eager" : "lazy"}
-                        decoding="async"
-                        draggable={false}
-                      />
-                    ))}
+                    {stop.images.map((img, j) =>
+                      /\.(mp4|webm|mov)$/i.test(img.src) ? (
+                        <video
+                          key={j}
+                          className="wipu-sample-tl-image"
+                          src={img.src}
+                          aria-label={img.alt}
+                          autoPlay
+                          loop
+                          muted
+                          playsInline
+                          preload="metadata"
+                          draggable={false}
+                        />
+                      ) : (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          key={j}
+                          className="wipu-sample-tl-image"
+                          src={img.src}
+                          alt={img.alt}
+                          loading={i === 0 ? "eager" : "lazy"}
+                          decoding="async"
+                          draggable={false}
+                        />
+                      ),
+                    )}
                   </div>
                 ) : stop.image ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    className="wipu-sample-tl-image"
-                    src={stop.image.src}
-                    alt={stop.image.alt}
-                    loading={i === 0 ? "eager" : "lazy"}
-                    decoding="async"
-                    draggable={false}
-                  />
+                  /\.(mp4|webm|mov)$/i.test(stop.image.src) ? (
+                    <video
+                      className="wipu-sample-tl-image"
+                      src={stop.image.src}
+                      aria-label={stop.image.alt}
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                      preload="metadata"
+                      draggable={false}
+                    />
+                  ) : (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      className="wipu-sample-tl-image"
+                      src={stop.image.src}
+                      alt={stop.image.alt}
+                      loading={i === 0 ? "eager" : "lazy"}
+                      decoding="async"
+                      draggable={false}
+                    />
+                  )
                 ) : (
                   <div
                     className="wipu-sample-tl-image"
@@ -233,7 +371,7 @@ export function TimelineSample({
                     aria-hidden="true"
                   >
                     {stop.annotations.map((a, j) => {
-                      const seg = ANNO_PATHS[a.position];
+                      const seg = annoPath(a.position, mediaBoxes[i]);
                       return (
                         <path
                           key={`anno-line-${j}`}
@@ -250,13 +388,11 @@ export function TimelineSample({
                     })}
                   </svg>
                   {stop.annotations.map((a, j) => {
-                    const seg = ANNO_PATHS[a.position];
+                    const seg = annoPath(a.position, mediaBoxes[i]);
                     return (
                       <span
                         key={`anno-arrow-${j}`}
-                        className={`wipu-sample-tl-anno-arrow${
-                          seg.endsDown ? " is-down" : " is-up"
-                        }`}
+                        className={`wipu-sample-tl-anno-arrow is-${seg.dir}`}
                         style={{
                           left: `${seg.endX}%`,
                           top: `${seg.endY}%`,

@@ -1,5 +1,18 @@
 /* Sample presentation — shows one of each template with lorem ipsum */
 
+/* Self-hosted Material Symbols for direct-mounted prototype slides —
+   same variable font (opsz/wght/FILL/GRAD) the prototypes' standalone
+   layout pulls from Google Fonts, but with zero remote dependency so
+   the deck presents reliably offline. display=block keeps ligature
+   names invisible until glyphs are ready (correct for icons). */
+@font-face {
+  font-family: "Material Symbols Rounded";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url(/fonts/material-symbols-rounded.woff2) format("woff2");
+}
+
 /* The case-study root owns its own scroll, just like the home page's
    `.wipu-deck`. Containing the scroll here (rather than scrolling the
    window) sidesteps a long list of browser quirks that fight a JS-driven
@@ -16,15 +29,35 @@
 }
 .wipu-sample-root::-webkit-scrollbar { display: none; }
 
+/* Every slide lives in the DOM at once. Pause CSS keyframe animations on
+   slides that aren't active — kills off-screen tile drift, flowchart
+   marching-dash / gel-blob loops, etc. that otherwise run forever and
+   contend for the compositor. Critical here because the prototype slide
+   mounts the full prototype component tree on this page; quiet
+   neighbours keep it responsive — and this rule now also freezes the
+   prototype's own animations while its slide is inactive. Mirrors the home
+   deck's rule in app/_deck/styles/deck.css. Keyed on the slide-index attr
+   so it covers both the <section> and the self-contained wrapper. The
+   active slide animates normally; transitions are untouched. */
+[data-cs-slide-index]:not([data-active="true"]),
+[data-cs-slide-index]:not([data-active="true"]) *,
+[data-cs-slide-index]:not([data-active="true"]) *::before,
+[data-cs-slide-index]:not([data-active="true"]) *::after {
+  animation-play-state: paused !important;
+}
+
 .wipu-sample-slide {
   min-height: 100svh;
-  padding: 64px 48px;
+  /* Vertical padding shrinks on short windows so content-heavy slides keep
+     fitting (and stay fully visible) instead of growing taller than the
+     viewport — which, in a snap deck, leaves the bottom unreachable. */
+  padding: clamp(28px, 7vh, 64px) 48px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   justify-content: center;
   position: relative;
-  border-bottom: 1px dashed var(--wipu-rule);
+  border-bottom: var(--wipu-dash-soft);
 }
 
 /* Mobile (touch) only: native scroll with proximity snap. The JS
@@ -44,7 +77,7 @@
   left: 48px;
   font-family: var(--wipu-mono);
   font-size: 11px;
-  letter-spacing: 0.18em;
+  letter-spacing: var(--wipu-track-eyebrow);
   text-transform: uppercase;
   color: var(--wipu-ink-dim);
 }
@@ -78,7 +111,7 @@
   margin-top: 24px;
   font-size: 14px;
   font-style: normal;
-  letter-spacing: 0.14em;
+  letter-spacing: var(--wipu-track-tight);
   text-transform: uppercase;
   color: var(--wipu-ink-dim);
 }
@@ -121,7 +154,7 @@
   position: relative;
   width: 100%;
   height: 500svh; /* STOPS.length (5) * 100svh — keep in sync with JS */
-  border-bottom: 1px dashed var(--wipu-rule);
+  border-bottom: var(--wipu-dash-soft);
 }
 
 /* Invisible snap markers — one per stop. If scroll-snap is enabled on
@@ -149,7 +182,7 @@
   width: 500%; /* STOPS.length * 100% */
   height: 100%;
   will-change: transform;
-  transition: transform 80ms linear;
+  transition: transform var(--wipu-dur-xfast) linear;
 }
 
 .wipu-sample-tl-stop {
@@ -173,7 +206,7 @@
   height: 100%;
   max-height: 100%;
   max-width: 100%;
-  transition: transform 560ms cubic-bezier(0.2, 0.6, 0.2, 1),
+  transition: transform 560ms var(--wipu-ease),
     opacity 560ms ease;
   transform: scale(0.86);
   opacity: 0.55;
@@ -194,7 +227,12 @@
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
   user-select: none;
 }
-img.wipu-sample-tl-image {
+/* Real media (img or video) hugs its intrinsic aspect so the rounded
+   mask sits on the bitmap corners, not on a letterboxed 16/10 box —
+   a portrait phone recording otherwise renders square-cornered inside
+   an invisible landscape frame. */
+img.wipu-sample-tl-image,
+video.wipu-sample-tl-image {
   display: block;
   width: auto;
   height: auto;
@@ -282,6 +320,30 @@ img.wipu-sample-tl-image {
   transform: translate(-50%, -50%) scale(var(--zoom));
   transform-origin: center;
 }
+/* Transient mute-state pill for embeds with the M hotkey. Sits inside
+   the (overflow:hidden, rounded) video frame, bottom center. */
+.wipu-video-mute-pill {
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  z-index: 2;
+  font-family: var(--wipu-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--wipu-ink);
+  background: rgba(0, 0, 0, 0.62);
+  border-radius: 999px;
+  padding: 7px 14px;
+  pointer-events: none;
+  animation: wipu-video-mute-pill-in 160ms ease;
+}
+@keyframes wipu-video-mute-pill-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(4px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
 .wipu-sample-tl-image[data-tint="terracotta"] {
   background: linear-gradient(135deg, #7a2e15 0%, #1f1410 100%);
 }
@@ -302,7 +364,7 @@ img.wipu-sample-tl-image {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: var(--wipu-sp-2xs);
   text-align: center;
 }
 
@@ -321,7 +383,7 @@ img.wipu-sample-tl-image {
 .wipu-sample-tl.is-low-titles .wipu-sample-tl-image,
 .wipu-sample-tl.is-low-titles .wipu-sample-tl-images {
   transform: scale(0.86);
-  transition: transform 560ms cubic-bezier(0.2, 0.6, 0.2, 1);
+  transition: transform 560ms var(--wipu-ease);
 }
 .wipu-sample-tl.is-low-titles .wipu-sample-tl-stop.is-active .wipu-sample-tl-image,
 .wipu-sample-tl.is-low-titles .wipu-sample-tl-stop.is-active .wipu-sample-tl-images {
@@ -352,7 +414,7 @@ img.wipu-sample-tl-image {
   pointer-events: none;
   color: var(--wipu-mustard);
   opacity: 0;
-  transition: opacity 380ms ease 200ms;
+  transition: opacity var(--wipu-dur-slow) ease var(--wipu-dur-base);
   z-index: 3;
 }
 .wipu-sample-tl-stop.is-active .wipu-sample-tl-anno-svg {
@@ -383,7 +445,7 @@ img.wipu-sample-tl-image {
   z-index: 3;
   color: var(--wipu-mustard);
   opacity: 0;
-  transition: opacity 380ms ease 320ms;
+  transition: opacity var(--wipu-dur-slow) ease var(--wipu-dur-slow);
 }
 .wipu-sample-tl-anno-arrow.is-down {
   border-left: 5px solid transparent;
@@ -395,25 +457,39 @@ img.wipu-sample-tl-image {
   border-right: 5px solid transparent;
   border-bottom: 7px solid currentColor;
 }
+/* Side-approach variants — used when the media is too narrow for the
+   leader's end column, so it runs horizontally and points at the edge. */
+.wipu-sample-tl-anno-arrow.is-left {
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-right: 7px solid currentColor;
+}
+.wipu-sample-tl-anno-arrow.is-right {
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 7px solid currentColor;
+}
 .wipu-sample-tl-stop.is-active .wipu-sample-tl-anno-arrow {
   opacity: 0.85;
 }
 
 .wipu-sample-tl-anno {
   position: absolute;
-  width: clamp(220px, 22vw, 320px);
+  width: max-content;
+  max-width: clamp(220px, 26vw, 360px);
+  text-wrap: balance;
   font-family: var(--wipu-mono);
   font-size: clamp(11px, 0.95vw, 13px);
   line-height: 1.55;
   letter-spacing: 0.02em;
   color: var(--wipu-ink);
   background: var(--wipu-bg-elev);
-  border-radius: 12px;
+  border-radius: var(--wipu-frame-radius);
   padding: 16px 20px;
   z-index: 4;
   opacity: 0;
   transform: translateY(-6px);
-  transition: opacity 380ms ease 250ms, transform 380ms ease 250ms;
+  transition: opacity var(--wipu-dur-slow) ease 250ms, transform var(--wipu-dur-slow) ease 250ms;
 }
 .wipu-sample-tl-stop.is-active .wipu-sample-tl-anno {
   opacity: 1;
@@ -434,7 +510,7 @@ img.wipu-sample-tl-image {
   font-family: var(--wipu-mono);
   font-size: 10px;
   font-weight: 500;
-  letter-spacing: 0.24em;
+  letter-spacing: var(--wipu-track-wide);
   text-transform: uppercase;
   color: var(--wipu-ink-faint);
 }
@@ -454,7 +530,7 @@ img.wipu-sample-tl-image {
   width: 100%;
   height: 2px;
   background: var(--wipu-rule-strong);
-  border-radius: 2px;
+  border-radius: var(--wipu-r-xs);
 }
 .wipu-sample-tl-fill {
   position: absolute;
@@ -463,9 +539,9 @@ img.wipu-sample-tl-image {
   height: 100%;
   width: 0%;
   background: var(--wipu-ink);
-  border-radius: 2px;
+  border-radius: var(--wipu-r-xs);
   will-change: width;
-  transition: width 80ms linear;
+  transition: width var(--wipu-dur-xfast) linear;
 }
 
 .wipu-sample-tl-tick {
@@ -483,8 +559,8 @@ img.wipu-sample-tl-image {
   background: var(--wipu-bg);
   border: 2px solid var(--wipu-rule-strong);
   box-shadow: 0 0 0 4px var(--wipu-bg);
-  transition: background 220ms ease, border-color 220ms ease,
-    transform 220ms cubic-bezier(0.2, 0.6, 0.2, 1);
+  transition: background var(--wipu-dur-base) ease, border-color var(--wipu-dur-base) ease,
+    transform var(--wipu-dur-base) var(--wipu-ease);
 }
 .wipu-sample-tl-tick.is-reached .wipu-sample-tl-tick-dot {
   background: var(--wipu-ink);
@@ -505,11 +581,11 @@ img.wipu-sample-tl-image {
   font-family: var(--wipu-mono);
   font-size: 10px;
   font-weight: 500;
-  letter-spacing: 0.2em;
+  letter-spacing: var(--wipu-track-eyebrow);
   text-transform: uppercase;
   color: var(--wipu-ink-faint);
   white-space: nowrap;
-  transition: color 220ms ease;
+  transition: color var(--wipu-dur-base) ease;
 }
 .wipu-sample-tl-tick.is-active .wipu-sample-tl-tick-label {
   color: var(--wipu-ink);
@@ -576,7 +652,7 @@ img.wipu-sample-tl-image {
   margin: 0 auto;
 }
 .wipu-sample-explore-tile {
-  border-radius: 16px;
+  border-radius: var(--wipu-r-xl);
   position: relative;
   overflow: hidden;
   grid-column: span 2;
@@ -621,7 +697,7 @@ img.wipu-sample-tl-image {
 }
 .wipu-sample-heroMetric-lbl {
   font-size: 18px;
-  letter-spacing: 0.16em;
+  letter-spacing: var(--wipu-track-tight);
   text-transform: uppercase;
   color: var(--wipu-ink);
   margin-bottom: 16px;
@@ -643,6 +719,12 @@ img.wipu-sample-tl-image {
   width: 100%;
   max-width: min(1100px, 92vw);
   height: auto;
+  /* Short glyph runs (e.g. "+17%") have a square-ish aspect, so at full
+     width the SVG can grow taller than the slide and clip the label.
+     Cap height to the slide's usable space (100svh minus slide padding,
+     label, and breathing room) — preserveAspectRatio keeps the glyphs
+     bottom-aligned so the label stays tight underneath. */
+  max-height: calc(100svh - 240px);
   /* Tight gap to the label below — pulls the subtitle in close to the
      number so the stack doesn't feel bottom-heavy. */
   margin: 0 auto 12px;
@@ -650,7 +732,7 @@ img.wipu-sample-tl-image {
   overflow: visible;
   /* Hide until measurement settles to avoid a flash of mis-sized text. */
   opacity: 0;
-  transition: opacity 200ms ease-out;
+  transition: opacity var(--wipu-dur-base) ease-out;
 }
 .wipu-sample-heroMetric-svg[data-ready="true"] {
   opacity: 1;
@@ -712,7 +794,7 @@ img.wipu-sample-tl-image {
 .wipu-sample-metric-n[data-tone="navy"] { color: var(--wipu-navy); }
 .wipu-sample-metric-lbl {
   font-size: 12px;
-  letter-spacing: 0.14em;
+  letter-spacing: var(--wipu-track-tight);
   text-transform: uppercase;
   color: var(--wipu-ink-dim);
   line-height: 1.4;
@@ -797,7 +879,7 @@ img.wipu-sample-tl-image {
 .wipu-sample-press-attr {
   font-family: var(--wipu-mono);
   font-size: 11px;
-  letter-spacing: 0.18em;
+  letter-spacing: var(--wipu-track-eyebrow);
   text-transform: uppercase;
   color: var(--wipu-ink-faint);
   margin: 0;
@@ -828,22 +910,52 @@ img.wipu-sample-tl-image {
   max-width: min(960px, 80vw);
 }
 
-/* Prototype — full-bleed embed of the real /prototypes/<slug> page.
-   Self-contained slide: no inset, no border, no shadow — the prototype
-   IS the slide. Sample/preview wrappers are bypassed via SELF_CONTAINED. */
+/* Prototype — direct mount of the real prototype components (see
+   PrototypeEmbed.tsx). Self-contained slide: no inset, no border, no
+   shadow — the prototype IS the slide. Sample/preview wrappers are
+   bypassed via SELF_CONTAINED. */
 .wipu-sample-proto {
   display: block;
+  position: relative; /* anchor for the re-anchored toggles below */
+  overflow: hidden;   /* clip any vh/svh delta bleed */
   width: 100%;
   height: 100svh;
   margin: 0;
   padding: 0;
   background: var(--wipu-bg);
 }
-.wipu-sample-proto-iframe {
-  width: 100%;
+
+/* Host-scoped overrides for the direct-mounted prototype. theme.css is
+   written for a full-viewport document (standalone pages + the terminal's
+   ?embed=1 iframes) and must stay untouched; in the deck the prototype
+   fills its 100svh slide instead. Two-class specificity beats every
+   single-class theme.css rule, including those inside media queries. */
+.wipu-sample-proto .proto-root {
   height: 100%;
-  border: 0;
-  display: block;
+  min-height: 0; /* kill theme.css's min-height: 100vh */
+}
+.wipu-sample-proto .proto-stage {
+  height: 100%; /* not 100vh */
+}
+/* Page-fixed top-right toggles (theme.css) would float over neighbouring
+   slides when scrolled past — pin them to the slide instead. The
+   --stage-pad-* offsets inherit from .proto-stage, so they keep working. */
+.wipu-sample-proto .proto-phone-toggles {
+  position: absolute;
+}
+/* Phone + backlight size off the viewport (vh) standalone; inside the deck
+   use svh so they match the 100svh slide exactly. Desktop only — theme.css's
+   own ≤900px (width-driven) and ≤720px (full-bleed) phone rules are
+   single-class and would otherwise lose to this two-class override. */
+@media (min-width: 901px) {
+  .wipu-sample-proto .proto-phone,
+  .wipu-sample-proto .proto-phone-backlight {
+    height: calc(100svh - (var(--stage-pad-y, 40px) * 2));
+  }
+}
+/* Don't let scenario-list scrolling chain into the deck's scroll container. */
+.wipu-sample-proto .proto-panel {
+  overscroll-behavior: contain;
 }
 
 /* Force-dark slides: redeclare the dark token set on the section itself
@@ -861,7 +973,7 @@ img.wipu-sample-tl-image {
   --wipu-rule-strong: #2d2d33;
   background: var(--wipu-bg);
   color: var(--wipu-ink);
-  transition: background-color 240ms ease, color 240ms ease;
+  transition: background-color var(--wipu-dur-base) ease, color var(--wipu-dur-base) ease;
 }
 
 /* Video embed — centered 16:9 YouTube iframe with hue-sync ambient glow.
@@ -895,7 +1007,7 @@ img.wipu-sample-tl-image {
   filter: blur(112px) saturate(1.5);
   opacity: 0.5;
   transform: scale(1.18) translate(0, 5%);
-  border-radius: 22px;
+  border-radius: var(--wipu-r-2xl);
   z-index: -1;
   pointer-events: none;
 }
@@ -903,7 +1015,7 @@ img.wipu-sample-tl-image {
   position: relative;
   width: 100%;
   height: 100%;
-  border-radius: 22px;
+  border-radius: var(--wipu-r-2xl);
   overflow: hidden;
   /* Black fill behind the iframe — holds shape before YouTube paints
      and avoids a Y-biased drop shadow (the ambient glow is the lift). */
@@ -951,8 +1063,8 @@ img.wipu-sample-tl-image {
   object-fit: cover;
   display: block;
   user-select: none;
-  transition: transform 480ms cubic-bezier(0.22, 0.8, 0.2, 1),
-    filter 320ms ease;
+  transition: transform 480ms var(--wipu-ease),
+    filter var(--wipu-dur-slow) ease;
   filter: brightness(0.78) saturate(1.05);
 }
 .wipu-share-embed-cta {
@@ -961,7 +1073,7 @@ img.wipu-sample-tl-image {
   bottom: clamp(16px, 4%, 28px);
   transform: translateX(-50%);
   padding: 10px 18px;
-  border-radius: 999px;
+  border-radius: var(--wipu-r-pill);
   background: color-mix(in srgb, var(--wipu-bg) 72%, transparent);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
@@ -971,8 +1083,8 @@ img.wipu-sample-tl-image {
   font-size: 12px;
   letter-spacing: 0.06em;
   white-space: nowrap;
-  transition: transform 220ms cubic-bezier(0.22, 0.8, 0.2, 1),
-    background 220ms ease, border-color 220ms ease;
+  transition: transform var(--wipu-dur-base) var(--wipu-ease),
+    background var(--wipu-dur-base) ease, border-color var(--wipu-dur-base) ease;
 }
 .wipu-share-embed-link:hover .wipu-share-embed-cover {
   transform: scale(1.02);
@@ -1011,12 +1123,12 @@ img.wipu-sample-tl-image {
   gap: 14px;
   padding: 20px 28px;
   background: none;
-  border: 1px dashed var(--wipu-rule-strong);
-  border-radius: 12px;
+  border: var(--wipu-dash);
+  border-radius: var(--wipu-frame-radius);
   color: var(--wipu-ink);
   cursor: pointer;
   font-family: var(--wipu-mono);
-  transition: transform 220ms ease, border-color 220ms ease;
+  transition: transform var(--wipu-dur-base) ease, border-color var(--wipu-dur-base) ease;
 }
 .wipu-sample-archive-trigger:hover {
   transform: translateY(-4px);
@@ -1027,7 +1139,7 @@ img.wipu-sample-tl-image {
 }
 .wipu-sample-archive-lbl {
   font-size: 11px;
-  letter-spacing: 0.18em;
+  letter-spacing: var(--wipu-track-eyebrow);
   text-transform: uppercase;
   color: var(--wipu-ink-dim);
 }
@@ -1044,7 +1156,7 @@ img.wipu-sample-tl-image {
   padding: 48px 24px 64px;
   font-family: var(--wipu-mono);
   font-size: 11px;
-  letter-spacing: 0.18em;
+  letter-spacing: var(--wipu-track-eyebrow);
   text-transform: uppercase;
   color: var(--wipu-ink-dim);
   text-decoration: none;

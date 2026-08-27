@@ -375,41 +375,58 @@ export function FortranCodingSheet() {
 const SHIPPED_META: FortranMeta = {
   program: "WHAT I'VE SHIPPED AT GEMINI",
   programmer: "PETER HERSHEY",
-  date: "2024-2025",
+  date: "2024-2026",
   page: "2 OF 2",
   graphic: "APP · MULTIMODAL · MEDIA",
   punch: "SALON",
-  identification: "TGTS · SHIPPED · 8",
+  identification: "TGTS · SHIPPED · 9",
 };
 
 const SHIPPED_LINES: FortranLine[] = [
-  { comment: true, stmt: "WHAT I'VE SHIPPED AT GEMINI · 2024-2025" },
+  { comment: true, stmt: "WHAT I'VE SHIPPED AT GEMINI · 2024-2026" },
   { comment: true },
-  { stmt: "PROGRAM SHIPPED", ident: "PH 2025" },
-  { stmt: "DIMENSION MULTIMODAL(4), MEDIA(2)", ident: "PH 2025" },
+  { stmt: "PROGRAM SHIPPED 🤖", ident: "PH 2025" },
+  { stmt: "DIMENSION MULTIMODAL(5), MEDIA(2)", ident: "PH 2025" },
   { comment: true, stmt: "THE APP" },
-  { num: "01", stmt: "CALL LAUNCH ('GEMINI APP')", ident: "PH 2025" },
+  { num: "01", stmt: "CALL LAUNCH ('GEMINI APP') 🚀", ident: "PH 2025" },
   { comment: true },
   { comment: true, stmt: "MULTIMODAL COMMUNICATION" },
-  { num: "10", stmt: "MULTIMODAL(1) = 'GEMINI LIVE VIDEO'", ident: "PH 2025" },
-  { num: "20", stmt: "MULTIMODAL(2) = 'VISUAL OVERLAYS'", ident: "PH 2025" },
+  {
+    num: "10",
+    stmt: "MULTIMODAL(1) = 'GEMINI LIVE VIDEO' 🎥",
+    ident: "PH 2025",
+  },
+  {
+    num: "20",
+    stmt: "MULTIMODAL(2) = 'VISUAL OVERLAYS' ✨",
+    ident: "PH 2025",
+  },
   {
     num: "30",
-    stmt: "MULTIMODAL(3) = 'MULTIMODAL LAUNCHER'",
+    stmt: "MULTIMODAL(3) = 'MULTIMODAL LAUNCHER' 🧩",
     ident: "PH 2025",
   },
   {
     num: "40",
-    stmt: "MULTIMODAL(4) = 'FLOATY + SCREEN CONTEXT'",
+    stmt: "MULTIMODAL(4) = 'ANDROID SCREEN CONTEXT' 📱",
+    ident: "PH 2025",
+  },
+  {
+    num: "50",
+    stmt: "MULTIMODAL(5) = 'VOICE SELECTION' 🎤",
     ident: "PH 2025",
   },
   { comment: true },
   { comment: true, stmt: "MEDIA GENERATION" },
-  { num: "50", stmt: "MEDIA(1) = 'VEO VIDEO GENERATION'", ident: "PH 2025" },
-  { num: "60", stmt: "MEDIA(2) = 'AUDIO OVERVIEWS'", ident: "PH 2025" },
+  {
+    num: "60",
+    stmt: "MEDIA(1) = 'VEO VIDEO GENERATION' 🎬",
+    ident: "PH 2025",
+  },
+  { num: "70", stmt: "MEDIA(2) = 'AUDIO OVERVIEWS' 🎧", ident: "PH 2025" },
   { comment: true },
   { comment: true, stmt: "COMMUNITY" },
-  { num: "70", stmt: "CALL HOST ('MONTHLY AI SALON')", ident: "PH 2025" },
+  { num: "80", stmt: "CALL HOST ('MONTHLY AI SALON') 🥂", ident: "PH 2025" },
   { comment: true },
   { stmt: "CALL DEPLOY (MULTIMODAL, MEDIA)", ident: "PH 2025" },
   { stmt: "STOP", ident: "PH 2025" },
@@ -417,5 +434,7 @@ const SHIPPED_LINES: FortranLine[] = [
 ];
 
 export function FortranShippedSheet() {
-  return <FortranSheet meta={SHIPPED_META} lines={SHIPPED_LINES} typing />;
+  return (
+    <FortranSheet meta={SHIPPED_META} lines={SHIPPED_LINES} totalRows={24} typing />
+  );
 }

@@ -12,9 +12,28 @@
    even at rest. The disambiguate cycle to its right (clear → suggest →
    clarify → submit) is the friction loop users get stuck in: those
    three edges animate with a marching dash so the cycle visibly
-   churns even when nothing is hovered. */
+   churns even when nothing is hovered.
 
-import { useState, type ReactNode } from "react";
+   The diagram is large and dense, so on a slide it would render too
+   small to read. This file wraps the graph in a scroll-pinned
+   "overview → zoom → pan" choreography (mirrors TimelineSample): you
+   arrive on the whole chart fit-to-viewport, it auto-zooms in after a
+   beat so the top is readable, you scroll down through the rest, then
+   the next arrow-step releases to the following slide. Reduced-motion
+   and narrow viewports get a plain scrollable fallback instead. */
+
+import {
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
+import { CaseStudyScrollContext } from "../CaseStudyDeck";
+import {
+  containerSurface,
+  springScrollTo,
+} from "../../../_deck/scroll/springScroll";
 
 type NodeKind = "terminal" | "process" | "decision";
 type Tone = "default" | "success" | "refine" | "failure" | "punt";
@@ -33,6 +52,10 @@ type FlowNode = {
   textBox?: { x: number; y: number; w: number; h: number };
   /** Marks Submit as the primary CTA — filled mustard at rest. */
   primary?: boolean;
+  /** Marks the latency-bearing step (generation): renders a slow
+      indeterminate shimmer sweep through the node to convey "this takes
+      time" without a literal "(latency)" text label. */
+  latency?: boolean;
 };
 
 type FlowEdge = {
@@ -52,7 +75,7 @@ type FlowEdge = {
 const NODES: FlowNode[] = [
   // Linear input flow — straight vertical down the center column.
   { id: "discovery", kind: "terminal", cx: 560, cy: 70, w: 180, h: 44, label: "Discovery" },
-  { id: "intent", kind: "process", cx: 560, cy: 150, w: 200, h: 44, label: "Initial intent" },
+  { id: "intent", kind: "process", cx: 560, cy: 150, w: 220, h: 44, label: "User signals intent" },
   { id: "prompt", kind: "process", cx: 560, cy: 230, w: 220, h: 44, label: "Compose prompt" },
   // Submit — the primary CTA. Bigger box, filled mustard at rest.
   {
@@ -100,7 +123,21 @@ const NODES: FlowNode[] = [
     label: "User clarifies prompt",
   },
   // Generation phase — the latency-heavy black box.
-  { id: "generate", kind: "process", cx: 560, cy: 525, w: 240, h: 44, label: "Generate (latency)" },
+  {
+    id: "generate",
+    kind: "process",
+    cx: 560,
+    cy: 525,
+    w: 240,
+    h: 52,
+    label: (
+      <>
+        <span>Gemini generates video</span>
+        <span className="wpd-flow-sub">two to three minutes</span>
+      </>
+    ),
+    latency: true,
+  },
   // While generating, users either stay in the app or background it and
   // come back to a push notification. Both routes converge into Fulfilled.
   {
@@ -162,14 +199,14 @@ const EDGES: FlowEdge[] = [
     id: "e6",
     from: "clear",
     to: "generate",
-    d: "M 560 463 V 503",
+    d: "M 560 463 V 499",
     label: { x: 580, y: 488, text: "yes" },
   },
   // The cycle's right side — suggest → clarify (up), clarify → submit (left).
   { id: "e7", from: "suggest", to: "clarify", d: "M 880 393 V 337", tone: "refine", cycle: true },
   { id: "e8", from: "clarify", to: "submit", d: "M 770 315 H 670", tone: "refine", cycle: true },
   // Generate → wait/leave decision.
-  { id: "e9", from: "generate", to: "wait_choice", d: "M 560 547 V 575" },
+  { id: "e9", from: "generate", to: "wait_choice", d: "M 560 551 V 575" },
   // Stay path — left vertex of decision out and down to "Wait in app".
   {
     id: "e9a",
@@ -218,6 +255,23 @@ const EDGES: FlowEdge[] = [
   { id: "e16", from: "diagnose", to: "punt", d: "M 900 1022 V 1050 H 1240 V 1078", tone: "punt" },
 ];
 
+/* SVG aspect ratio — viewBox is 1440 × 1160. Kept here so the choreography
+   math and the CSS `aspect-ratio` stay in sync. */
+const VB_W = 1440;
+const VB_H = 1160;
+const ASPECT = VB_W / VB_H;
+
+/* Snap stops within the slide: overview, then the chart split into a top
+   and bottom half once zoomed in. Each contributes one `.wipu-sample-tl-snap`
+   marker, which the deck's SNAP_SELECTOR treats as one arrow-key step. After
+   the last stop, the next step releases to the following slide. Keep this in
+   sync with the inline section height (`N_STOPS * 100svh`). */
+const N_STOPS = 3;
+
+/* Idle delay before the overview auto-zooms into the top of the chart. Long
+   enough to register the whole shape, short enough not to feel stuck. */
+const AUTO_ZOOM_DELAY_MS = 850;
+
 function NodeShape({ node }: { node: FlowNode }) {
   const { kind, cx, cy, w, h, primary } = node;
   if (kind === "decision") {
@@ -235,118 +289,342 @@ function NodeShape({ node }: { node: FlowNode }) {
   return <rect className="wpd-flow-shape" x={x} y={y} width={w} height={h} rx={rx} ry={rx} />;
 }
 
+/* The diagram itself — pure SVG, no layout concerns. The wrappers around it
+   (pinned/zoomed choreography vs. plain scrollable fallback) own sizing. */
+function FlowGraph({
+  className,
+  active,
+  setActive,
+}: {
+  className: string;
+  active: string | null;
+  setActive: (next: string | null | ((cur: string | null) => string | null)) => void;
+}) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 1440 1160"
+      preserveAspectRatio="xMidYMid meet"
+      role="img"
+      aria-label="User flow for video generation: discovery, prompt, the disambiguate cycle around submit, generation with a stay-or-leave fork (wait in app, or background and return via push notification), fulfillment with success and failure branches."
+    >
+      <defs>
+        <marker
+          id="wpd-flow-arrow"
+          viewBox="0 0 10 10"
+          refX="9"
+          refY="5"
+          markerWidth="7"
+          markerHeight="7"
+          orient="auto-start-reverse"
+        >
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor" />
+        </marker>
+      </defs>
+
+      {/* Edges first so nodes paint on top. */}
+      <g className="wpd-flow-edges">
+        {EDGES.map((edge) => {
+          const isActive = active === edge.from || active === edge.to;
+          return (
+            <g
+              key={edge.id}
+              className="wpd-flow-edge"
+              data-tone={edge.tone ?? "default"}
+              data-loop={edge.loop ? "true" : undefined}
+              data-cycle={edge.cycle ? "true" : undefined}
+              data-active={isActive ? "true" : undefined}
+            >
+              <path d={edge.d} markerEnd="url(#wpd-flow-arrow)" />
+              {edge.label && (
+                <text
+                  className="wpd-flow-edge-label"
+                  x={edge.label.x}
+                  y={edge.label.y}
+                  textAnchor="middle"
+                >
+                  {edge.label.text}
+                </text>
+              )}
+            </g>
+          );
+        })}
+      </g>
+
+      <g className="wpd-flow-nodes">
+        {NODES.map((node) => {
+          const tb = node.textBox ?? {
+            x: node.cx - node.w / 2,
+            y: node.cy - node.h / 2,
+            w: node.w,
+            h: node.h,
+          };
+          // Primary node (Submit) is filled with the same purple gel
+          // texture from the timeline's "what's next?" slot — three
+          // blurred blobs drifting on offset timings, scaled smaller to
+          // fit the button. Painted behind the rect outline + label.
+          const gelBox = {
+            x: node.cx - node.w / 2,
+            y: node.cy - node.h / 2,
+            w: node.w,
+            h: node.h,
+          };
+          return (
+            <g
+              key={node.id}
+              className="wpd-flow-node"
+              data-node={node.id}
+              data-kind={node.kind}
+              data-tone={node.tone ?? "default"}
+              data-primary={node.primary ? "true" : undefined}
+              data-active={active === node.id ? "true" : undefined}
+              onMouseEnter={() => setActive(node.id)}
+              onMouseLeave={() => setActive((cur) => (cur === node.id ? null : cur))}
+              onFocus={() => setActive(node.id)}
+              onBlur={() => setActive((cur) => (cur === node.id ? null : cur))}
+              tabIndex={0}
+            >
+              {node.primary && (
+                <foreignObject
+                  x={gelBox.x}
+                  y={gelBox.y}
+                  width={gelBox.w}
+                  height={gelBox.h}
+                  aria-hidden="true"
+                >
+                  <div className="wpd-flow-gel">
+                    <span className="wpd-flow-gel-blob" />
+                    <span className="wpd-flow-gel-blob" />
+                    <span className="wpd-flow-gel-blob" />
+                  </div>
+                </foreignObject>
+              )}
+              {node.latency && (
+                <foreignObject
+                  x={gelBox.x}
+                  y={gelBox.y}
+                  width={gelBox.w}
+                  height={gelBox.h}
+                  aria-hidden="true"
+                >
+                  <div className="wpd-flow-gen">
+                    <span className="wpd-flow-gen-sweep" />
+                  </div>
+                </foreignObject>
+              )}
+              <NodeShape node={node} />
+              <foreignObject x={tb.x} y={tb.y} width={tb.w} height={tb.h}>
+                <div className="wpd-flow-label">{node.label}</div>
+              </foreignObject>
+            </g>
+          );
+        })}
+      </g>
+    </svg>
+  );
+}
+
 export function VeoFlowchart() {
   const [active, setActive] = useState<string | null>(null);
+  // Default to the choreographed structure so SSR and the client's first
+  // paint agree; the effect below downgrades to the plain fallback on
+  // reduced-motion / narrow viewports after mount.
+  const [fallback, setFallback] = useState(false);
+
+  const sectionRef = useRef<HTMLDivElement | null>(null);
+  const pinRef = useRef<HTMLDivElement | null>(null);
+  const trackRef = useRef<HTMLDivElement | null>(null);
+
+  // Inside a CaseStudyDeck the scroll surface is the deck container; outside
+  // (standalone previews) it falls back to window. The auto-zoom only runs
+  // when we have a real container to spring.
+  const scrollSource = useContext(CaseStudyScrollContext);
+
+  // Decide choreography vs. fallback. Re-evaluated on viewport/motion change.
+  useEffect(() => {
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const narrow = window.matchMedia("(max-width: 820px)");
+    const sync = () => setFallback(reduced.matches || narrow.matches);
+    sync();
+    reduced.addEventListener("change", sync);
+    narrow.addEventListener("change", sync);
+    return () => {
+      reduced.removeEventListener("change", sync);
+      narrow.removeEventListener("change", sync);
+    };
+  }, []);
+
+  // Scroll-driven transform: overview → zoom (first stop) → vertical pan
+  // (remaining stops). Mirrors TimelineSample's rAF-throttled pattern, but
+  // the progress drives scale + translateY instead of a horizontal pan.
+  useEffect(() => {
+    if (fallback) return;
+    const section = sectionRef.current;
+    const pin = pinRef.current;
+    const track = trackRef.current;
+    if (!section || !pin || !track) return;
+    const scrollEl: HTMLElement | Window = scrollSource ?? window;
+
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const Wv = pin.clientWidth;
+      const Hv = pin.clientHeight;
+      if (Wv === 0 || Hv === 0) return;
+      // The graph renders at "fill width" (svgH = Wv / ASPECT) — its natural
+      // zoomed size. Overview shrinks it to fit the viewport height; the pan
+      // distance is whatever spills past the viewport at full zoom.
+      const svgH = Wv / ASPECT;
+      const overflow = Math.max(0, svgH - Hv);
+      const overviewScale = Math.min(1, Hv / svgH);
+
+      const rect = section.getBoundingClientRect();
+      const pannable =
+        N_STOPS > 1 ? ((N_STOPS - 1) / N_STOPS) * rect.height : 1;
+      const scrolled = -rect.top;
+      const progress = Math.max(0, Math.min(1, scrolled / pannable));
+
+      // First half of the scroll (stop 0 → 1) zooms in from overview to full
+      // scale, anchored at the top so reading starts at "Discovery". The
+      // remaining scroll (stop 1 → 2) holds full scale and pans downward.
+      const zoomT = Math.min(1, progress / 0.5);
+      const panT = Math.max(0, (progress - 0.5) / 0.5);
+      const scale = overviewScale + (1 - overviewScale) * zoomT;
+      const ty = -overflow * panT;
+
+      track.style.transform = `translate3d(0, ${ty}px, 0) scale(${scale})`;
+    };
+
+    const onScroll = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(update);
+    };
+    update();
+    scrollEl.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      scrollEl.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [fallback, scrollSource]);
+
+  // Auto-zoom on arrival: once the overview has been sitting fully in view
+  // and idle for a beat, spring the container down to the first zoom stop.
+  // Debounced on scroll so the deck's arrival spring (still settling) and any
+  // user scroll both reset the timer — we only fire on genuine idle, and only
+  // once per mount so scrolling back up never yanks the viewer.
+  useEffect(() => {
+    if (fallback) return;
+    const container = scrollSource;
+    const section = sectionRef.current;
+    const firstSnap = section?.querySelector<HTMLElement>(
+      ".wipu-sample-tl-snap[data-stop='0']",
+    );
+    const secondSnap = section?.querySelector<HTMLElement>(
+      ".wipu-sample-tl-snap[data-stop='1']",
+    );
+    if (!container || !section || !firstSnap || !secondSnap) return;
+
+    let armed = false;
+    let done = false;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+
+    const clearTimer = () => {
+      if (timer) {
+        clearTimeout(timer);
+        timer = null;
+      }
+    };
+
+    const targetY = () => {
+      const top = secondSnap.getBoundingClientRect().top;
+      const base = container.getBoundingClientRect().top;
+      return Math.round(top - base + container.scrollTop);
+    };
+
+    const fire = () => {
+      timer = null;
+      if (done || !armed) return;
+      // Only auto-advance from the overview zone — never yank a viewer who has
+      // already started scrolling into the chart.
+      const overviewBottom = firstSnap.getBoundingClientRect().bottom;
+      const containerTop = container.getBoundingClientRect().top;
+      if (overviewBottom - containerTop < container.clientHeight * 0.6) return;
+      done = true;
+      springScrollTo(containerSurface(container), targetY());
+    };
+
+    const scheduleFromIdle = () => {
+      if (done || !armed) return;
+      clearTimer();
+      timer = setTimeout(fire, AUTO_ZOOM_DELAY_MS);
+    };
+
+    const onScroll = () => {
+      // Any scroll (arrival spring or the viewer) restarts the idle clock.
+      if (armed) scheduleFromIdle();
+    };
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          armed = entry.intersectionRatio >= 0.9;
+          if (armed) scheduleFromIdle();
+          else clearTimer();
+        }
+      },
+      { root: container, threshold: [0, 0.9, 1] },
+    );
+    io.observe(firstSnap);
+    container.addEventListener("scroll", onScroll, { passive: true });
+
+    return () => {
+      io.disconnect();
+      container.removeEventListener("scroll", onScroll);
+      clearTimer();
+    };
+  }, [fallback, scrollSource]);
+
+  // Plain scrollable fallback — reduced motion or narrow viewport. The chart
+  // renders at a readable width and the viewer scrolls it freely; the
+  // data-allow-scroll marker stops the deck from hijacking the wheel/touch.
+  if (fallback) {
+    return (
+      <div className="wpd-flow-fallback" data-allow-scroll="true">
+        <FlowGraph
+          className="wpd-flow-svg wpd-flow-svg--fallback"
+          active={active}
+          setActive={setActive}
+        />
+      </div>
+    );
+  }
 
   return (
-    <div className="wpd-flow">
-      <svg
-        className="wpd-flow-svg"
-        viewBox="0 0 1440 1160"
-        preserveAspectRatio="xMidYMid meet"
-        role="img"
-        aria-label="User flow for video generation: discovery, prompt, the disambiguate cycle around submit, generation with a stay-or-leave fork (wait in app, or background and return via push notification), fulfillment with success and failure branches."
-      >
-        <defs>
-          <marker
-            id="wpd-flow-arrow"
-            viewBox="0 0 10 10"
-            refX="9"
-            refY="5"
-            markerWidth="7"
-            markerHeight="7"
-            orient="auto-start-reverse"
-          >
-            <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor" />
-          </marker>
-        </defs>
-
-        {/* Edges first so nodes paint on top. */}
-        <g className="wpd-flow-edges">
-          {EDGES.map((edge) => {
-            const isActive = active === edge.from || active === edge.to;
-            return (
-              <g
-                key={edge.id}
-                className="wpd-flow-edge"
-                data-tone={edge.tone ?? "default"}
-                data-loop={edge.loop ? "true" : undefined}
-                data-cycle={edge.cycle ? "true" : undefined}
-                data-active={isActive ? "true" : undefined}
-              >
-                <path d={edge.d} markerEnd="url(#wpd-flow-arrow)" />
-                {edge.label && (
-                  <text
-                    className="wpd-flow-edge-label"
-                    x={edge.label.x}
-                    y={edge.label.y}
-                    textAnchor="middle"
-                  >
-                    {edge.label.text}
-                  </text>
-                )}
-              </g>
-            );
-          })}
-        </g>
-
-        <g className="wpd-flow-nodes">
-          {NODES.map((node) => {
-            const tb = node.textBox ?? {
-              x: node.cx - node.w / 2,
-              y: node.cy - node.h / 2,
-              w: node.w,
-              h: node.h,
-            };
-            // Primary node (Submit) is filled with the same purple gel
-            // texture from the timeline's "what's next?" slot — three
-            // blurred blobs drifting on offset timings, scaled smaller to
-            // fit the button. Painted behind the rect outline + label.
-            const gelBox = {
-              x: node.cx - node.w / 2,
-              y: node.cy - node.h / 2,
-              w: node.w,
-              h: node.h,
-            };
-            return (
-              <g
-                key={node.id}
-                className="wpd-flow-node"
-                data-node={node.id}
-                data-kind={node.kind}
-                data-tone={node.tone ?? "default"}
-                data-primary={node.primary ? "true" : undefined}
-                data-active={active === node.id ? "true" : undefined}
-                onMouseEnter={() => setActive(node.id)}
-                onMouseLeave={() => setActive((cur) => (cur === node.id ? null : cur))}
-                onFocus={() => setActive(node.id)}
-                onBlur={() => setActive((cur) => (cur === node.id ? null : cur))}
-                tabIndex={0}
-              >
-                {node.primary && (
-                  <foreignObject
-                    x={gelBox.x}
-                    y={gelBox.y}
-                    width={gelBox.w}
-                    height={gelBox.h}
-                    aria-hidden="true"
-                  >
-                    <div className="wpd-flow-gel">
-                      <span className="wpd-flow-gel-blob" />
-                      <span className="wpd-flow-gel-blob" />
-                      <span className="wpd-flow-gel-blob" />
-                    </div>
-                  </foreignObject>
-                )}
-                <NodeShape node={node} />
-                <foreignObject x={tb.x} y={tb.y} width={tb.w} height={tb.h}>
-                  <div className="wpd-flow-label">{node.label}</div>
-                </foreignObject>
-              </g>
-            );
-          })}
-        </g>
-      </svg>
+    <div
+      ref={sectionRef}
+      className="wpd-flow-scroll"
+      style={{ height: `${N_STOPS * 100}svh` }}
+    >
+      {Array.from({ length: N_STOPS }, (_, i) => (
+        <div
+          key={`snap-${i}`}
+          className="wipu-sample-tl-snap"
+          data-stop={i}
+          style={{ top: `${i * 100}svh` }}
+          aria-hidden="true"
+        />
+      ))}
+      <div ref={pinRef} className="wpd-flow-pin">
+        <div ref={trackRef} className="wpd-flow-track">
+          <FlowGraph
+            className="wpd-flow-svg wpd-flow-svg--zoom"
+            active={active}
+            setActive={setActive}
+          />
+        </div>
+      </div>
     </div>
   );
 }

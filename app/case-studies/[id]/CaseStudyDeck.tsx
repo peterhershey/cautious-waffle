@@ -36,8 +36,11 @@ export type CaseStudySlide = {
   /** Force-dark slides redeclare dark tokens regardless of root theme. */
   dark?: boolean;
   /** Hide the SiteFrame chrome while this slide is active. Used by prototype
-      slides where the embedded iframe should own the entire viewport. */
+      slides where the embedded prototype should own the entire viewport. */
   hideChrome?: boolean;
+  /** Hide only the ASCII SiteFrame (keep DeckChrome nav). Used by slides
+      whose background the corner art reads poorly against (e.g. Fortran). */
+  hideSiteFrame?: boolean;
 };
 
 export type CaseStudyMeta = {
@@ -80,21 +83,26 @@ const SLIDE_INDEX_ATTR = "data-cs-slide-index";
 /* Body-level chrome toggle, driven off the active slide. Slides that
    set `hideChrome: true` (e.g. prototypes) fade the SiteFrame and
    pull the DeckChrome corners off the page so its 64×64 corner-zone
-   buttons stop intercepting clicks intended for the embedded iframe. */
-function useHideChromeForSlide(hide: boolean) {
+   buttons stop intercepting clicks intended for the embedded prototype. */
+function useHideChromeForSlide(hide: boolean, hideFrameOnly: boolean) {
   useEffect(() => {
-    if (hide) {
+    // `hideChrome` fades both the ASCII frame and the DeckChrome nav.
+    // `hideSiteFrame` fades only the ASCII frame, leaving the nav in place.
+    if (hide || hideFrameOnly) {
       document.body.dataset.hideSiteFrame = "true";
-      document.body.dataset.hideDeckChrome = "true";
     } else {
       delete document.body.dataset.hideSiteFrame;
+    }
+    if (hide) {
+      document.body.dataset.hideDeckChrome = "true";
+    } else {
       delete document.body.dataset.hideDeckChrome;
     }
     return () => {
       delete document.body.dataset.hideSiteFrame;
       delete document.body.dataset.hideDeckChrome;
     };
-  }, [hide]);
+  }, [hide, hideFrameOnly]);
 }
 
 /* Container-relative top of `el` in pixels, rounded to whole pixels —
@@ -165,6 +173,10 @@ function useCaseStudySpringNav(
       if (t) {
         const tag = t.tagName;
         if (tag === "INPUT" || tag === "TEXTAREA" || t.isContentEditable) return;
+        // A focused button keeps native Space activation (e.g. prototype
+        // controls — previously masked by the iframe boundary). Arrow keys
+        // still navigate the deck regardless of focus.
+        if (tag === "BUTTON" && e.key === " ") return;
       }
       const dir: 1 | -1 | 0 =
         e.key === "ArrowDown" ||
@@ -287,14 +299,31 @@ export function CaseStudyDeck({ slides, meta }: CaseStudyDeckProps) {
   const [container, setContainer] = useState<HTMLDivElement | null>(null);
 
   const navSlides: DeckContextSlide[] = useMemo(
-    () => slides.map((s, i) => ({ id: `${s.slug}-${i}`, label: s.name })),
+    () =>
+      slides.map((s, i) => ({
+        id: `${s.slug}-${i}`,
+        label: s.name,
+        // Structural role for the nav: "Section · X" slides (and the
+        // "… · Divider" results marker) divide chapters; hideChrome is
+        // the prototype signal (full-viewport embedded prototypes).
+        kind: s.name.startsWith("Section · ")
+          ? ("section" as const)
+          : s.name.endsWith(" · Divider")
+            ? ("section" as const)
+            : s.hideChrome
+              ? ("prototype" as const)
+              : ("slide" as const),
+      })),
     [slides],
   );
 
   const bumpNavKey = useCallback(() => setLastNavKeyAt(Date.now()), []);
 
   const { springTo } = useCaseStudySpringNav(container, bumpNavKey);
-  useHideChromeForSlide(slides[activeIndex]?.hideChrome === true);
+  useHideChromeForSlide(
+    slides[activeIndex]?.hideChrome === true,
+    slides[activeIndex]?.hideSiteFrame === true,
+  );
 
   /* Active-slide detection — IntersectionObserver scoped to the scroll
      container, with a centered trip-line. Whichever slide straddles the
@@ -382,7 +411,11 @@ export function CaseStudyDeck({ slides, meta }: CaseStudyDeckProps) {
           {slides.map((s, i) => {
             if (s.selfContained) {
               return (
-                <div key={`${s.slug}-${i}`} {...{ [SLIDE_INDEX_ATTR]: i }}>
+                <div
+                  key={`${s.slug}-${i}`}
+                  data-active={i === activeIndex ? "true" : undefined}
+                  {...{ [SLIDE_INDEX_ATTR]: i }}
+                >
                   {s.content}
                 </div>
               );
@@ -393,6 +426,7 @@ export function CaseStudyDeck({ slides, meta }: CaseStudyDeckProps) {
                 id={`slide-${s.slug}-${i}`}
                 className="wipu-sample-slide"
                 data-theme={s.dark ? "dark" : undefined}
+                data-active={i === activeIndex ? "true" : undefined}
                 {...{ [SLIDE_INDEX_ATTR]: i }}
               >
                 <div className="wipu-sample-inner">{s.content}</div>

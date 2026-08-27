@@ -49,7 +49,7 @@ export type Scenario = {
   backgroundVideo?: string;
 };
 
-export type PrototypeKind = "voice-chat" | "video-generation";
+export type PrototypeKind = "voice-chat" | "video-generation" | "image-editing";
 
 export type Prototype = {
   slug: string;
@@ -284,6 +284,17 @@ export const prototypes: Prototype[] = [
           },
         ],
       },
+    ],
+  },
+  {
+    slug: "image-editing",
+    kind: "image-editing",
+    title: "Image editing",
+    year: "2026",
+    summary:
+      "A tappable image editor where the prompt is a live reflection of what you're looking at — tap a variant or zoom into a region to rewrite the words, edit a word to regenerate the image.",
+    scenarios: [
+      { id: "futuristic-car", label: "Futuristic car", turns: [] },
     ],
   },
 ];

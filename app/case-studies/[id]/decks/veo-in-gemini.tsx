@@ -1,5 +1,4 @@
 import { ProjectAtAGlanceTemplate } from "../../../_deck/templates/ProjectAtAGlanceTemplate";
-import { HoverGif } from "../../../_deck/templates/HoverGif";
 import { ThreeUpTemplate } from "../../../_deck/templates/ThreeUpTemplate";
 import {
   GoalTemplate,
@@ -11,8 +10,13 @@ import {
   MediaTextTemplate,
   type MediaTextMedia,
 } from "../../../_deck/templates/MediaTextTemplate";
-import { VeoHero, VeoMetricHero } from "./VeoHero";
+import {
+  TimelineSample,
+  type TimelineStop,
+} from "../../_shared/TimelineSample";
+import { VeoHero, VeoMetricHero, VeoGlanceField } from "./VeoHero";
 import { VeoFlowchart } from "./VeoFlowchart";
+import { PrototypeEmbed } from "../../_shared/PrototypeEmbed";
 import type { CaseStudyDeckEntry } from "../CaseStudyDeck";
 
 const SORA_LANDSCAPE: MediaTextMedia = {
@@ -23,6 +27,38 @@ const VEO2_CAPABILITY: MediaTextMedia = {
   src: "/portfolio%20transfer/veo/veo2_stage.webp",
   alt: "Veo 2 — Google DeepMind's state-of-the-art video generation model",
 };
+const CREATIVE_PARTNER_STOPS: TimelineStop[] = [
+  {
+    tint: "terracotta",
+    title: "Centralized hub for media gen in Gemini",
+    image: {
+      src: "/portfolio%20transfer/veo/creative%20partner/crpa_mediahub.png",
+      alt: "Creative Partner — centralized media-gen hub in Gemini",
+    },
+  },
+  {
+    tint: "mustard",
+    title: "New frameworks for interacting with images",
+    images: [
+      {
+        src: "/portfolio%20transfer/veo/creative%20partner/crpa_swap_cinematic.mp4",
+        alt: "Swap face — recasting a generated character within the scene",
+      },
+      {
+        src: "/portfolio%20transfer/veo/creative%20partner/crpa_swap_closeup.mp4",
+        alt: "Swap character — high-fidelity close-up of an in-place character swap",
+      },
+    ],
+  },
+  {
+    tint: "mint",
+    title: "Where we landed",
+    image: {
+      src: "/portfolio%20transfer/veo/creative%20partner/crpa_finalproduct.png",
+      alt: "Creative Partner — where we landed",
+    },
+  },
+];
 
 export const veoInGemini: CaseStudyDeckEntry = {
   meta: {
@@ -40,54 +76,126 @@ export const veoInGemini: CaseStudyDeckEntry = {
       slug: "16",
       name: "Project at a glance",
       content: (
-        <ProjectAtAGlanceTemplate
-          title="Veo Video Generation in Gemini"
-          team="Google DeepMind · Gemini"
-          timeline="Jan 2025 → Apr 2025 ship"
-          platforms="iOS · Android · Web"
-          scope="End-to-end video generation experience"
-          role="Sole interaction designer"
-          coreTeam="1 PM · 1 tPGM · 2 engineers"
-          crossFunctional="Legal · Research · Marketing"
+        <VeoGlanceField>
+          <ProjectAtAGlanceTemplate
+            title="Veo Video Generation in Gemini"
+            team="Google DeepMind · Gemini"
+            timeline="Jan 2025 → Apr 2025 ship"
+            platforms="iOS · Android · Web"
+            scope="End-to-end video generation experience"
+            role="Sole interaction designer"
+            coreTeam="1 PM · 1 tPGM · 2 engineers"
+            crossFunctional="Legal · Research · Marketing"
+          />
+        </VeoGlanceField>
+      ),
+    },
+    {
+      slug: "incident",
+      name: "Image-gen incident",
+      content: (
+        <figure className="wipu-veo-imageOnly">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/portfolio%20transfer/veo/gemini-imagegen-feb2024-debacle.jpg"
+            alt="Gemini image generation returning historically inaccurate, over-diversified depictions — the February 2024 controversy"
+            loading="lazy"
+            decoding="async"
+          />
+          <figcaption className="wipu-veo-imageOnly-cap">Feb 2024</figcaption>
+        </figure>
+      ),
+    },
+    {
+      slug: "crpa-intro",
+      name: "Creative partner · Framing",
+      content: (
+        <EmojiHeadlineTemplate
+          emojis={["🤠"]}
+          staticLead={<>What does it look like for Gemini to be a{" "}</>}
+          title={<strong>creative partner?</strong>}
+        />
+      ),
+    },
+    {
+      slug: "11",
+      name: "Prototype · Image editing",
+      selfContained: true,
+      hideChrome: true,
+      content: <PrototypeEmbed slug="image-editing" />,
+    },
+    {
+      slug: "crpa",
+      name: "Creative Partner",
+      selfContained: true,
+      content: <TimelineSample stops={CREATIVE_PARTNER_STOPS} />,
+    },
+    {
+      slug: "pivot",
+      name: "The Pivot · Divider",
+      content: (
+        <EmojiHeadlineTemplate
+          emojis={["🔀"]}
+          title={
+            <>
+              <strong>The Pivot.</strong>
+            </>
+          }
         />
       ),
     },
     {
       slug: "06",
-      name: "Competitive landscape",
+      name: "Landscape & model",
       content: (
-        <MediaTextTemplate
-          eyebrow="THE LANDSCAPE"
-          title={<>The competitive landscape.</>}
-          body={
-            <p>
-              OpenAI dominated the conversation, but the broader media-gen
-              ecosystem was wide and changing fast — new players, new
-              modalities, new flows shipping every month.
-            </p>
-          }
-          media={SORA_LANDSCAPE}
-          mediaSide="left"
-        />
-      ),
-    },
-    {
-      slug: "06",
-      name: "Capabilities",
-      content: (
-        <MediaTextTemplate
-          eyebrow="THE MODEL"
-          title={<>The capabilities.</>}
-          body={
-            <p>
-              Inside Google DeepMind, a new video model — <strong>Veo 2</strong>{" "}
-              — had moved past research into a state-of-the-art capability
-              ready for a consumer surface.
-            </p>
-          }
-          media={VEO2_CAPABILITY}
-          mediaSide="right"
-        />
+        <div className="wipu-veo-twoup">
+          <div className="wipu-veo-twoup-col">
+            <figure className="wipu-tpl-mediatext-media wipu-veo-twoup-well">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={SORA_LANDSCAPE.src}
+                alt={SORA_LANDSCAPE.alt}
+                loading="lazy"
+                decoding="async"
+              />
+            </figure>
+            <div className="wipu-tpl-mediatext-text">
+              <div className="wipu-tpl-mediatext-eyebrow">THE LANDSCAPE</div>
+              <h2 className="wipu-tpl-mediatext-title">
+                The competitive landscape.
+              </h2>
+              <div className="wipu-tpl-mediatext-body">
+                <p>
+                  OpenAI dominated the conversation, but the broader media-gen
+                  ecosystem was wide and changing fast — new players, new
+                  modalities, new flows shipping every month.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="wipu-veo-twoup-col">
+            <figure className="wipu-tpl-mediatext-media wipu-veo-twoup-well">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={VEO2_CAPABILITY.src}
+                alt={VEO2_CAPABILITY.alt}
+                loading="lazy"
+                decoding="async"
+              />
+            </figure>
+            <div className="wipu-tpl-mediatext-text">
+              <div className="wipu-tpl-mediatext-eyebrow">THE MODEL</div>
+              <h2 className="wipu-tpl-mediatext-title">The capabilities.</h2>
+              <div className="wipu-tpl-mediatext-body">
+                <p>
+                  Inside Google DeepMind, a new video model —{" "}
+                  <strong>Veo 2</strong> — had moved past research into a
+                  state-of-the-art capability ready for a consumer surface.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       ),
     },
     {
@@ -99,35 +207,48 @@ export const veoInGemini: CaseStudyDeckEntry = {
           emoji="🎯"
           goal={
             <>
-              Ship the{" "}
-              <GoalTarget id="best">
-                <strong>world&apos;s best</strong>
-              </GoalTarget>{" "}
-              video gen model —{" "}
               <GoalTarget id="fast">
-                <strong>fast</strong>
-              </GoalTarget>
-              .
+                <strong>Move fast</strong>
+              </GoalTarget>{" "}
+              to make{" "}
+              <GoalTarget id="best">
+                <strong>state of the art</strong>
+              </GoalTarget>{" "}
+              video generation a{" "}
+              <GoalTarget id="native">
+                <strong>native capability</strong>
+              </GoalTarget>{" "}
+              in the Gemini app.
             </>
           }
           annotations={[
             {
               position: "tl",
-              target: "best",
-              text: (
-                <>
-                  Veo 2 leads on motion quality, physics, and prompt adherence —
-                  a genuine step change in what video gen can do.
-                </>
-              ),
-            },
-            {
-              position: "br",
               target: "fast",
               text: (
                 <>
                   SOTA doesn&apos;t last forever — speed to market is the
                   difference between defining the category and chasing it.
+                </>
+              ),
+            },
+            {
+              position: "br",
+              target: "best",
+              text: (
+                <>
+                  Veo 2 leads on motion quality, physics, and prompt adherence —
+                  a genuine step change in what video generation can do.
+                </>
+              ),
+            },
+            {
+              position: "bl",
+              target: "native",
+              text: (
+                <>
+                  Not a bolted-on tool — generation has to fold seamlessly into
+                  the app&apos;s conversational framework.
                 </>
               ),
             },
@@ -138,42 +259,28 @@ export const veoInGemini: CaseStudyDeckEntry = {
     {
       slug: "06",
       name: "User flow",
+      selfContained: true,
       content: <VeoFlowchart />,
     },
     {
-      slug: "15",
-      name: "Foundation",
-      content: (
-        <EmojiHeadlineTemplate
-          emojis={["🏗️", "🧱"]}
-          title={
-            <>
-              Laying a <strong>foundation</strong>
-              {" "}for Gemini&apos;s media-gen framework.
-            </>
-          }
-        />
-      ),
-    },
-    {
       slug: "04",
-      name: "What guided my explorations?",
+      name: "What's guiding the process?",
       content: (
         <div className="wipu-sample-section">
           <h2 className="wipu-sample-section-title">
-            What guided my explorations?
+            What&apos;s guiding the process?
           </h2>
           <ThreeUpTemplate
             blocks={[
               {
                 eyebrow: "01",
-                title: "Understanding the landscape.",
-                body: "Before touching pixels, I did independent research on the media generation space — how competitors structured their flows, what users expected from gen tools, where existing products created friction. This research directly informed the design decisions that followed.",
+                title: "Video gen tools skew more experimental.",
+                body: "The existing landscape leans novelty over utility — impressive demos wrapped in flows that assume you're here to play, not to make something you'll actually keep. That gap is the opening: design for immediate, practical value instead of spectacle.",
               },
               {
                 eyebrow: "02",
-                title: "Navigating technical constraints.",
-                body: "Video gen has hard constraints that image gen doesn't: longer wait times, larger file sizes, more complex preview states. I worked closely with product and eng to define a product that was lean and intuitive within those constraints — not a feature-complete creative suite, but something with immediate user value.",
+                title: "Laying the groundwork for Gemini's mediagen framework.",
+                body: "Veo isn't a one-off feature — it's the first surface of a broader media-generation system. The patterns I set here (preview states, generation controls, the generate → refine → share loop) have to hold up as image, video, and whatever comes next converge on one framework.",
               },
               {
                 eyebrow: "03",
@@ -186,21 +293,26 @@ export const veoInGemini: CaseStudyDeckEntry = {
       ),
     },
     {
+      slug: "dealbreakers",
+      name: "Dealbreakers",
+      content: (
+        <EmojiHeadlineTemplate
+          emojis={["🚀", "⛔"]}
+          title={
+            <>
+              Moving at speed means deciding your{" "}
+              <strong>dealbreakers</strong>.
+            </>
+          }
+        />
+      ),
+    },
+    {
       slug: "11",
       name: "Prototype",
       selfContained: true,
       hideChrome: true,
-      content: (
-        <section className="wipu-sample-proto">
-          <iframe
-            src="/archive/prototypes/video-generation?embed=1"
-            title="Veo video generation prototype"
-            className="wipu-sample-proto-iframe"
-            loading="lazy"
-            allow="autoplay; encrypted-media"
-          />
-        </section>
-      ),
+      content: <PrototypeEmbed slug="video-generation" />,
     },
     {
       slug: "results",
@@ -333,36 +445,21 @@ export const veoInGemini: CaseStudyDeckEntry = {
       content: (
         <EmojiHeadlineTemplate
           emojis={["💬", "⭐", "✨"]}
-          title={
-            <>
-              Users praised Veo 2&apos;s{" "}
-              <strong>exceptional quality</strong> and intuitive{" "}
-              <strong>simplicity</strong>.
-            </>
-          }
+          staticLead={<>Users praised Veo 2&apos;s{" "}</>}
+          title={<strong>exceptional quality and intuitive simplicity.</strong>}
           note="— gUP User Insights"
         />
       ),
     },
     {
-      slug: "peace",
-      name: "Peace",
+      slug: "thanks",
+      name: "Thank you",
       content: (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            width: "100%",
-            fontSize: "clamp(88px, 11vw, 160px)",
-            lineHeight: 1,
-          }}
-        >
-          <HoverGif
-            src="/portfolio%20transfer/peace%20emoji%20.gif"
-            alt="Peace"
-          />
-        </div>
+        <EmojiHeadlineTemplate
+          className="is-small"
+          emojis={["✌️"]}
+          title={<strong>Thank you.</strong>}
+        />
       ),
     },
   ],

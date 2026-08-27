@@ -10,6 +10,9 @@ import "../_deck/chrome/chrome.css";
 import "./_shared/sample.css";
 import "./_shared/gel.css";
 import "./[id]/case-study.css";
+/* Prototype styles for direct-mounted PrototypeEmbed slides. All selectors
+   are prefixed (.proto-, .gemini-) — no leakage into deck styles. */
+import "../archive/prototypes/theme.css";
 
 const plexMono = IBM_Plex_Mono({
   variable: "--font-mono",

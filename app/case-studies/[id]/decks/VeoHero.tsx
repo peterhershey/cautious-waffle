@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import type { CSSProperties, ReactNode } from "react";
+import { useInView } from "framer-motion";
 import { IntroTemplate } from "../../../_deck/templates/IntroTemplate";
 import { StrokeHeroMetric } from "../../../_deck/templates/StrokeHeroMetric";
 
@@ -70,20 +71,42 @@ const COLORS = [
 
 const HERO_DIR = "/portfolio%20transfer/veo/hero/";
 
+/* Sparse echo — slide-two ("Project at a glance") carries a thinned-out
+   version of this same field so the two openers feel connected without a
+   second full hero competing with the metadata. Half the slots: two opposite
+   sharp corners to keep the crisp rhyme, three far/blurred drifters spread to
+   the edges so the center stays clear. */
+const SPARSE_SLOT_POS = new Set(["tl", "br", "blur-tr", "blur-ml", "blur-bl"]);
+const SPARSE_SLOTS: Slot[] = SLOTS.filter((s) => SPARSE_SLOT_POS.has(s.pos));
+
 type VeoTileFieldProps = {
   /** Rotates the image→slot mapping so two instances feel like the same
       collage with a different focal pick. Any integer is valid. */
   offset?: number;
+  /** "sparse" renders the curated half-field for the connective slide-two
+      echo (fewer tiles, dimmed via .wipu-veo-hero--sparse). */
+  density?: "full" | "sparse";
   children: ReactNode;
 };
 
-function VeoTileField({ offset = 0, children }: VeoTileFieldProps) {
+function VeoTileField({ offset = 0, density = "full", children }: VeoTileFieldProps) {
+  // Per-instance and stable (density never changes for a mounted field), so
+  // this is a fixed module-array reference the effect can close over safely.
+  const slots = density === "sparse" ? SPARSE_SLOTS : SLOTS;
   const ref = useRef<HTMLDivElement>(null);
   const tileRefs = useRef<(HTMLDivElement | null)[]>([]);
+  // Only run the per-frame parallax loop while this field is on (or near)
+  // screen. The deck mounts every slide at once, so without this the loop
+  // keeps ticking on off-screen slides — and because the prototype slide
+  // embeds a same-origin iframe that shares this main thread, that wasted
+  // work starves the iframe's input handling. The 200px margin starts it
+  // just before the slide scrolls in so there's no pop-in.
+  const inView = useInView(ref, { margin: "200px" });
 
   useEffect(() => {
     const hero = ref.current;
     if (!hero) return;
+    if (!inView) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     type TileState = {
@@ -96,7 +119,7 @@ function VeoTileField({ offset = 0, children }: VeoTileFieldProps) {
           foreground tiles — so the field doesn't settle in lockstep. */
       sy: number;
     };
-    const states: TileState[] = SLOTS.map((slot, i) => ({
+    const states: TileState[] = slots.map((slot, i) => ({
       tile: tileRefs.current[i],
       lerp: slot.lerp,
       cx: 0,
@@ -152,15 +175,18 @@ function VeoTileField({ offset = 0, children }: VeoTileFieldProps) {
       hero.removeEventListener("pointermove", onMove);
       hero.removeEventListener("pointerleave", onLeave);
     };
-  }, []);
+  }, [inView, slots]);
 
   const len = IMAGES.length;
   const norm = ((offset % len) + len) % len;
 
   return (
-    <div ref={ref} className="wipu-veo-hero">
+    <div
+      ref={ref}
+      className={`wipu-veo-hero${density === "sparse" ? " wipu-veo-hero--sparse" : ""}`}
+    >
       <div className="wipu-veo-hero-tiles" aria-hidden>
-        {SLOTS.map((slot, i) => {
+        {slots.map((slot, i) => {
           const idx = (i + norm) % len;
           return (
             <div
@@ -207,6 +233,19 @@ export function VeoHero() {
         name={<>Everyone&rsquo;s a Director.</>}
         note="Creating the interface for Google's most advanced video generation model."
       />
+    </VeoTileField>
+  );
+}
+
+/* ─────────────── Glance-backdrop variant ───────────────
+   Wraps arbitrary slide content (the "Project at a glance" metadata) in the
+   sparse half-field, offset by 3 so its focal pick differs from both the
+   title (0) and metric (5) heroes. Gives slide two a quiet, connective echo
+   of the hero without standing up a second full collage. */
+export function VeoGlanceField({ children }: { children: ReactNode }) {
+  return (
+    <VeoTileField offset={3} density="sparse">
+      {children}
     </VeoTileField>
   );
 }

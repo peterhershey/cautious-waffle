@@ -1,0 +1,673 @@
+/* Terminal window chrome, transcript, status line, palette, mobile notice.
+   All scoped under .term-root (set on the layout wrapper). Reuses the deck's
+   glass tokens (glass.css) and palette tokens (theme.css). */
+
+/* ── Window ────────────────────────────────────────────────────────── */
+.term-root .term-window {
+  width: min(1040px, 84vw);
+  height: min(720px, 86svh);
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--glass-radius);
+  border: 1px solid var(--glass-border-strong);
+  box-shadow: var(--glass-shadow);
+  background: color-mix(in srgb, var(--wipu-bg-elev) 92%, transparent);
+  overflow: hidden;
+}
+
+.term-root .term-titlebar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--wipu-sp-sm);
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--wipu-rule);
+  background: color-mix(in srgb, var(--wipu-bg-elev) 80%, transparent);
+  flex: 0 0 auto;
+}
+.term-root .term-lights {
+  display: flex;
+  gap: 8px;
+}
+.term-root .term-light {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.term-root .term-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: var(--wipu-fs-meta);
+  letter-spacing: 0.02em;
+}
+.term-root .term-controls {
+  margin-left: auto;
+  display: flex;
+  gap: 10px;
+  color: var(--wipu-ink-faint);
+  font-size: 13px;
+}
+
+/* ── Body / transcript ─────────────────────────────────────────────── */
+.term-root .term-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: var(--wipu-sp-lg) var(--wipu-sp-lg) var(--wipu-sp-md);
+  font-size: var(--wipu-fs-body);
+  line-height: 1.65;
+  /* Anchored commands sit just below the title bar, not flush against it. */
+  scroll-padding-top: var(--wipu-sp-lg);
+}
+/* Tail spacer: guarantees room to scroll any beat's prompt to the top. */
+.term-root .term-tail {
+  height: 72vh;
+  flex: 0 0 auto;
+}
+/* ── Shell: continuous text column + sticky media stage ─────────────── */
+/* The column is the continuous spine; the stage holds beside it and stays
+   pinned while text scrolls past. Their flex-basis is animated by framer-motion
+   (HomeView) so layout changes read as a spatial MOVE, not a cut. The gap lives
+   inside the stage's padding so it collapses to zero with the stage. */
+.term-root .term-shell {
+  display: flex;
+  align-items: flex-start;
+}
+.term-root .term-column {
+  flex: 0 0 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.term-root .term-stage {
+  flex: 0 0 0;
+  box-sizing: border-box;
+  padding-left: clamp(20px, 4vw, 56px);
+  overflow: hidden;
+  position: sticky;
+  top: var(--wipu-sp-lg);
+  align-self: flex-start;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  /* Definite height so percentage heights cascade and media fills the stage.
+     Subtracts the window chrome (title + status ≈ 82px), the body's vertical
+     padding (≈62px), the sticky top offset (≈40px) and a little breathing room
+     from the fixed window box — so the frame fills without overflowing. */
+  height: calc(min(720px, 86svh) - 190px);
+}
+.term-root .term-stage-inner {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.term-root .term-beat {
+  margin-bottom: var(--wipu-sp-md);
+}
+.term-root .term-line {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.term-root .term-gap {
+  height: 0.9em;
+}
+.term-root .term-boot {
+  margin-top: 2px;
+}
+.term-root .term-output {
+  margin-top: 4px;
+}
+
+.term-root .term-banner {
+  margin: 4px 0 2px;
+  font-size: clamp(7px, 1.15vw, 13px);
+  line-height: 1.05;
+  white-space: pre;
+  overflow-x: auto;
+  text-shadow: 0 0 18px color-mix(in srgb, var(--term-accent) 32%, transparent);
+}
+
+/* Reused ASCII eye (case-study hero). Smaller than the banner — it's 24 rows. */
+.term-root .term-eye {
+  margin: 2px 0;
+  font-size: clamp(5px, 0.82vw, 10px);
+  line-height: 1;
+  white-space: pre;
+  overflow-x: auto;
+  text-shadow: 0 0 14px color-mix(in srgb, var(--term-accent) 22%, transparent);
+}
+
+/* Big metric number (the green-for-numbers treatment, in mustard here). */
+.term-root .term-stat {
+  display: inline-block;
+  font-size: var(--wipu-fs-h1);
+  font-weight: 600;
+  line-height: 1.1;
+  color: var(--term-head);
+}
+
+/* Big white statement — for thesis/pull quotes (smaller than a stat). */
+.term-root .term-quote {
+  display: inline-block;
+  font-size: calc(var(--wipu-fs-h2) * 0.8);
+  font-weight: 500;
+  line-height: 1.32;
+  color: var(--wipu-ink);
+}
+
+/* ── Status line ───────────────────────────────────────────────────── */
+.term-root .term-status {
+  flex: 0 0 auto;
+  border-top: 1px solid var(--wipu-rule);
+  padding: 9px 16px;
+  font-size: var(--wipu-fs-meta);
+  background: color-mix(in srgb, var(--wipu-bg-elev) 80%, transparent);
+  display: flex;
+  align-items: center;
+}
+.term-root .term-status-key {
+  font-weight: 600;
+}
+.term-root .term-status-sep {
+  color: var(--wipu-ink-faint);
+}
+
+/* ── Command palette ───────────────────────────────────────────────── */
+.term-root .term-palette-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 16vh;
+  background: color-mix(in srgb, #000 55%, transparent);
+}
+.term-root .term-palette {
+  width: min(560px, 86vw);
+  border-radius: var(--glass-radius);
+  border: 1px solid var(--glass-border-strong);
+  box-shadow: var(--glass-shadow);
+  background: color-mix(in srgb, var(--wipu-bg-elev) 96%, transparent);
+  overflow: hidden;
+}
+.term-root .term-palette-input-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--wipu-rule);
+}
+.term-root .term-palette-input {
+  flex: 1 1 auto;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--wipu-ink);
+  font-family: var(--wipu-mono);
+  font-size: var(--wipu-fs-body);
+}
+.term-root .term-palette-input::placeholder {
+  color: var(--wipu-ink-faint);
+}
+.term-root .term-palette-list {
+  margin: 0;
+  padding: 6px;
+  max-height: 340px;
+  overflow-y: auto;
+}
+.term-root .term-palette-list ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.term-root .term-palette-group + .term-palette-group {
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px solid var(--wipu-rule);
+}
+.term-root .term-palette-group-title {
+  font-size: var(--wipu-fs-eyebrow);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 8px 12px 4px;
+}
+.term-root .term-palette-item {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 9px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.term-root .term-palette-item.is-selected {
+  background: color-mix(in srgb, var(--term-accent) 14%, transparent);
+}
+.term-root .term-palette-cmd {
+  font-weight: 500;
+}
+.term-root .term-palette-label {
+  margin-left: auto;
+  font-size: var(--wipu-fs-meta);
+}
+.term-root .term-palette-empty {
+  padding: 12px;
+  text-align: center;
+}
+
+/* ── Divider / section-break slide ─────────────────────────────────── */
+.term-root .term-divider {
+  text-align: center;
+  padding: clamp(28px, 12vh, 110px) 0;
+  animation: term-divider-in 360ms ease both;
+}
+@keyframes term-divider-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+.term-root .term-divider-rule {
+  font-size: var(--wipu-fs-meta);
+  letter-spacing: 0;
+}
+.term-root .term-divider-title {
+  font-size: var(--wipu-fs-h2);
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin: 20px 0 8px;
+}
+.term-root .term-divider-meta {
+  font-size: var(--wipu-fs-meta);
+  letter-spacing: 0.06em;
+}
+
+/* ── Inline image preview ──────────────────────────────────────────── */
+.term-root .term-preview {
+  margin: 8px 0 4px;
+  max-width: 480px;
+}
+.term-root .term-preview-head {
+  font-size: var(--wipu-fs-meta);
+  margin-bottom: 6px;
+  letter-spacing: 0.01em;
+}
+.term-root .term-preview-dim {
+  color: var(--wipu-ink-faint);
+}
+.term-root .term-preview-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--wipu-frame-radius);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+}
+
+/* ── Split beat (two-column: text left, framed media right) ────────── */
+/* Framed media inside the stage (the single image, or the carousel's box). */
+.term-root .term-aside {
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(14px, 2vw, 26px);
+  background: #000;
+  border: 1px solid var(--term-accent);
+  border-radius: var(--glass-radius);
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.5),
+    0 0 28px color-mix(in srgb, var(--term-accent) 16%, transparent);
+}
+.term-root .term-aside img {
+  display: block;
+  max-width: 100%;
+  max-height: 56vh;
+  height: auto;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+/* Gallery: fills the stage vertically. The stage contains the image (which may
+   vary in size); the per-frame text lives in the left column, so the only
+   chrome here is a terminal-style position readout on the bottom line. */
+.term-root .term-gallery {
+  flex-direction: column;
+  gap: 14px;
+  height: 100%;
+}
+.term-root .term-gallery-stage {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.term-root .term-gallery-stage img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 6px;
+}
+/* Position readout: ASCII dot counter (left) + n/total (right). */
+.term-root .term-gallery-cap {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  font-size: var(--wipu-fs-meta);
+}
+.term-root .term-gallery-track {
+  letter-spacing: 0.32em;
+  font-size: calc(var(--wipu-fs-meta) + 1px);
+}
+.term-root .term-gallery-num {
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Left-column per-frame text during a gallery slideshow. */
+.term-root .term-gallery-frame {
+  margin-top: var(--wipu-sp-md);
+}
+.term-root .term-gallery-frame-title {
+  font-size: var(--wipu-fs-h3);
+  margin-bottom: 4px;
+}
+.term-root .term-gallery-frame-note {
+  margin-top: 8px;
+}
+
+/* ── Feature beat (breathing room for big beats / pull quotes) ──────── */
+.term-root .term-beat-feature {
+  min-height: 62vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* ── Inline video embed ────────────────────────────────────────────── */
+.term-root .term-video {
+  margin: 8px 0 4px;
+  max-width: min(820px, 100%);
+}
+.term-root .term-video-frame {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  margin-top: 6px;
+  border-radius: var(--wipu-frame-radius);
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+}
+.term-root .term-video-iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* ── Quote attribution avatar ──────────────────────────────────────── */
+.term-root .term-attribution {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+.term-root .term-attribution-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--glass-border);
+}
+
+/* ── Floating carousel window (Quick Look pop-up) ──────────────────── */
+/* Offset over the terminal (which stays visible behind it), not a dimmed
+   modal — the pop-up floats like a real second window. */
+.term-root .term-media-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: color-mix(in srgb, #000 18%, transparent);
+}
+.term-root .term-media-window {
+  position: absolute;
+  top: clamp(36px, 8vh, 92px);
+  right: clamp(20px, 6vw, 110px);
+  display: flex;
+  flex-direction: column;
+  width: min(760px, 64vw);
+  max-height: 82vh;
+  border-radius: var(--glass-radius);
+  border: 1px solid var(--glass-border-strong);
+  box-shadow: var(--glass-shadow);
+  background: color-mix(in srgb, var(--wipu-bg-elev) 98%, transparent);
+  overflow: hidden;
+  transform-origin: top right;
+}
+.term-root .term-media-titlebar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--wipu-sp-sm);
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--wipu-rule);
+  flex: 0 0 auto;
+}
+.term-root .term-media-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: var(--wipu-fs-meta);
+}
+.term-root .term-media-ctl {
+  margin-left: auto;
+  background: transparent;
+  border: none;
+  color: var(--wipu-ink-dim);
+  font-family: var(--wipu-mono);
+  font-size: 13px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 5px;
+}
+.term-root .term-media-ctl:hover {
+  color: var(--wipu-ink);
+  background: var(--wipu-rule);
+}
+.term-root .term-media-body {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(20px, 4vw, 40px) clamp(44px, 6vw, 76px);
+  background: #000;
+}
+.term-root .term-media-img {
+  max-width: 100%;
+  max-height: 60vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 6px;
+}
+/* Chevrons live in the side margins (no circle) — like the reference. */
+.term-root .term-media-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 34px;
+  height: 48px;
+  border: none;
+  background: transparent;
+  color: var(--term-accent);
+  opacity: 0.55;
+  font-size: 30px;
+  line-height: 1;
+  cursor: pointer;
+  transition: opacity 140ms ease;
+}
+.term-root .term-media-nav:hover {
+  opacity: 1;
+}
+.term-root .term-media-nav:disabled {
+  opacity: 0.12;
+  cursor: default;
+}
+.term-root .term-media-prev {
+  left: 6px;
+}
+.term-root .term-media-next {
+  right: 6px;
+}
+.term-root .term-media-foot {
+  display: flex;
+  align-items: center;
+  gap: var(--wipu-sp-md);
+  padding: 10px 16px;
+  border-top: 1px solid var(--wipu-rule);
+  font-size: var(--wipu-fs-meta);
+  flex: 0 0 auto;
+}
+.term-root .term-media-count {
+  margin-left: auto;
+}
+.term-root .term-media-link {
+  margin-left: auto;
+  font-weight: 600;
+  text-decoration: none;
+}
+.term-root .term-media-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ── Article reader (pop-up variant="article") ─────────────────────── */
+/* Reads like the published piece opened in the window: serif headline against
+   the mono chrome, hero photo, dek, byline, and a "continue reading" action. */
+.term-root .term-article {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: clamp(22px, 3vw, 40px);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.term-root .term-article-hero {
+  width: 100%;
+  max-height: 40vh;
+  object-fit: cover;
+  border-radius: var(--wipu-frame-radius, 10px);
+  border: 1px solid var(--glass-border);
+}
+.term-root .term-article-kicker {
+  margin: 8px 0 0;
+  font-size: var(--wipu-fs-meta);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.term-root .term-article-headline {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 700;
+  font-size: clamp(24px, 2.4vw, 34px);
+  line-height: 1.18;
+  color: var(--wipu-ink);
+}
+.term-root .term-article-dek {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(15px, 1.1vw, 18px);
+  line-height: 1.5;
+}
+.term-root .term-article-byline {
+  margin: 2px 0 0;
+  font-size: var(--wipu-fs-meta);
+}
+.term-root .term-article-cta {
+  align-self: flex-start;
+  margin-top: 10px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: var(--term-accent);
+  color: #1a1118;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 140ms ease, filter 140ms ease;
+}
+.term-root .term-article-cta:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+/* Gallery launch line in the transcript — clickable to (re)open. */
+.term-root .term-launch {
+  display: block;
+  margin-top: 4px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  font: inherit;
+  font-size: var(--wipu-fs-body);
+  text-align: left;
+  cursor: pointer;
+}
+.term-root .term-launch:hover .term-command {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ── Mobile notice ─────────────────────────────────────────────────── */
+.term-root .term-notice {
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.term-root .term-notice-card {
+  max-width: 440px;
+  border-radius: var(--glass-radius);
+  border: 1px solid var(--glass-border-strong);
+  box-shadow: var(--glass-shadow);
+  background: color-mix(in srgb, var(--wipu-bg-elev) 92%, transparent);
+  padding: var(--wipu-sp-lg);
+}
+.term-root .term-notice-eyebrow {
+  font-size: var(--wipu-fs-eyebrow);
+  letter-spacing: 0.04em;
+  margin: 0 0 12px;
+}
+.term-root .term-notice-title {
+  font-size: var(--wipu-fs-h2);
+  font-weight: 500;
+  margin: 0 0 12px;
+  line-height: 1.2;
+}
+.term-root .term-notice-body {
+  font-size: var(--wipu-fs-body);
+  line-height: 1.6;
+  margin: 0 0 var(--wipu-sp-md);
+}
+.term-root .term-notice-link {
+  color: var(--term-accent);
+  text-decoration: none;
+  font-weight: 500;
+}
+.term-root .term-notice-link:hover {
+  text-decoration: underline;
+}

@@ -1,0 +1,122 @@
+/* Terminal variant — scoped tokens + base layout.
+   Layers on top of .wipu-root (theme.css). Everything here is namespaced
+   under .term-root so nothing can leak into the existing deck. */
+
+.term-root {
+  /* Semantic palette, built from the deck's brand colors (theme.css) and
+     tuned for legibility on the near-black terminal background. Green is
+     reserved for "ok/success" rather than used everywhere — the signature
+     voice is the warm terracotta accent. Scoped to .term-root so none of
+     this leaks into other routes. */
+  --term-accent: #ef8a60; /* terracotta (brand #e07a52, nudged brighter) —
+                             prompt, caret, primary accent, the banner */
+  --term-ok: #8ce0a8; /* mint (brand) — "ok", success, confirmations */
+  --term-head: #f2d06a; /* mustard (brand) — section headers, metrics */
+  --term-link: #7d97ff; /* navy (brand #2640e2) brightened to read as text —
+                           file paths, URLs, links */
+  --term-rose: #cf8a93; /* rose (brand #a3636b) brightened — quiet tertiary */
+
+  --term-prompt: var(--term-accent);
+  --term-cps: 42; /* default chars-per-second for streamed text */
+
+  /* Desktop backdrop: a quiet dark gradient, not a literal wallpaper. */
+  min-height: 100svh;
+  width: 100%;
+}
+
+/* No visible scrollbars anywhere in the terminal — everything stays
+   scrollable, the bars are just hidden (it's a driven experience). */
+.term-root *::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+.term-root * {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* ── Viewport gates (SSR-safe, no JS) ─────────────────────────────── */
+.term-mobile-gate {
+  display: none;
+}
+@media (max-width: 1023px) {
+  .term-desktop-gate {
+    display: none;
+  }
+  .term-mobile-gate {
+    display: block;
+  }
+}
+
+/* ── Desktop ───────────────────────────────────────────────────────── */
+.term-desktop {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(16px, 3vh, 40px);
+  background:
+    radial-gradient(
+      120% 120% at 50% 0%,
+      #14141a 0%,
+      var(--wipu-bg) 60%
+    );
+  overflow: hidden;
+}
+
+/* ── Streamed text + cursor ───────────────────────────────────────── */
+.term-cursor {
+  display: inline-block;
+  width: 0.55ch;
+  color: var(--term-accent);
+  font-weight: 600;
+  animation: term-blink 1s steps(2, start) infinite;
+}
+@keyframes term-blink {
+  50% {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .term-cursor {
+    animation: none;
+  }
+}
+
+.term-prompt-sym {
+  color: var(--term-prompt);
+  font-weight: 600;
+}
+.term-command {
+  color: var(--wipu-ink);
+  font-weight: 500;
+}
+.term-dim {
+  color: var(--wipu-ink-dim);
+}
+.term-faint {
+  color: var(--wipu-ink-faint);
+}
+.term-accent {
+  color: var(--term-accent);
+}
+.term-ok {
+  color: var(--term-ok);
+}
+.term-head {
+  color: var(--term-head);
+}
+.term-link {
+  color: var(--term-link);
+}
+.term-rose {
+  color: var(--term-rose);
+}
+
+/* Generic streamed block: preserve whitespace, wrap long lines. */
+.term-stream {
+  white-space: pre-wrap;
+  word-break: break-word;
+}

@@ -37,12 +37,20 @@ function getMountedServer(): boolean {
 export type EmojiHeadlineTemplateProps = {
   /** Row of emoji shown above the headline. Order matters. */
   emojis: ReactNode[];
+  /** Optional lead shown immediately (dim, never typed) before the title.
+      Use it to let the type-on begin partway through a sentence — the lead
+      sits there from the start and the caret/typing picks up at `title`. */
+  staticLead?: ReactNode;
   /** The headline. Default text reads dim; wrap emphasized fragments in
-      <strong> to make them bright. */
+      <strong> to make them bright. When `staticLead` is set, this is only
+      the portion that types on. */
   title: ReactNode;
   /** Optional small secondary line shown below the headline. Fades in once
       the type-on animation finishes (or immediately under reduced motion). */
   note?: ReactNode;
+  /** Optional modifier class appended to the root, for per-instance variants
+      (e.g. "is-small" to shrink the headline on a closing beat). */
+  className?: string;
 };
 
 const PER_CHAR_MS = 70;
@@ -127,8 +135,10 @@ function prefersReducedMotion() {
 
 export function EmojiHeadlineTemplate({
   emojis,
+  staticLead,
   title,
   note,
+  className,
 }: EmojiHeadlineTemplateProps) {
   const total = useMemo(() => countChars(title), [title]);
   const [revealed, setRevealed] = useState(total);
@@ -224,7 +234,10 @@ export function EmojiHeadlineTemplate({
   }, [title, revealed, mounted]);
 
   return (
-    <div ref={wrapRef} className="wipu-tpl-emojihead">
+    <div
+      ref={wrapRef}
+      className={`wipu-tpl-emojihead${className ? ` ${className}` : ""}`}
+    >
       <div className="wipu-tpl-emojihead-row" aria-hidden>
         {emojis.map((e, i) => (
           <span key={i} className="wipu-tpl-emojihead-emoji">
@@ -234,8 +247,13 @@ export function EmojiHeadlineTemplate({
       </div>
       <h2 className="wipu-tpl-emojihead-title">
         {/* Full title for assistive tech — typing tree is aria-hidden. */}
-        <span className="wipu-tpl-emojihead-sr">{title}</span>
+        <span className="wipu-tpl-emojihead-sr">
+          {staticLead}
+          {title}
+        </span>
         <span className="wipu-tpl-emojihead-typed" aria-hidden="true">
+          {/* Lead is always visible; only `title` types on after it. */}
+          {staticLead}
           {rendered}
         </span>
       </h2>

@@ -53,16 +53,16 @@
   opacity: 0;
   transform: translate3d(0, 24px, 0);
   transition:
-    opacity 760ms cubic-bezier(0.22, 0.8, 0.2, 1),
-    transform 880ms cubic-bezier(0.22, 0.8, 0.2, 1);
+    opacity 760ms var(--wipu-ease),
+    transform 880ms var(--wipu-ease);
 }
 [data-reveal].is-revealed {
   opacity: 1;
   transform: translate3d(0, 0, 0);
 }
-[data-reveal][data-reveal-delay="1"] { transition-delay: 80ms; }
-[data-reveal][data-reveal-delay="2"] { transition-delay: 160ms; }
-[data-reveal][data-reveal-delay="3"] { transition-delay: 240ms; }
+[data-reveal][data-reveal-delay="1"] { transition-delay: var(--wipu-dur-xfast); }
+[data-reveal][data-reveal-delay="2"] { transition-delay: var(--wipu-dur-base); }
+[data-reveal][data-reveal-delay="3"] { transition-delay: var(--wipu-dur-base); }
 
 /* Parallax-transformed elements need room for the transform without shifting
    surrounding layout: JS applies translate3d, so we don't set transition. */
@@ -93,7 +93,7 @@
   font-family: var(--wipu-mono);
   font-size: 11px;
   font-weight: 500;
-  letter-spacing: 0.24em;
+  letter-spacing: var(--wipu-track-wide);
   text-transform: uppercase;
   z-index: 2;
 }
@@ -144,7 +144,7 @@
 .wipu-hero-scroll {
   margin-top: 96px;
   font-size: 11px;
-  letter-spacing: 0.24em;
+  letter-spacing: var(--wipu-track-wide);
   text-transform: uppercase;
   color: var(--wipu-ink-faint);
   animation: wipu-bob 2.4s ease-in-out infinite;
@@ -281,7 +281,7 @@
 .wipu-stat-lbl-sub {
   font-family: var(--wipu-mono);
   font-size: 10px;
-  letter-spacing: 0.18em;
+  letter-spacing: var(--wipu-track-eyebrow);
   text-transform: uppercase;
   color: var(--wipu-ink-dim);
 }
@@ -299,7 +299,7 @@
   align-items: center;
   gap: var(--wipu-sp-xl) var(--wipu-sp-xl);
   padding-top: var(--wipu-sp-lg);
-  border-top: 1px dashed var(--wipu-rule-strong);
+  border-top: var(--wipu-dash);
 }
 .wipu-logo-strip .wipu-logo { font-size: 20px; }
 .wipu-logo-strip .wipu-logo-serif { font-size: 22px; }
@@ -308,7 +308,7 @@
 .wipu-footnote {
   margin-top: var(--wipu-sp-xl);
   padding-top: var(--wipu-sp-lg);
-  border-top: 1px dashed var(--wipu-rule-strong);
+  border-top: var(--wipu-dash);
   font-family: var(--wipu-mono);
   font-size: 12px;
   letter-spacing: 0.04em;
@@ -381,7 +381,7 @@
 .wipu-note-kicker {
   display: block;
   font-size: 10px;
-  letter-spacing: 0.2em;
+  letter-spacing: var(--wipu-track-eyebrow);
   text-transform: uppercase;
   opacity: 0.65;
   margin-bottom: 6px;
@@ -398,7 +398,7 @@
 .wipu-callout {
   position: absolute;
   padding: 10px 18px;
-  border-radius: 999px;
+  border-radius: var(--wipu-r-pill);
   font-family: var(--wipu-mono);
   font-size: 12px;
   line-height: 1.3;
@@ -418,7 +418,7 @@
 .wipu-quote {
   position: absolute;
   padding: 20px 22px;
-  border-radius: 6px;
+  border-radius: var(--wipu-r-md);
   font-family: var(--wipu-mono);
   font-size: 15px;
   line-height: 1.5;
@@ -477,13 +477,13 @@
   gap: var(--wipu-sp-sm);
   padding: var(--wipu-sp-md) var(--wipu-sp-md);
   border: 1.5px solid currentColor;
-  border-radius: 999px;
+  border-radius: var(--wipu-r-pill);
   font-family: var(--wipu-mono);
   font-size: 12px;
   font-weight: 500;
-  letter-spacing: 0.16em;
+  letter-spacing: var(--wipu-track-tight);
   text-transform: uppercase;
-  transition: background 160ms ease, transform 160ms ease;
+  transition: background var(--wipu-dur-base) ease, transform var(--wipu-dur-base) ease;
 }
 .wipu-btn:hover { background: color-mix(in srgb, currentColor 12%, transparent); transform: translateX(3px); }
 .wipu-btn:focus-visible { outline: 2px solid var(--wipu-emph); outline-offset: 4px; }
@@ -586,7 +586,7 @@
   font-weight: 500;
   color: var(--wipu-ink);
   opacity: 0.85;
-  transition: opacity 160ms ease;
+  transition: opacity var(--wipu-dur-base) ease;
   font-size: 22px;
   text-align: center;
   letter-spacing: -0.01em;
@@ -652,7 +652,7 @@
   padding: var(--wipu-sp-md) var(--wipu-sp-md);
   background: color-mix(in srgb, currentColor 90%, transparent);
   color: var(--wipu-mustard);
-  border-radius: 4px;
+  border-radius: var(--wipu-r-sm);
   max-width: 420px;
 }
 
@@ -684,7 +684,7 @@
   display: flex;
   gap: var(--wipu-sp-lg);
   font-size: 12px;
-  letter-spacing: 0.16em;
+  letter-spacing: var(--wipu-track-tight);
   text-transform: uppercase;
 }
 .wipu-cta-links a { color: var(--wipu-ink-dim); }
@@ -706,12 +706,12 @@
 @media (max-width: 768px) { .wipu-cases-grid { grid-template-columns: 1fr; } }
 .wipu-case {
   position: relative;
-  border-radius: 14px;
+  border-radius: var(--wipu-r-xl);
   padding: var(--wipu-sp-xl);
   min-height: 520px;
   overflow: hidden;
   cursor: pointer;
-  transition: transform 200ms ease, box-shadow 200ms ease;
+  transition: transform var(--wipu-dur-base) ease, box-shadow var(--wipu-dur-base) ease;
   box-shadow: 0 24px 48px rgba(0, 0, 0, 0.35);
 }
 .wipu-case:hover {
@@ -721,7 +721,7 @@
 .wipu-case-label {
   font-family: var(--wipu-mono);
   font-size: 11px;
-  letter-spacing: 0.22em;
+  letter-spacing: var(--wipu-track-eyebrow);
   text-transform: uppercase;
   opacity: 0.8;
   margin: 0 0 var(--wipu-sp-lg);
@@ -762,7 +762,7 @@
 }
 .wipu-phone-bar {
   height: 12px;
-  border-radius: 2px;
+  border-radius: var(--wipu-r-xs);
   background: color-mix(in srgb, currentColor 20%, transparent);
 }
 .wipu-phone-bar.is-full { height: 60px; }
@@ -783,9 +783,9 @@
   color: var(--wipu-bg);
   font-family: var(--wipu-mono);
   font-size: 10px;
-  letter-spacing: 0.18em;
+  letter-spacing: var(--wipu-track-eyebrow);
   text-transform: uppercase;
-  border-radius: 999px;
+  border-radius: var(--wipu-r-pill);
   transform: rotate(6deg);
 }
 
@@ -804,7 +804,7 @@
   max-width: 1080px;
   background: #f5f0e4;
   padding: 14px 14px 0;
-  border-radius: 2px;
+  border-radius: var(--wipu-r-xs);
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.45), 0 4px 0 rgba(0, 0, 0, 0.2);
   transform: rotate(-0.6deg);
 }
@@ -817,7 +817,7 @@
 .wipu-image-cap {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--wipu-sp-2xs);
   padding: 14px 6px 18px;
   font-family: var(--wipu-mono);
   color: #15150f;
@@ -826,7 +826,7 @@
 .wipu-image-kicker {
   font-size: 10px;
   font-weight: 500;
-  letter-spacing: 0.22em;
+  letter-spacing: var(--wipu-track-eyebrow);
   text-transform: uppercase;
   opacity: 0.55;
 }
@@ -866,8 +866,8 @@
   align-items: center;
   gap: var(--wipu-sp-md);
   padding: var(--wipu-sp-xs) var(--wipu-sp-md);
-  border-radius: 6px;
-  transition: transform 280ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  border-radius: var(--wipu-r-md);
+  transition: transform var(--wipu-dur-slow) var(--wipu-ease);
   z-index: 1;
 }
 .wipu-folder:hover { transform: translateY(-4px); }
@@ -906,7 +906,7 @@
   border-radius: 6px 0 0 0;
   clip-path: polygon(0 0, 86% 0, 100% 100%, 0 100%);
   transform-origin: 0% 100%;
-  transition: transform 360ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: transform var(--wipu-dur-slow) var(--wipu-ease);
 }
 
 /* Paper sheets peeking out (behind the front lip, in front of the back body) */
@@ -916,9 +916,9 @@
   left: 20%;
   top: 22%;
   height: 54%;
-  border-radius: 2px;
+  border-radius: var(--wipu-r-xs);
   box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
-  transition: transform 360ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: transform var(--wipu-dur-slow) var(--wipu-ease);
 }
 .wipu-folder-paper--a {
   background: #f5f0e4;
@@ -946,7 +946,7 @@
   border-radius: 6px 6px 14px 14px;
   z-index: 2;
   transform-origin: 50% 100%;
-  transition: transform 360ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: transform var(--wipu-dur-slow) var(--wipu-ease);
 }
 
 /* Hover: tab peels, front lifts a hair, papers poke out more */
@@ -1016,22 +1016,22 @@ body.wipu-fs-active .wipu-drawtool {
   bottom: clamp(28px, 4vw, 48px);
   z-index: 60;
   padding: var(--wipu-sp-md) var(--wipu-sp-xl);
-  border-radius: 999px;
+  border-radius: var(--wipu-r-pill);
   background: var(--wipu-navy-ink);
   color: var(--wipu-navy);
   font-family: var(--wipu-mono);
   font-size: 13px;
   font-weight: 500;
-  letter-spacing: 0.18em;
+  letter-spacing: var(--wipu-track-eyebrow);
   text-transform: uppercase;
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.32);
   transform: translate(-50%, 16px);
   opacity: 0;
   transition:
-    transform 360ms cubic-bezier(0.22, 0.9, 0.24, 1),
-    opacity 240ms ease,
-    background 160ms ease,
-    color 160ms ease;
+    transform var(--wipu-dur-slow) cubic-bezier(0.22, 0.9, 0.24, 1),
+    opacity var(--wipu-dur-base) ease,
+    background var(--wipu-dur-base) ease,
+    color var(--wipu-dur-base) ease;
 }
 .wipu-fs-back.is-visible { transform: translate(-50%, 0); opacity: 1; }
 .wipu-fs-back:hover { background: var(--wipu-terracotta); color: var(--wipu-terracotta-ink); }
@@ -1052,7 +1052,7 @@ body.wipu-fs-active .wipu-drawtool {
   display: block;
   font-size: 10px;
   font-weight: 500;
-  letter-spacing: 0.2em;
+  letter-spacing: var(--wipu-track-eyebrow);
   text-transform: uppercase;
   opacity: 0.7;
   margin-bottom: 6px;
@@ -1064,7 +1064,7 @@ body.wipu-fs-active .wipu-drawtool {
   padding: 12px 12px 0;
   display: flex;
   flex-direction: column;
-  border-radius: 2px;
+  border-radius: var(--wipu-r-xs);
   background: #f5f0e4;
   color: #15150f;
 }
@@ -1133,7 +1133,7 @@ body.wipu-fs-active .wipu-drawtool {
 .wipu-fs-image {
   width: 100%;
   height: 100%;
-  border-radius: 2px;
+  border-radius: var(--wipu-r-xs);
   position: relative;
   overflow: hidden;
   background: linear-gradient(135deg, #2a2a30 0%, #18181c 100%);
@@ -1166,7 +1166,7 @@ body.wipu-fs-active .wipu-drawtool {
 /* ——— Note ——— */
 .wipu-fs-note {
   padding: 14px 16px;
-  border-radius: 3px;
+  border-radius: var(--wipu-note-radius);
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -1181,7 +1181,7 @@ body.wipu-fs-active .wipu-drawtool {
 /* ——— Quote ——— */
 .wipu-fs-quote {
   padding: 18px 20px;
-  border-radius: 4px;
+  border-radius: var(--wipu-r-sm);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -1195,7 +1195,7 @@ body.wipu-fs-active .wipu-drawtool {
 }
 .wipu-fs-quote-sub {
   font-size: 10px;
-  letter-spacing: 0.18em;
+  letter-spacing: var(--wipu-track-eyebrow);
   text-transform: uppercase;
   opacity: 0.7;
 }
@@ -1224,7 +1224,7 @@ body.wipu-fs-active .wipu-drawtool {
 /* ——— Stat (big thin number + label) ——— */
 .wipu-fs-stat {
   padding: 18px 22px;
-  border-radius: 4px;
+  border-radius: var(--wipu-r-sm);
   display: flex;
   align-items: center;
   gap: 18px;
@@ -1246,7 +1246,7 @@ body.wipu-fs-active .wipu-drawtool {
 .wipu-fs-stat-kicker {
   font-size: 10px;
   font-weight: 500;
-  letter-spacing: 0.2em;
+  letter-spacing: var(--wipu-track-eyebrow);
   text-transform: uppercase;
   text-decoration: underline;
   text-decoration-thickness: 1.5px;
@@ -1261,7 +1261,7 @@ body.wipu-fs-active .wipu-drawtool {
 /* ——— Callout pill ——— */
 .wipu-fs-callout {
   padding: 0 20px;
-  border-radius: 999px;
+  border-radius: var(--wipu-r-pill);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1276,20 +1276,20 @@ body.wipu-fs-active .wipu-drawtool {
   background: #f5f0e4;
   color: #15150f;
   border: 2px solid #15150f;
-  border-radius: 22px;
+  border-radius: var(--wipu-r-2xl);
   padding: 18px 10px 14px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--wipu-sp-xs);
 }
 .wipu-fs-phone-notch {
   width: 40%;
   height: 6px;
   background: #15150f;
-  border-radius: 3px;
+  border-radius: var(--wipu-note-radius);
   margin: 0 auto 6px;
 }
-.wipu-fs-phone-bar { height: 26px; background: #e8e0cf; border-radius: 3px; }
+.wipu-fs-phone-bar { height: 26px; background: #e8e0cf; border-radius: var(--wipu-note-radius); }
 .wipu-fs-phone-bar.is-short { width: 70%; }
 .wipu-fs-phone-bar.is-full { height: 56px; }
 .wipu-fs-phone-bar.is-accent { background: var(--wipu-terracotta); height: 44px; }
@@ -1298,7 +1298,7 @@ body.wipu-fs-active .wipu-drawtool {
 .wipu-fs-phonea {
   background: color-mix(in srgb, var(--wipu-navy-ink) 8%, var(--wipu-navy));
   border: 1px solid color-mix(in srgb, var(--wipu-navy-ink) 20%, transparent);
-  border-radius: 10px;
+  border-radius: var(--wipu-frame-radius);
   padding: 18px 22px 22px;
   display: flex;
   flex-direction: column;
@@ -1307,7 +1307,7 @@ body.wipu-fs-active .wipu-drawtool {
 .wipu-fs-phonea-kicker {
   font-size: 10px;
   font-weight: 500;
-  letter-spacing: 0.22em;
+  letter-spacing: var(--wipu-track-eyebrow);
   text-transform: uppercase;
   opacity: 0.7;
   margin-bottom: 10px;
@@ -1326,16 +1326,16 @@ body.wipu-fs-active .wipu-drawtool {
   background: #f5f0e4;
   color: #15150f;
   border: 2px solid #15150f;
-  border-radius: 24px;
+  border-radius: var(--wipu-r-2xl);
   padding: 16px 10px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--wipu-sp-xs);
   z-index: 2;
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.32);
 }
-.wipu-fs-phonea-phone .wipu-fs-phone-notch { background:#15150f; width:40%; height:6px; border-radius:3px; margin:0 auto 6px; }
-.wipu-fs-phonea-phone .wipu-fs-phone-bar { background:#e8e0cf; height:22px; border-radius:3px; }
+.wipu-fs-phonea-phone .wipu-fs-phone-notch { background:#15150f; width:40%; height:6px; border-radius:var(--wipu-note-radius); margin:0 auto 6px; }
+.wipu-fs-phonea-phone .wipu-fs-phone-bar { background:#e8e0cf; height:22px; border-radius:var(--wipu-note-radius); }
 .wipu-fs-phonea-phone .wipu-fs-phone-bar.is-full { height: 56px; }
 .wipu-fs-phonea-phone .wipu-fs-phone-bar.is-short { width: 70%; }
 .wipu-fs-phonea-phone .wipu-fs-phone-bar.is-accent { background: var(--wipu-terracotta); }
@@ -1350,9 +1350,9 @@ body.wipu-fs-active .wipu-drawtool {
 .wipu-fs-phonea-pill {
   position: absolute;
   padding: 6px 12px;
-  border-radius: 999px;
+  border-radius: var(--wipu-r-pill);
   font-size: 10px;
-  letter-spacing: 0.14em;
+  letter-spacing: var(--wipu-track-tight);
   text-transform: uppercase;
   font-weight: 500;
   z-index: 3;
@@ -1371,7 +1371,7 @@ body.wipu-fs-active .wipu-drawtool {
 .wipu-fs-triad {
   background: color-mix(in srgb, var(--wipu-navy-ink) 8%, var(--wipu-navy));
   border: 1px solid color-mix(in srgb, var(--wipu-navy-ink) 20%, transparent);
-  border-radius: 10px;
+  border-radius: var(--wipu-frame-radius);
   padding: 22px 24px 26px;
   display: flex;
   flex-direction: column;
@@ -1380,7 +1380,7 @@ body.wipu-fs-active .wipu-drawtool {
 .wipu-fs-triad-kicker {
   font-size: 10px;
   font-weight: 500;
-  letter-spacing: 0.22em;
+  letter-spacing: var(--wipu-track-eyebrow);
   text-transform: uppercase;
   opacity: 0.7;
   margin-bottom: 16px;
@@ -1402,7 +1402,7 @@ body.wipu-fs-active .wipu-drawtool {
 .wipu-fs-triad-tag {
   align-self: flex-start;
   padding: 6px 14px;
-  border-radius: 3px;
+  border-radius: var(--wipu-note-radius);
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.04em;
@@ -1420,21 +1420,21 @@ body.wipu-fs-active .wipu-drawtool {
   flex-direction: column;
   gap: 6px;
 }
-.wipu-fs-triad-phone .wipu-fs-phone-notch { background: color-mix(in srgb, var(--wipu-navy-ink) 50%, transparent); width:40%; height:4px; margin:0 auto 4px; border-radius:2px; }
-.wipu-fs-triad-phone .wipu-fs-phone-bar { background: color-mix(in srgb, var(--wipu-navy-ink) 30%, transparent); height:16px; border-radius:2px; margin-top:auto; }
+.wipu-fs-triad-phone .wipu-fs-phone-notch { background: color-mix(in srgb, var(--wipu-navy-ink) 50%, transparent); width:40%; height:4px; margin:0 auto 4px; border-radius:var(--wipu-r-xs); }
+.wipu-fs-triad-phone .wipu-fs-phone-bar { background: color-mix(in srgb, var(--wipu-navy-ink) 30%, transparent); height:16px; border-radius:var(--wipu-r-xs); margin-top:auto; }
 .wipu-fs-triad-phone .wipu-fs-phone-bar.is-short { width: 60%; }
 .wipu-fs-triad-phone .wipu-fs-phone-bar.is-accent { background: var(--wipu-terracotta); }
 .wipu-fs-triad-bullets {
   list-style: none;
   padding: 0; margin: 0;
-  display: flex; flex-direction: column; gap: 4px;
+  display: flex; flex-direction: column; gap: var(--wipu-sp-2xs);
   font-size: 11px; line-height: 1.4;
 }
 .wipu-fs-triad-bullets li::before { content: "· "; opacity: 0.6; }
 
 /* ——— Overlap stack ——— */
 .wipu-fs-overlap {
-  border-radius: 10px;
+  border-radius: var(--wipu-frame-radius);
   padding: 22px 24px;
   display: flex;
   flex-direction: column;
@@ -1444,7 +1444,7 @@ body.wipu-fs-active .wipu-drawtool {
 .wipu-fs-overlap-kicker {
   font-size: 10px;
   font-weight: 500;
-  letter-spacing: 0.22em;
+  letter-spacing: var(--wipu-track-eyebrow);
   text-transform: uppercase;
   opacity: 0.7;
   margin-bottom: 12px;
@@ -1459,7 +1459,7 @@ body.wipu-fs-active .wipu-drawtool {
 .wipu-fs-overlap-card {
   position: absolute;
   padding: 14px 16px;
-  border-radius: 3px;
+  border-radius: var(--wipu-note-radius);
   min-width: 200px;
   max-width: 280px;
   font-size: 13px;
@@ -1470,7 +1470,7 @@ body.wipu-fs-active .wipu-drawtool {
   display: block;
   font-size: 9px;
   font-weight: 500;
-  letter-spacing: 0.22em;
+  letter-spacing: var(--wipu-track-eyebrow);
   text-transform: uppercase;
   opacity: 0.65;
   margin-bottom: 4px;
@@ -1479,7 +1479,7 @@ body.wipu-fs-active .wipu-drawtool {
 
 /* ——— Agenda ——— */
 .wipu-fs-agenda {
-  border-radius: 6px;
+  border-radius: var(--wipu-r-md);
   padding: 22px 26px;
   display: flex;
   flex-direction: column;
@@ -1515,12 +1515,12 @@ body.wipu-fs-active .wipu-drawtool {
   justify-content: center;
   gap: 6px;
   padding: 10px 14px;
-  border-radius: 4px;
+  border-radius: var(--wipu-r-sm);
 }
-.wipu-fs-emoji-glyph { font-size: 34px; letter-spacing: 0.1em; line-height: 1; }
+.wipu-fs-emoji-glyph { font-size: 34px; letter-spacing: var(--wipu-track-tight); line-height: 1; }
 .wipu-fs-emoji-label {
   font-size: 10px;
-  letter-spacing: 0.22em;
+  letter-spacing: var(--wipu-track-eyebrow);
   text-transform: uppercase;
   opacity: 0.75;
 }
@@ -1529,7 +1529,7 @@ body.wipu-fs-active .wipu-drawtool {
 .wipu-fs-logo {
   background: #f5f0e4;
   color: #15150f;
-  border-radius: 2px;
+  border-radius: var(--wipu-r-xs);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1544,8 +1544,8 @@ body.wipu-fs-active .wipu-drawtool {
 
 /* ——— Shapes ——— */
 .wipu-fs-shape-circle { border-radius: 50%; box-shadow: 0 6px 14px rgba(0,0,0,0.2); }
-.wipu-fs-shape-rect   { border-radius: 2px; box-shadow: 0 6px 14px rgba(0,0,0,0.2); }
-.wipu-fs-shape-line   { border-radius: 2px; box-shadow: none; }
+.wipu-fs-shape-rect   { border-radius: var(--wipu-r-xs); box-shadow: 0 6px 14px rgba(0,0,0,0.2); }
+.wipu-fs-shape-line   { border-radius: var(--wipu-r-xs); box-shadow: none; }
 .wipu-fs-shape-triangle {
   width: 0 !important; height: 0 !important;
   background: transparent !important;
@@ -1568,7 +1568,7 @@ body.wipu-fs-active .wipu-drawtool {
   padding: var(--wipu-sp-md) var(--wipu-sp-md);
   font-family: var(--wipu-mono);
   font-size: 11px;
-  letter-spacing: 0.16em;
+  letter-spacing: var(--wipu-track-tight);
   text-transform: uppercase;
   color: var(--wipu-ink-dim);
   pointer-events: none;
@@ -1580,7 +1580,7 @@ body.wipu-fs-active .wipu-drawtool {
   align-items: center;
   gap: var(--wipu-sp-sm);
 }
-.wipu-hud-mark { color: #fff; letter-spacing: 0.1em; font-weight: 500; }
+.wipu-hud-mark { color: #fff; letter-spacing: var(--wipu-track-tight); font-weight: 500; }
 /* ——— PEN TOOL (carried over) ——— */
 .wipu-drawtool {
   position: fixed;
@@ -1591,13 +1591,13 @@ body.wipu-fs-active .wipu-drawtool {
   align-items: center;
   gap: var(--wipu-sp-xs);
   padding: var(--wipu-sp-xs) var(--wipu-sp-sm);
-  border: 1px dashed var(--wipu-rule-strong);
-  border-radius: 999px;
+  border: var(--wipu-dash);
+  border-radius: var(--wipu-r-pill);
   background: color-mix(in srgb, var(--wipu-bg) 80%, transparent);
   backdrop-filter: blur(8px);
   font-family: var(--wipu-mono);
   font-size: 11px;
-  letter-spacing: 0.14em;
+  letter-spacing: var(--wipu-track-tight);
   text-transform: uppercase;
   color: var(--wipu-ink);
   max-width: calc(100vw - 36px);
@@ -1614,7 +1614,7 @@ body.wipu-fs-active .wipu-drawtool {
   align-items: center;
   gap: var(--wipu-sp-xs);
   padding: var(--wipu-sp-xs) var(--wipu-sp-sm);
-  border-radius: 999px;
+  border-radius: var(--wipu-r-pill);
   background: var(--wipu-ink);
   color: var(--wipu-bg);
   font-weight: 500;
@@ -1629,7 +1629,7 @@ body.wipu-fs-active .wipu-drawtool {
   align-items: center;
   gap: 6px;
   padding: 0 8px;
-  border-left: 1px dashed var(--wipu-rule);
+  border-left: var(--wipu-dash-soft);
 }
 .wipu-drawtool-swatch {
   all: unset;
@@ -1638,13 +1638,13 @@ body.wipu-fs-active .wipu-drawtool {
   height: 22px;
   border-radius: 50%;
   border: 2px solid transparent;
-  transition: transform 120ms ease, border-color 120ms ease;
+  transition: transform var(--wipu-dur-fast) ease, border-color var(--wipu-dur-fast) ease;
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
 }
 .wipu-drawtool-swatch:hover { transform: scale(1.12); }
 .wipu-drawtool-swatch.is-active { border-color: var(--wipu-ink); transform: scale(1.12); }
 .wipu-drawtool-swatch:focus-visible { outline: 2px solid var(--wipu-ink); outline-offset: 2px; }
-.wipu-drawtool-sizes { gap: 4px; }
+.wipu-drawtool-sizes { gap: var(--wipu-sp-2xs); }
 .wipu-drawtool-size {
   all: unset;
   cursor: pointer;
@@ -1652,7 +1652,7 @@ body.wipu-fs-active .wipu-drawtool {
   border-radius: 50%;
   display: inline-flex; align-items: center; justify-content: center;
   border: 1px solid transparent;
-  transition: border-color 120ms ease, background 120ms ease;
+  transition: border-color var(--wipu-dur-fast) ease, background var(--wipu-dur-fast) ease;
 }
 .wipu-drawtool-size:hover { background: color-mix(in srgb, var(--wipu-ink) 10%, transparent); }
 .wipu-drawtool-size.is-active { border-color: var(--wipu-ink); }
@@ -1661,12 +1661,12 @@ body.wipu-fs-active .wipu-drawtool {
   all: unset;
   cursor: pointer;
   padding: 6px 12px;
-  border-radius: 999px;
-  border: 1px dashed var(--wipu-rule-strong);
+  border-radius: var(--wipu-r-pill);
+  border: var(--wipu-dash);
   color: var(--wipu-ink-dim);
   font-family: var(--wipu-mono);
   font-size: 10px;
-  letter-spacing: 0.14em;
+  letter-spacing: var(--wipu-track-tight);
   text-transform: uppercase;
 }
 .wipu-drawtool-clear:hover:not([disabled]) { color: var(--wipu-ink); border-color: var(--wipu-ink); }
@@ -1698,7 +1698,7 @@ body.wipu-fs-active .wipu-drawtool {
   font-family: var(--wipu-mono);
   font-size: 11px;
   font-weight: 500;
-  letter-spacing: 0.24em;
+  letter-spacing: var(--wipu-track-wide);
   text-transform: uppercase;
   color: var(--wipu-mint);
   margin: 0 0 var(--wipu-sp-lg);
@@ -1764,7 +1764,7 @@ body.wipu-fs-active .wipu-drawtool {
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--wipu-sp-lg);
   padding: var(--wipu-sp-lg) 0 0;
-  border-top: 1px dashed var(--wipu-rule-strong);
+  border-top: var(--wipu-dash);
 }
 @media (max-width: 768px) {
   .wipu-case-meta { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--wipu-sp-lg); }
@@ -1778,7 +1778,7 @@ body.wipu-fs-active .wipu-drawtool {
   font-family: var(--wipu-mono);
   font-size: 10px;
   font-weight: 500;
-  letter-spacing: 0.2em;
+  letter-spacing: var(--wipu-track-eyebrow);
   text-transform: uppercase;
   color: var(--wipu-ink-faint);
 }
@@ -1798,7 +1798,7 @@ body.wipu-fs-active .wipu-drawtool {
   gap: var(--wipu-sp-xl) var(--wipu-sp-xl);
   margin: var(--wipu-sp-xl) 0 0;
   padding: var(--wipu-sp-xl) 0 0;
-  border-top: 1px dashed var(--wipu-rule-strong);
+  border-top: var(--wipu-dash);
 }
 .wipu-case-statrow .wipu-pullnum {
   margin: 0;
@@ -1849,7 +1849,7 @@ body.wipu-fs-active .wipu-drawtool {
 .wipu-case-press {
   position: relative;
   padding: var(--wipu-sp-lg) var(--wipu-sp-lg);
-  border-radius: 8px;
+  border-radius: var(--wipu-r-md);
   box-shadow: 0 18px 36px rgba(0, 0, 0, 0.3), 0 3px 0 rgba(0, 0, 0, 0.2);
   transform-origin: top left;
 }
@@ -1866,7 +1866,7 @@ body.wipu-fs-active .wipu-drawtool {
 .wipu-case-press-attribution {
   font-family: var(--wipu-mono);
   font-size: 11px;
-  letter-spacing: 0.18em;
+  letter-spacing: var(--wipu-track-eyebrow);
   text-transform: uppercase;
   opacity: 0.75;
   margin: 0;
@@ -1877,7 +1877,7 @@ body.wipu-fs-active .wipu-drawtool {
   list-style: none;
   padding: var(--wipu-sp-xl) 0 0;
   margin: 0;
-  border-top: 1px dashed var(--wipu-rule-strong);
+  border-top: var(--wipu-dash);
   display: flex;
   flex-direction: column;
   gap: var(--wipu-sp-sm);
@@ -1895,8 +1895,8 @@ body.wipu-fs-active .wipu-drawtool {
 .wipu-case-honest {
   margin: var(--wipu-sp-lg) 0 0;
   padding: var(--wipu-sp-md) var(--wipu-sp-md);
-  border: 1px dashed var(--wipu-rule-strong);
-  border-radius: 6px;
+  border: var(--wipu-dash);
+  border-radius: var(--wipu-r-md);
   font-family: var(--wipu-mono);
   font-size: 13px;
   line-height: 1.55;
@@ -1980,8 +1980,8 @@ body.wipu-fs-active .wipu-drawtool {
 .wipu-case-image-well {
   position: relative;
   width: 100%;
-  border: 1.5px dashed var(--wipu-rule-strong);
-  border-radius: 6px;
+  border: var(--wipu-dash);
+  border-radius: var(--wipu-r-md);
   background-image: radial-gradient(
     color-mix(in srgb, currentColor 10%, transparent) 1px,
     transparent 1px
@@ -2007,7 +2007,7 @@ body.wipu-fs-active .wipu-drawtool {
   font-family: var(--wipu-mono);
   font-size: 10px;
   font-weight: 500;
-  letter-spacing: 0.2em;
+  letter-spacing: var(--wipu-track-eyebrow);
   text-transform: uppercase;
   text-align: center;
   padding: 0 20px;
@@ -2079,15 +2079,15 @@ body.wipu-fs-active .wipu-drawtool {
   gap: var(--wipu-sp-sm);
   padding: var(--wipu-sp-md) var(--wipu-sp-md);
   border: 1.5px solid var(--wipu-rule-strong);
-  border-radius: 999px;
+  border-radius: var(--wipu-r-pill);
   font-family: var(--wipu-mono);
   font-size: 12px;
   font-weight: 500;
-  letter-spacing: 0.16em;
+  letter-spacing: var(--wipu-track-tight);
   text-transform: uppercase;
   color: var(--wipu-ink-dim);
   text-decoration: none;
-  transition: background 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease;
+  transition: background var(--wipu-dur-base) ease, border-color var(--wipu-dur-base) ease, color var(--wipu-dur-base) ease, transform var(--wipu-dur-base) ease;
 }
 .wipu-case-back:hover {
   background: color-mix(in srgb, var(--wipu-ink) 8%, transparent);
@@ -2149,7 +2149,7 @@ body.wipu-fs-active .wipu-drawtool {
   stroke-linejoin: round;
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
-  transition: stroke-dashoffset 1500ms cubic-bezier(0.22, 0.8, 0.2, 1);
+  transition: stroke-dashoffset 1500ms var(--wipu-ease);
 }
 .wipu-case-stamp.is-revealed .wipu-case-stamp-draw {
   stroke-dashoffset: 0;
@@ -2157,9 +2157,9 @@ body.wipu-fs-active .wipu-drawtool {
 
 /* Stagger: rings → ticks → star → rules → plane */
 .wipu-case-stamp-draw-ring-outer  { transition-delay:   0ms; stroke-width: 1.8; }
-.wipu-case-stamp-draw-ring-mid    { transition-delay: 120ms; stroke-width: 0.9; opacity: 0.7; }
-.wipu-case-stamp-draw-ring-inner  { transition-delay: 200ms; stroke-width: 1.2; }
-.wipu-case-stamp-draw-tick        { transition-delay: 340ms; stroke-width: 1.3; transition-duration: 900ms; }
+.wipu-case-stamp-draw-ring-mid    { transition-delay: var(--wipu-dur-fast); stroke-width: 0.9; opacity: 0.7; }
+.wipu-case-stamp-draw-ring-inner  { transition-delay: var(--wipu-dur-base); stroke-width: 1.2; }
+.wipu-case-stamp-draw-tick        { transition-delay: 340ms; stroke-width: 1.3; transition-duration: var(--wipu-dur-fade); }
 .wipu-case-stamp-draw-star        { transition-delay: 560ms; stroke-width: 1.3; }
 .wipu-case-stamp-draw-rule        { transition-delay: 700ms; stroke-width: 1.1; }
 .wipu-case-stamp-draw-plane       { transition-delay: 880ms; stroke-width: 1.1; opacity: 0.82; }
@@ -2170,13 +2170,13 @@ body.wipu-fs-active .wipu-drawtool {
   font-family: var(--wipu-mono);
   font-weight: 600;
   fill: currentColor;
-  letter-spacing: 0.22em;
+  letter-spacing: var(--wipu-track-eyebrow);
   opacity: 0;
   transition: opacity 600ms ease 920ms;
 }
 .wipu-case-stamp-text-arc { font-size: 9px; }
-.wipu-case-stamp-text-arc-bottom { font-size: 7px; letter-spacing: 0.28em; }
-.wipu-case-stamp-text-date { font-size: 10px; letter-spacing: 0.2em; }
+.wipu-case-stamp-text-arc-bottom { font-size: 7px; letter-spacing: var(--wipu-track-wide); }
+.wipu-case-stamp-text-date { font-size: 10px; letter-spacing: var(--wipu-track-eyebrow); }
 .wipu-case-stamp.is-revealed .wipu-case-stamp-text-arc,
 .wipu-case-stamp.is-revealed .wipu-case-stamp-text-date {
   opacity: 0.88;
@@ -2261,7 +2261,7 @@ body.wipu-fs-active .wipu-drawtool {
   width: 500%; /* STOPS.length * 100% */
   height: 100%;
   will-change: transform;
-  transition: transform 80ms linear;
+  transition: transform var(--wipu-dur-xfast) linear;
 }
 
 .wipu-timeline-stop {
@@ -2281,7 +2281,7 @@ body.wipu-fs-active .wipu-drawtool {
   gap: var(--wipu-sp-md);
   max-height: 100%;
   max-width: 100%;
-  transition: transform 480ms cubic-bezier(0.2, 0.6, 0.2, 1),
+  transition: transform 480ms var(--wipu-ease),
               opacity 480ms ease;
   transform: scale(0.97);
   opacity: 0.82;
@@ -2319,7 +2319,7 @@ body.wipu-fs-active .wipu-drawtool {
   font-family: var(--wipu-mono);
   font-size: 10px;
   font-weight: 500;
-  letter-spacing: 0.24em;
+  letter-spacing: var(--wipu-track-wide);
   text-transform: uppercase;
   color: var(--wipu-ink-faint);
 }
@@ -2339,7 +2339,7 @@ body.wipu-fs-active .wipu-drawtool {
   width: 100%;
   height: 2px;
   background: var(--wipu-rule-strong);
-  border-radius: 2px;
+  border-radius: var(--wipu-r-xs);
 }
 .wipu-timeline-progress-fill {
   position: absolute;
@@ -2348,9 +2348,9 @@ body.wipu-fs-active .wipu-drawtool {
   height: 100%;
   width: 0%;
   background: var(--wipu-ink);
-  border-radius: 2px;
+  border-radius: var(--wipu-r-xs);
   will-change: width;
-  transition: width 80ms linear;
+  transition: width var(--wipu-dur-xfast) linear;
 }
 
 /* Tick = circle sitting ON the rail + date label hanging below. */
@@ -2369,8 +2369,8 @@ body.wipu-fs-active .wipu-drawtool {
   background: var(--wipu-bg);
   border: 2px solid var(--wipu-rule-strong);
   box-shadow: 0 0 0 4px var(--wipu-bg);
-  transition: background 220ms ease, border-color 220ms ease,
-              transform 220ms cubic-bezier(0.2, 0.6, 0.2, 1);
+  transition: background var(--wipu-dur-base) ease, border-color var(--wipu-dur-base) ease,
+              transform var(--wipu-dur-base) var(--wipu-ease);
 }
 .wipu-timeline-tick.is-reached .wipu-timeline-tick-dot {
   background: var(--wipu-ink);
@@ -2391,11 +2391,11 @@ body.wipu-fs-active .wipu-drawtool {
   font-family: var(--wipu-mono);
   font-size: 11px;
   font-weight: 500;
-  letter-spacing: 0.18em;
+  letter-spacing: var(--wipu-track-eyebrow);
   text-transform: uppercase;
   color: var(--wipu-ink-faint);
   white-space: nowrap;
-  transition: color 220ms ease;
+  transition: color var(--wipu-dur-base) ease;
 }
 .wipu-timeline-tick.is-active .wipu-timeline-tick-label {
   color: var(--wipu-ink);
@@ -2460,7 +2460,7 @@ body.wipu-fs-active .wipu-drawtool {
   font-family: var(--wipu-mono);
   font-size: 11px;
   font-weight: 500;
-  letter-spacing: 0.28em;
+  letter-spacing: var(--wipu-track-wide);
   text-transform: uppercase;
   color: var(--wipu-navy);
 }
@@ -2470,7 +2470,7 @@ body.wipu-fs-active .wipu-drawtool {
   font-family: var(--wipu-mono);
   font-size: 11px;
   font-weight: 500;
-  letter-spacing: 0.2em;
+  letter-spacing: var(--wipu-track-eyebrow);
   text-transform: uppercase;
   color: var(--wipu-ink-faint);
 }
@@ -2491,7 +2491,7 @@ body.wipu-fs-active .wipu-drawtool {
 }
 .wipu-zurich-strip-scroll::-webkit-scrollbar-thumb {
   background: var(--wipu-rule-strong);
-  border-radius: 6px;
+  border-radius: var(--wipu-r-md);
 }
 
 .wipu-zurich-strip-list {
@@ -2516,7 +2516,7 @@ body.wipu-fs-active .wipu-drawtool {
   width: auto;
   max-width: none;
   object-fit: contain;
-  border-radius: 6px;
+  border-radius: var(--wipu-r-md);
   user-select: none;
   background: var(--wipu-bg);
 }
@@ -2588,11 +2588,11 @@ body.wipu-fs-active .wipu-drawtool {
   font-family: var(--wipu-mono);
   font-size: 11px;
   font-weight: 500;
-  letter-spacing: 0.28em;
+  letter-spacing: var(--wipu-track-wide);
   text-transform: uppercase;
   color: var(--wipu-ink-faint);
   opacity: 0;
-  transition: opacity 520ms ease 120ms;
+  transition: opacity var(--wipu-dur-slower) ease var(--wipu-dur-fast);
 }
 
 .wipu-herostat-num {
@@ -2617,8 +2617,8 @@ body.wipu-fs-active .wipu-drawtool {
   stroke-dasharray: 4000;
   stroke-dashoffset: 4000;
   transition:
-    stroke-dashoffset 3400ms cubic-bezier(0.22, 0.8, 0.2, 1) 280ms,
-    fill-opacity 900ms ease 2800ms;
+    stroke-dashoffset 3400ms var(--wipu-ease) var(--wipu-dur-slow),
+    fill-opacity var(--wipu-dur-fade) ease 2800ms;
 }
 
 .wipu-herostat-label {
@@ -2634,7 +2634,7 @@ body.wipu-fs-active .wipu-drawtool {
   transform: translateY(14px);
   transition:
     opacity 700ms ease 3500ms,
-    transform 700ms cubic-bezier(0.22, 0.8, 0.2, 1) 3500ms;
+    transform 700ms var(--wipu-ease) 3500ms;
 }
 
 .wipu-herostat.is-revealed .wipu-herostat-eyebrow  { opacity: 1; }

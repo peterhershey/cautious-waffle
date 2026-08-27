@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Masthead — ASCII shader</title>
+<style>
+  :root { --ink:#9fb0a8; --dim:#46514b; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; background:#000; color:var(--ink);
+    font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace; }
+  body { min-height:100vh; display:flex; flex-direction:column; align-items:center;
+    padding:26px 16px 60px; }
+
+  .controls { display:flex; gap:8px; align-items:center; flex-wrap:wrap; justify-content:center;
+    margin-bottom:30px; }
+  .tab { background:transparent; color:var(--dim); border:1px solid #1c211e;
+    padding:7px 16px; border-radius:999px; font:inherit; font-size:13px; letter-spacing:.02em;
+    cursor:pointer; transition:.18s; }
+  .tab:hover { color:var(--ink); border-color:#2c332e; }
+  .tab.on { color:#000; background:#c6ff14; border-color:#c6ff14; }
+  .sliders { display:flex; gap:16px; margin-left:6px; padding-left:16px; border-left:1px solid #1c211e; }
+  .slider { display:flex; flex-direction:column; gap:5px; font-size:10px; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--dim); }
+  input[type=range]{ width:104px; accent-color:#15e1e6; }
+
+  .frame { position:relative; background:#000; border:1px solid #11150f;
+    box-shadow:0 30px 90px -50px #000; }
+  pre.art { margin:0; padding:14px; font-size:8px; line-height:8px; letter-spacing:0;
+    white-space:pre; font-family:inherit; }
+  pre.art span { display:inline-block; width:1ch; }
+
+  .caption { margin-top:18px; font-size:12px; line-height:1.6; color:#5a655e; max-width:60ch;
+    text-align:center; }
+  .caption b { color:#c6ff14; font-weight:600; }
+</style>
+</head>
+<body>
+  <div class="controls">
+    <button class="tab on" data-subj="name">block</button>
+    <button class="tab" data-subj="script">cursive</button>
+    <button class="tab" data-subj="choc">chocolate</button>
+    <button class="tab" data-subj="bar">🍫 bar</button>
+    <div class="sliders">
+      <label class="slider">speed <input id="speed" type="range" min="20" max="220" value="100"></label>
+      <label class="slider">shimmer <input id="amp" type="range" min="0" max="100" value="38"></label>
+    </div>
+  </div>
+
+  <div class="frame"><pre class="art" id="art" aria-label="Peter Hershey"></pre></div>
+  <div class="caption"><b>ascii shader.</b> The name rasterised, then dissolved into a field of
+    glyphs — colour and density read from brightness, lime &amp; cyan dithered on black.
+    The glyphs churn a few frames on a slow loop; the form holds still.</div>
+
+<script>
+const COLS = 124, ROWS = 58, SCALE = 4;      // grid + offscreen supersample
+let onThresh = 0.12;                           // luminance below this = empty/black
+
+/* glyph pools by density tier (dark → bright) */
+const TIERS = [
+  "`'.,:;\"-~^".split(""),
+  "ilcvxzjtf?+=<>/\\()][}{1374coesyk".split(""),
+  "ABDHKNRSVYZUMW#@&%$8052█▓▒┼╳┐└┤├┬┴".split(""),
+];
+const PALETTES = {
+  name: { a:[198,255,20], aDim:[110,150,0],  b:[34,232,236], bDim:[8,138,148] },  // lime / cyan
+  choc: { a:[255,196,70], aDim:[150,92,20],  b:[232,120,46], bDim:[120,52,18] },  // amber / cocoa
+};
+const BAYER = [ [0,8,2,10],[12,4,14,6],[3,11,1,9],[15,7,13,5] ].map(r=>r.map(v=>v/16));
+const hash = (x,y)=>{ const s=Math.sin(x*12.9898+y*78.233)*43758.5453; return s-Math.floor(s); };
+const mix = (a,b,t)=>{ t=Math.max(0,Math.min(1,t));
+  return `rgb(${a[0]+(b[0]-a[0])*t|0},${a[1]+(b[1]-a[1])*t|0},${a[2]+(b[2]-a[2])*t|0})`; };
+
+/* ---- offscreen raster: returns Float32 luminance grid (COLS*ROWS) ---- */
+const cv = document.createElement("canvas");
+cv.width = COLS*SCALE; cv.height = ROWS*SCALE;
+const ctx = cv.getContext("2d", { willReadFrequently:true });
+
+function fitFont(text, maxW, weight, fam){
+  let s = ROWS*SCALE; ctx.font = `${weight} ${s}px ${fam}`;
+  while (ctx.measureText(text).width > maxW && s > 4){ s -= 1; ctx.font = `${weight} ${s}px ${fam}`; }
+  return s;
+}
+const FONTS = {
+  block:  `"Arial Narrow","Helvetica Neue",Impact,sans-serif`,
+  script: `"Snell Roundhand","Apple Chancery","Brush Script MT",cursive`,
+};
+function rasterName(style){
+  const W=cv.width, H=cv.height, script = style==="script";
+  const fam = script ? FONTS.script : FONTS.block;
+  const wt  = script ? 700 : 900;
+  const l1  = script ? "Peter"   : "PETER";
+  const l2  = script ? "Hershey" : "HERSHEY";
+  const sq  = script ? 0.78 : 0.62;            // less vertical squash for the airier script
+  ctx.fillStyle="#000"; ctx.fillRect(0,0,W,H);
+  ctx.fillStyle="#fff"; ctx.textAlign="center"; ctx.textBaseline="middle";
+  ctx.save(); ctx.translate(W/2,0); ctx.scale(1,sq); ctx.translate(-W/2,0);
+  const s1=fitFont(l1, W*(script?0.7:0.94), wt, fam);
+  ctx.font=`${wt} ${s1}px ${fam}`; ctx.fillText(l1, W/2, H*(script?0.36:0.34)/sq);
+  const s2=fitFont(l2, W*(script?0.9:0.98), wt, fam);
+  ctx.font=`${wt} ${s2}px ${fam}`; ctx.fillText(l2, W/2, H*(script?0.72:0.74)/sq);
+  ctx.restore();
+}
+function rasterChoc(){
+  const W=cv.width, H=cv.height;
+  ctx.fillStyle="#000"; ctx.fillRect(0,0,W,H);
+  // bar body (rounded) mid-grey
+  const m=W*0.06, bw=W-2*m, bh=H-2*m, x0=m, y0=m;
+  ctx.fillStyle="#7a7a7a"; ctx.fillRect(x0,y0,bw,bh);
+  // molded squares: bright top-left bevel, dark grooves
+  const sx=6, sy=4, cw=bw/sx, ch=bh/sy;
+  for(let i=0;i<sx;i++)for(let j=0;j<sy;j++){
+    const px=x0+i*cw, py=y0+j*ch;
+    ctx.fillStyle="#9a9a9a"; ctx.fillRect(px+cw*0.10,py+ch*0.10,cw*0.80,ch*0.80);
+    ctx.fillStyle="#4d4d4d"; ctx.fillRect(px+cw*0.10,py+ch*0.74,cw*0.80,ch*0.16); // bottom shadow
+  }
+  ctx.fillStyle="#2a2a2a"; ctx.lineWidth=1;
+  for(let i=0;i<=sx;i++){ ctx.fillRect(x0+i*cw-1,y0,2,bh); }
+  for(let j=0;j<=sy;j++){ ctx.fillRect(x0,y0+j*ch-1,bw,2); }
+  // embossed name (bright), squashed
+  ctx.fillStyle="#fff"; ctx.textAlign="center"; ctx.textBaseline="middle";
+  ctx.save(); ctx.translate(W/2,0); ctx.scale(1,0.62); ctx.translate(-W/2,0);
+  let s1=fitFont("PETER", bw*0.8, 800);
+  ctx.font=`800 ${s1}px "Arial Narrow",Impact,sans-serif`; ctx.fillText("PETER", W/2, H*0.40/0.62);
+  let s2=fitFont("HERSHEY", bw*0.86, 800);
+  ctx.font=`800 ${s2}px "Arial Narrow",Impact,sans-serif`; ctx.fillText("HERSHEY", W/2, H*0.66/0.62);
+  ctx.restore();
+}
+function rrect(x,y,w,h,r){ ctx.beginPath(); ctx.roundRect(x,y,w,h,r); }
+function rasterEmoji(){
+  const W=cv.width, H=cv.height;
+  ctx.fillStyle="#000"; ctx.fillRect(0,0,W,H);
+  ctx.save();
+  ctx.translate(W/2,H/2); ctx.rotate(-13*Math.PI/180);
+  // bar geometry — squares drawn wide in canvas so they read square on the tall char-cells
+  const bw=W*0.60, bh=H*0.66, x0=-bw/2, y0=-bh/2;
+  const wrapTop = y0 + bh*0.56;                 // foil wrapper covers the lower ~44%
+  // chocolate body
+  ctx.fillStyle="#6e6e6e"; rrect(x0,y0,bw,bh,bh*0.06); ctx.fill();
+  // molded squares (raised bevel: bright top, dark bottom-shadow)
+  const sx=4, sy=4, cw=bw/sx, ch=bh/sy;
+  for(let i=0;i<sx;i++) for(let j=0;j<sy;j++){
+    const px=x0+i*cw, py=y0+j*ch;
+    ctx.fillStyle="#8c8c8c"; ctx.fillRect(px+cw*0.12,py+ch*0.12,cw*0.76,ch*0.34); // highlight
+    ctx.fillStyle="#777";    ctx.fillRect(px+cw*0.12,py+ch*0.42,cw*0.76,ch*0.30);
+    ctx.fillStyle="#3c3c3c"; ctx.fillRect(px+cw*0.12,py+ch*0.74,cw*0.76,ch*0.14); // shadow
+  }
+  // grooves between squares
+  ctx.fillStyle="#1f1f1f";
+  for(let i=0;i<=sx;i++) ctx.fillRect(x0+i*cw-1.5,y0,3,bh);
+  for(let j=0;j<=sy;j++) ctx.fillRect(x0,y0+j*ch-1.5,bw,3);
+  // embossed PETER across the exposed chocolate (upper)
+  ctx.fillStyle="#f2f2f2"; ctx.textAlign="center"; ctx.textBaseline="middle";
+  let es=fitFont("Peter", bw*0.74, 800, FONTS.block);
+  ctx.font=`800 ${es}px ${FONTS.block}`; ctx.fillText("Peter", 0, y0+bh*0.26);
+  // foil wrapper band (bright) with a folded top edge + a peeled corner
+  ctx.fillStyle="#d8d8d8"; ctx.fillRect(x0, wrapTop, bw, y0+bh-wrapTop);
+  ctx.fillStyle="#f4f4f4"; ctx.fillRect(x0, wrapTop, bw, bh*0.05);          // fold catch-light
+  ctx.fillStyle="#eaeaea"; ctx.beginPath();                                  // peeled foil triangle
+  ctx.moveTo(x0, wrapTop); ctx.lineTo(x0+bw*0.22, wrapTop-bh*0.16); ctx.lineTo(x0+bw*0.30, wrapTop); ctx.fill();
+  // PETER printed on the wrapper (dark → knocks out of the bright foil)
+  ctx.fillStyle="#161616";
+  let ws=fitFont("Peter", bw*0.6, 700, FONTS.block);
+  ctx.font=`700 ${ws}px ${FONTS.block}`; ctx.fillText("Peter", 0, wrapTop + (y0+bh-wrapTop)/2);
+  ctx.restore();
+}
+function sampleLum(){
+  const img = ctx.getImageData(0,0,cv.width,cv.height).data;
+  const L = new Float32Array(COLS*ROWS);
+  for(let y=0;y<ROWS;y++) for(let x=0;x<COLS;x++){
+    let sum=0;
+    for(let dy=0;dy<SCALE;dy++) for(let dx=0;dx<SCALE;dx++){
+      const i=(((y*SCALE+dy)*cv.width)+(x*SCALE+dx))*4;
+      sum += (img[i]*0.299+img[i+1]*0.587+img[i+2]*0.114);
+    }
+    L[y*COLS+x] = sum/(SCALE*SCALE*255);
+  }
+  return L;
+}
+
+/* ---- build span grid once ---- */
+const art = document.getElementById("art");
+(function build(){
+  let html="";
+  for(let y=0;y<ROWS;y++){ for(let x=0;x<COLS;x++) html+=`<span></span>`; html+="\n"; }
+  art.innerHTML=html;
+})();
+const SP = art.querySelectorAll("span");
+
+/* ---- per-subject static fields: color + tier + on/off ---- */
+let cells = [];   // {on,color,tier,el}
+function setSubject(name){
+  onThresh = name==="script" ? 0.09 : 0.12;       // thinner strokes need a lower cutoff
+  if(name==="choc") rasterChoc();
+  else if(name==="bar") rasterEmoji();
+  else rasterName(name==="script"?"script":"block");
+  const L = sampleLum();
+  const P = PALETTES[(name==="choc"||name==="bar")?"choc":"name"];
+  cells = new Array(COLS*ROWS);
+  for(let y=0;y<ROWS;y++) for(let x=0;x<COLS;x++){
+    const idx=y*COLS+x, lum=L[idx], el=SP[idx];
+    if(lum<onThresh){ el.textContent=" "; el.style.color="transparent"; cells[idx]={on:false,el}; continue; }
+    // texture: break flat fills into a speckled brightness field
+    const tex = Math.min(1, lum*(0.55+0.7*hash(x,y)));
+    const dith = BAYER[y&3][x&3];
+    const lime = (lum*0.7 + (dith-0.5)*0.55) > 0.42;     // bright core → hue A, else hue B
+    const hi = lime ? P.a : P.b, lo = lime ? P.aDim : P.bDim;
+    el.style.color = mix(lo, hi, tex);
+    const tier = tex<0.34 ? 0 : tex<0.64 ? 1 : 2;
+    cells[idx] = { on:true, tier, el };
+  }
+  draw(0,true);
+}
+
+/* ---- animate: churn a fraction of glyphs per lo-fi tick ---- */
+function draw(t, full){
+  for(let i=0;i<cells.length;i++){
+    const c=cells[i]; if(!c.on) continue;
+    if(!full && Math.random()>churn) continue;        // only some cells change → lazy shimmer
+    const pool=TIERS[c.tier];
+    c.el.textContent = pool[(Math.random()*pool.length)|0];
+  }
+}
+let speed=1, churn=0.38, last=0;
+document.getElementById("speed").oninput=e=>speed=e.target.value/100;
+document.getElementById("amp").oninput =e=>churn=e.target.value/100;
+function loop(t){
+  const interval = 150/Math.max(.15,speed);            // ~6fps default, lo-fi
+  if(t-last>=interval){ last=t; draw(t,false); }
+  requestAnimationFrame(loop);
+}
+const initSubj = new URLSearchParams(location.search).get("s") || "name";
+document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("on", x.dataset.subj===initSubj));
+setSubject(initSubj);
+requestAnimationFrame(loop);
+
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("on",x===b));
+  setSubject(b.dataset.subj);
+});
+</script>
+</body>
+</html>

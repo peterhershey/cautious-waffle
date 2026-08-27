@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { useDeck } from "../Deck";
+import { useDeck, type DeckContextSlide } from "../Deck";
 import { nav } from "@/app/content";
 
 /* Page list comes from app/content.ts. Add entries there as new pages
@@ -15,20 +15,88 @@ function isPageActive(pathname: string, page: Page): boolean {
   return pathname === page.href;
 }
 
-/* Slide labels in the registry are styled all-caps for use as on-slide
-   eyebrows ("INDEX · 00", "AI · IN PRACTICE · 05"). The nav wants the
-   same identity in sentence case without the index suffix — preserving
-   acronyms like "AI". */
+/* Slide labels in the registry may be styled all-caps for use as on-slide
+   eyebrows ("INDEX · 00", "AI · IN PRACTICE · 05"). Case-study names are
+   already Title Case — sentence-casing only kicks in when the whole label
+   is uppercase, preserving acronyms like "AI". */
 const NAV_LABEL_ACRONYMS = new Set(["AI", "UX", "UI", "API", "ML"]);
 
-function toNavLabel(raw: string): string {
-  const stripped = raw.replace(/\s*·\s*\d+\s*$/, "");
-  const flat = stripped.replace(/\s*·\s*/g, " ");
+/* City codes prefixing case-study slide names ("NYC · The signal") —
+   chapter context the section header already carries; dropped in the nav. */
+const NAV_CITY_CODES = new Set(["NYC", "ZRH", "CA"]);
+
+function sentenceCaseIfShouting(flat: string): string {
+  if (flat !== flat.toUpperCase() || flat === flat.toLowerCase()) return flat;
   const cased = flat
     .split(/([\s-])/)
     .map((tok) => (NAV_LABEL_ACRONYMS.has(tok) ? tok : tok.toLowerCase()))
     .join("");
   return cased.charAt(0).toUpperCase() + cased.slice(1);
+}
+
+function toNavLabel(raw: string, groupTitle: string | null): string {
+  let s = raw.replace(/\s*·\s*\d+\s*$/, ""); // trailing "· NN" index
+  const parts = s.split(/\s*·\s*/);
+  // Drop a leading city code or a repeat of the group's own title.
+  while (parts.length > 1) {
+    const head = parts[0];
+    if (
+      NAV_CITY_CODES.has(head.toUpperCase()) ||
+      (groupTitle && head.toLowerCase() === groupTitle.toLowerCase()) ||
+      head.toLowerCase() === "prototype"
+    ) {
+      parts.shift();
+      continue;
+    }
+    break;
+  }
+  // After stripping context prefixes, the first segment is the title —
+  // trailing segments are template descriptors ("Hero · Coding Form").
+  s = parts[0];
+  return sentenceCaseIfShouting(s);
+}
+
+function toGroupTitle(raw: string): string {
+  return raw
+    .replace(/^Section\s*·\s*/i, "")
+    .replace(/\s*·\s*Divider\s*$/i, "");
+}
+
+type NavGroup = {
+  title: string;
+  /** Slide index the header navigates to — the divider slide itself,
+      or the first slide of a leading (divider-less) group. */
+  jumpIndex: number;
+  /** Index of the divider slide, if the group has one. */
+  dividerIndex: number | null;
+  items: { index: number; label: string; proto: boolean }[];
+};
+
+function buildGroups(slides: DeckContextSlide[]): NavGroup[] {
+  const groups: NavGroup[] = [];
+  let current: NavGroup | null = null;
+  slides.forEach((slide, i) => {
+    if (slide.kind === "section") {
+      if (current) groups.push(current);
+      current = {
+        title: toGroupTitle(slide.label),
+        jumpIndex: i,
+        dividerIndex: i,
+        items: [],
+      };
+      return;
+    }
+    if (!current) {
+      current = { title: "Overview", jumpIndex: i, dividerIndex: null, items: [] };
+    }
+    current.items.push({
+      index: i,
+      label: toNavLabel(slide.label, current.title),
+      proto: slide.kind === "prototype",
+    });
+  });
+  if (current) groups.push(current);
+  return groups;
 }
 
 export function NavCorner() {
@@ -63,6 +131,19 @@ export function NavCorner() {
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, []);
+
+  const groups = slides.length > 0 ? buildGroups(slides) : [];
+
+  /* Accordion state is derived, not stored: the group containing the
+     active slide (or whose divider IS the active slide) is the open one,
+     so arrowing through the deck expands sections as you arrive. */
+  const isGroupActive = (g: NavGroup) =>
+    g.dividerIndex === activeIndex ||
+    g.items.some((it) => it.index === activeIndex);
+
+  /* Flat row counter so the staggered rise animation cascades
+     top-to-bottom across groups. */
+  let row = nav.pages.length;
 
   return (
     <div
@@ -108,23 +189,75 @@ export function NavCorner() {
             </ul>
           </div>
 
-          {slides.length > 0 && (
+          {groups.length > 0 && (
             <div className="wipu-takeover-section">
               <div className="wipu-takeover-section-label">On this page</div>
-              <ul className="wipu-navcorner-list">
-                {slides.map((slide, i) => (
-                  <li key={slide.id} style={{ "--i": i } as CSSProperties}>
-                    <button
-                      type="button"
-                      className="wipu-navcorner-item"
-                      data-active={i === activeIndex ? "true" : undefined}
-                      aria-current={i === activeIndex ? "step" : undefined}
-                      onClick={() => goTo(i)}
+              <ul className="wipu-navcorner-list wipu-navcorner-groups">
+                {groups.map((group) => {
+                  const open = isGroupActive(group);
+                  const headerRow = row++;
+                  return (
+                    <li
+                      key={`g-${group.jumpIndex}`}
+                      className="wipu-navcorner-group"
+                      data-open={open ? "true" : undefined}
+                      style={{ "--i": headerRow } as CSSProperties}
                     >
-                      {toNavLabel(slide.label)}
-                    </button>
-                  </li>
-                ))}
+                      <button
+                        type="button"
+                        className="wipu-navcorner-item wipu-navcorner-group-header"
+                        data-active={open ? "true" : undefined}
+                        aria-expanded={open}
+                        onClick={() => goTo(group.jumpIndex)}
+                      >
+                        <span className="wipu-navcorner-group-title">
+                          {group.title}
+                        </span>
+                        <span
+                          className="wipu-navcorner-group-count"
+                          aria-label={`${group.items.length} slides`}
+                        >
+                          {group.items.length}
+                        </span>
+                      </button>
+                      <div className="wipu-navcorner-group-reveal">
+                        <ul className="wipu-navcorner-list wipu-navcorner-group-items">
+                          {group.items.map((item) => (
+                            <li
+                              key={item.index}
+                              style={{ "--i": open ? row++ : 0 } as CSSProperties}
+                            >
+                              <button
+                                type="button"
+                                className="wipu-navcorner-item wipu-navcorner-subitem"
+                                data-active={
+                                  item.index === activeIndex ? "true" : undefined
+                                }
+                                aria-current={
+                                  item.index === activeIndex ? "step" : undefined
+                                }
+                                tabIndex={open ? undefined : -1}
+                                onClick={() => goTo(item.index)}
+                              >
+                                <span className="wipu-navcorner-subitem-label">
+                                  {item.label}
+                                </span>
+                                {item.proto && (
+                                  <span
+                                    className="wipu-navcorner-proto-chip"
+                                    aria-label="Interactive prototype"
+                                  >
+                                    Proto
+                                  </span>
+                                )}
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           )}

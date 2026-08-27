@@ -32,7 +32,7 @@
 }
 .wipu-ti-eyebrow {
   font-size: var(--wipu-fs-eyebrow);
-  letter-spacing: 0.24em;
+  letter-spacing: var(--wipu-track-wide);
   text-transform: uppercase;
   color: var(--wipu-ink-faint);
   font-weight: 500;
@@ -66,11 +66,11 @@
   max-width: 360px;
   padding: var(--wipu-sp-xs) var(--wipu-sp-sm) var(--wipu-sp-xs) var(--wipu-sp-xs);
   border: 1px solid var(--wipu-rule);
-  border-radius: 14px;
+  border-radius: var(--wipu-r-xl);
   background: var(--wipu-bg-elev);
   color: var(--wipu-ink);
   text-decoration: none;
-  transition: border-color 160ms ease, transform 160ms ease;
+  transition: border-color var(--wipu-dur-base) ease, transform var(--wipu-dur-base) ease;
 }
 .wipu-ti-press:hover {
   border-color: var(--wipu-rule-strong);
@@ -80,7 +80,7 @@
   flex: 0 0 auto;
   width: 56px;
   height: 56px;
-  border-radius: 9px;
+  border-radius: var(--wipu-frame-radius);
   overflow: hidden;
   background: var(--wipu-rule);
 }
@@ -99,7 +99,7 @@
 .wipu-ti-press-source {
   font-family: var(--wipu-mono);
   font-size: var(--wipu-fs-eyebrow);
-  letter-spacing: 0.18em;
+  letter-spacing: var(--wipu-track-eyebrow);
   text-transform: uppercase;
   color: var(--wipu-ink-faint);
 }
@@ -113,7 +113,7 @@
   display: inline-block;
   margin-left: 2px;
   color: var(--wipu-ink-faint);
-  transition: transform 160ms ease, color 160ms ease;
+  transition: transform var(--wipu-dur-base) ease, color var(--wipu-dur-base) ease;
 }
 .wipu-ti-press:hover .wipu-ti-press-arrow {
   color: var(--wipu-ink);
@@ -137,7 +137,7 @@
 
 .wipu-placeholder {
   background: var(--wipu-bg-elev);
-  border-radius: 22px;
+  border-radius: var(--wipu-r-2xl);
   width: 100%;
   height: 100%;
   min-width: 0;
@@ -213,7 +213,7 @@
 .wipu-ti-single {
   width: min(100%, 68svh);
   margin: 0 auto;
-  border-radius: 22px;
+  border-radius: var(--wipu-r-2xl);
   overflow: hidden;
   background: var(--wipu-bg-elev);
 }
@@ -266,7 +266,7 @@
 }
 .wipu-morph-box {
   position: absolute;
-  border-radius: 22px;
+  border-radius: var(--wipu-r-2xl);
   overflow: hidden;
   will-change: left, top, width, height;
 }

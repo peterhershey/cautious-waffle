@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import { FieldNotesSlide } from "./field-notes";
 import { MediaMorphSlide, type MediaMorphMedia } from "./media-morph/MediaMorphSlide";
 import { TextImageSlide } from "./text-image/TextImageSlide";
-import { IntroTemplate } from "../templates/IntroTemplate";
+import { IntroTemplate, type IntroContact } from "../templates/IntroTemplate";
 import { StickyCardsTemplate } from "../templates/StickyCardsTemplate";
 import { ThreeUpTemplate } from "../templates/ThreeUpTemplate";
 import { TypeOnText } from "../templates/TypeOnText";
@@ -20,10 +20,12 @@ import {
   fieldNotes,
 } from "@/app/content";
 
-function HeroSlide() {
+export function HeroSlide({
+  contacts = hero.contacts,
+}: { contacts?: readonly IntroContact[] } = {}) {
   return (
     <IntroTemplate
-      emoji={<HoverGif src="/portfolio%20transfer/chocolate%20emoji.gif" />}
+      emoji={<HoverGif src="/portfolio%20transfer/chocolate%20emoji.mp4" />}
       greeting={hero.greeting}
       name={
         <TypeOnText perCharMs={140} wordPauseMs={320}>
@@ -31,7 +33,7 @@ function HeroSlide() {
         </TypeOnText>
       }
       subtitle={hero.subtitle}
-      contacts={hero.contacts}
+      contacts={contacts}
     />
   );
 }
@@ -70,7 +72,7 @@ function AiNativeSlide() {
   );
 }
 
-function AiInPracticeSlide() {
+export function AiInPracticeSlide() {
   const [home, work, lab] = aiInPractice.blocks;
   return (
     <ThreeUpTemplate
@@ -95,7 +97,7 @@ function AiInPracticeSlide() {
         {
           ...lab,
           video: {
-            src: "/portfolio%20transfer/aiart/skulls.mov",
+            src: "/portfolio%20transfer/aiart/skulls.mp4",
             alt: "Real-time generative AI — pop-art skulls",
           },
         },
@@ -104,7 +106,7 @@ function AiInPracticeSlide() {
   );
 }
 
-function EmpathySlide() {
+export function EmpathySlide() {
   return (
     <TextImageSlide
       side="left"
@@ -153,11 +155,11 @@ function EmpathySlide() {
   );
 }
 
-function CloserSlide() {
+export function CloserSlide() {
   return (
     <IntroTemplate
       emoji={
-        <HoverGif src="/portfolio%20transfer/peace%20emoji%20.gif" alt="Peace" />
+        <HoverGif src="/portfolio%20transfer/peace%20emoji%20.mp4" alt="Peace" />
       }
       name={closer.title}
       contacts={hero.contacts}
@@ -165,7 +167,25 @@ function CloserSlide() {
   );
 }
 
-function QualificationsSlide() {
+/* The case-studies slide — a tinted-card index that links out to each case
+   study. Shared across the home deck, the /anthropic cut, and the end of
+   every case-study deck, so there's always a jumping-off point. Override
+   eyebrow/title to retitle it (e.g. "More work." at the end of a deck). */
+export function CasesSlide({
+  eyebrow = cases.label,
+  title = cases.title,
+}: { eyebrow?: string; title?: ReactNode } = {}) {
+  return (
+    <StickyCardsTemplate
+      eyebrow={eyebrow}
+      title={title}
+      autoReveal
+      blocks={cases.blocks.map((b) => ({ ...b }))}
+    />
+  );
+}
+
+export function QualificationsSlide() {
   const [previously, currently] = qualifications.blocks;
   return (
     <ThreeUpTemplate
@@ -173,15 +193,15 @@ function QualificationsSlide() {
       blocks={[
         {
           ...previously,
-          image: {
-            src: "/portfolio%20transfer/field%20notes/product/washington-post-homepage.gif",
+          video: {
+            src: "/portfolio%20transfer/field%20notes/product/washington-post-homepage.mp4",
             alt: "Washington Post homepage redesign",
           },
         },
         {
           ...currently,
-          image: {
-            src: "/portfolio%20transfer/gemini_visualoverlays_commercial_2.gif",
+          video: {
+            src: "/portfolio%20transfer/gemini_visualoverlays_commercial_2.mp4",
             alt: "Gemini Visual Overlays — what it feels like when a model can look at what you're looking at.",
           },
         },
@@ -231,14 +251,7 @@ export const SLIDES: SlideDef[] = [
   {
     id: "cases",
     label: cases.label,
-    render: () => (
-      <StickyCardsTemplate
-        eyebrow={cases.label}
-        title={cases.title}
-        autoReveal
-        blocks={cases.blocks.map((b) => ({ ...b }))}
-      />
-    ),
+    render: () => <CasesSlide />,
   },
   {
     id: "closer",

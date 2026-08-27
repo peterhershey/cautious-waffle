@@ -73,7 +73,7 @@ body[data-hide-deck-chrome="true"] .wipu-chrome {
   background: color-mix(in srgb, var(--wipu-ink) 35%, transparent);
   border: 1px solid var(--glass-border);
   opacity: 0;
-  transition: opacity 200ms ease, background 200ms ease;
+  transition: opacity var(--wipu-dur-base) ease, background var(--wipu-dur-base) ease;
   pointer-events: none;
 }
 
@@ -110,7 +110,7 @@ body[data-hide-deck-chrome="true"] .wipu-chrome {
   opacity: 0;
   transform: translateY(-6px) scale(0.98);
   transform-origin: top center;
-  transition: opacity 180ms ease, transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: opacity var(--wipu-dur-base) ease, transform var(--wipu-dur-base) var(--wipu-ease);
 }
 .wipu-corner-panel::-webkit-scrollbar {
   display: none;
@@ -136,7 +136,7 @@ body[data-hide-deck-chrome="true"] .wipu-chrome {
   justify-content: space-between;
   font-family: var(--wipu-mono);
   font-size: var(--wipu-fs-eyebrow);
-  letter-spacing: 0.22em;
+  letter-spacing: var(--wipu-track-eyebrow);
   text-transform: uppercase;
   color: var(--wipu-ink-faint);
   margin-bottom: var(--wipu-sp-sm);
@@ -152,7 +152,7 @@ body[data-hide-deck-chrome="true"] .wipu-chrome {
 
 .wipu-corner-panel-hint {
   font-size: var(--wipu-fs-eyebrow);
-  letter-spacing: 0.12em;
+  letter-spacing: var(--wipu-track-tight);
   color: var(--wipu-ink-faint);
 }
 
@@ -172,7 +172,7 @@ body[data-hide-deck-chrome="true"] .wipu-chrome {
   align-items: baseline;
   gap: var(--wipu-sp-sm);
   padding: 9px 10px;
-  border-radius: 10px;
+  border-radius: var(--wipu-frame-radius);
   background: transparent;
   border: 1px solid transparent;
   color: var(--wipu-ink-dim);
@@ -244,7 +244,7 @@ body[data-hide-deck-chrome="true"] .wipu-chrome {
    bracketed slide title cleanly cedes to the takeover's [ NAVIGATOR ]
    row in the same position. Quick fade keeps it from feeling abrupt. */
 .site-frame-tl {
-  transition: opacity 80ms ease-out;
+  transition: opacity var(--wipu-dur-xfast) ease-out;
 }
 .wipu-chrome:has(.wipu-corner--takeover:hover) .site-frame-tl,
 .wipu-chrome:has(.wipu-corner--takeover:focus-within) .site-frame-tl,
@@ -292,7 +292,7 @@ body[data-hide-deck-chrome="true"] .wipu-chrome {
 .wipu-corner--takeover:hover .wipu-navcorner-list li,
 .wipu-corner--takeover:focus-within .wipu-navcorner-list li,
 .wipu-corner--takeover[data-open="true"] .wipu-navcorner-list li {
-  animation: wipu-takeover-rise 220ms ease-out both;
+  animation: wipu-takeover-rise var(--wipu-dur-base) ease-out both;
   animation-delay: calc(var(--i, 0) * 22ms + 40ms);
 }
 
@@ -320,11 +320,11 @@ body[data-hide-deck-chrome="true"] .wipu-chrome {
   color: #fff;
   background: transparent;
   border: 0;
-  border-radius: 12px;
+  border-radius: var(--wipu-frame-radius);
   padding: 9px var(--wipu-sp-sm);
   text-align: left;
   cursor: pointer;
-  transition: background-color 140ms ease;
+  transition: background-color var(--wipu-dur-fast) ease;
 }
 .wipu-corner--takeover .wipu-navcorner-item:hover,
 .wipu-corner--takeover .wipu-navcorner-item:focus-visible {
@@ -339,6 +339,110 @@ body[data-hide-deck-chrome="true"] .wipu-chrome {
 .wipu-corner--takeover .wipu-navcorner-item[data-active="true"] {
   color: #fff;
   background: rgba(255, 255, 255, 0.12);
+}
+
+/* ── NavCorner: grouped accordion for "On this page" ─────────────
+   Section divider slides ("Section · X") become group headers; the
+   group holding the active slide is expanded, the rest collapse to
+   header + slide count. Expansion is derived from the active slide,
+   so arrowing through the deck opens sections as you arrive. */
+.wipu-navcorner-group {
+  display: flex;
+  flex-direction: column;
+}
+.wipu-navcorner-groups > .wipu-navcorner-group + .wipu-navcorner-group {
+  margin-top: 2px;
+}
+
+.wipu-corner--takeover .wipu-navcorner-group-header {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+.wipu-navcorner-group-title {
+  font-family: var(--wipu-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  transition: color var(--wipu-dur-fast) ease;
+  white-space: nowrap;
+}
+/* Dotted leader runs from title to count, like a table of contents. */
+.wipu-corner--takeover .wipu-navcorner-group-header::after {
+  content: "";
+  flex: 1;
+  border-bottom: 1px dotted rgba(255, 255, 255, 0.18);
+  transform: translateY(-3px);
+  order: 1;
+}
+.wipu-navcorner-group-count {
+  order: 2;
+  font-family: var(--wipu-mono);
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.38);
+}
+.wipu-corner--takeover .wipu-navcorner-group-header:hover .wipu-navcorner-group-title,
+.wipu-corner--takeover .wipu-navcorner-group-header[data-active="true"] .wipu-navcorner-group-title {
+  color: #fff;
+}
+/* Headers read as rows, not pills — the active pill belongs to slides. */
+.wipu-corner--takeover .wipu-navcorner-group-header[data-active="true"] {
+  background: transparent;
+}
+
+/* Collapse/expand via grid-rows — animates height without measuring. */
+.wipu-navcorner-group-reveal {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--wipu-dur-base) ease;
+}
+.wipu-navcorner-group[data-open="true"] > .wipu-navcorner-group-reveal {
+  grid-template-rows: 1fr;
+}
+.wipu-navcorner-group-reveal > .wipu-navcorner-group-items {
+  overflow: hidden;
+  min-height: 0;
+}
+
+.wipu-corner--takeover .wipu-navcorner-subitem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 7px;
+  padding-bottom: 7px;
+  padding-left: calc(var(--wipu-sp-sm) + 10px);
+  color: rgba(255, 255, 255, 0.88);
+}
+.wipu-navcorner-subitem-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wipu-navcorner-proto-chip {
+  margin-left: auto;
+  flex: none;
+  font-family: var(--wipu-mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1;
+  color: var(--wipu-mustard);
+  border: 1px solid rgba(242, 208, 106, 0.45);
+  border-radius: 999px;
+  padding: 3px 7px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wipu-navcorner-group-reveal {
+    transition: none;
+  }
 }
 
 

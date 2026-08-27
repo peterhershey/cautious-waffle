@@ -70,14 +70,14 @@
   gap: 6px;
   padding: 10px 20px;
   min-height: 44px;
-  border-radius: 999px;
+  border-radius: var(--wipu-r-pill);
   background: transparent;
   color: var(--wipu-ink);
   border: 2px solid var(--tone-bg);
   text-decoration: none;
   font-weight: 600;
   letter-spacing: 0.01em;
-  transition: background-color 140ms ease, color 140ms ease, transform 140ms ease, box-shadow 140ms ease;
+  transition: background-color var(--wipu-dur-fast) ease, color var(--wipu-dur-fast) ease, transform var(--wipu-dur-fast) ease, box-shadow var(--wipu-dur-fast) ease;
 }
 .wipu-tpl-intro-contact[data-tone="mint"] {
   --tone-bg: var(--wipu-mint);
@@ -129,7 +129,7 @@
 .wipu-tpl-threeup-head-eyebrow {
   font-family: var(--wipu-mono);
   font-size: var(--wipu-fs-eyebrow);
-  letter-spacing: 0.16em;
+  letter-spacing: var(--wipu-track-tight);
   text-transform: uppercase;
   color: var(--wipu-ink-dim);
 }
@@ -182,7 +182,7 @@
 .wipu-tpl-threeup-eyebrow {
   font-family: var(--wipu-mono);
   font-size: var(--wipu-fs-eyebrow);
-  letter-spacing: 0.24em;
+  letter-spacing: var(--wipu-track-wide);
   text-transform: uppercase;
   color: var(--wipu-ink-faint);
   font-weight: 500;
@@ -254,7 +254,7 @@
 }
 .wipu-tpl-threeup[data-variant="phone"] .wipu-tpl-threeup-eyebrow {
   font-size: var(--wipu-fs-eyebrow);
-  letter-spacing: 0.22em;
+  letter-spacing: var(--wipu-track-eyebrow);
   margin-top: 0;
   order: 1;
 }
@@ -325,7 +325,7 @@
   font-family: var(--wipu-mono);
   font-size: var(--wipu-fs-eyebrow);
   font-weight: 500;
-  letter-spacing: 0.18em;
+  letter-spacing: var(--wipu-track-eyebrow);
   text-transform: uppercase;
   color: var(--wipu-ink-faint);
   margin-bottom: var(--wipu-sp-md);
@@ -381,7 +381,7 @@
   top: 0;
   left: 0;
   font-size: var(--wipu-fs-eyebrow);
-  letter-spacing: 0.22em;
+  letter-spacing: var(--wipu-track-eyebrow);
   text-transform: uppercase;
   font-weight: 500;
   color: var(--wipu-mustard);
@@ -456,7 +456,7 @@
   letter-spacing: 0.02em;
   padding: var(--wipu-sp-md) var(--wipu-sp-md);
   width: clamp(220px, 22vw, 320px);
-  border-radius: 4px;
+  border-radius: var(--wipu-r-sm);
 }
 
 .wipu-tpl-goal-card-tl { top: 6%; left: 4%; }
@@ -500,7 +500,7 @@
   line-height: 1.55;
   letter-spacing: 0.02em;
   padding: var(--wipu-sp-md) var(--wipu-sp-md);
-  border-radius: 4px;
+  border-radius: var(--wipu-r-sm);
   z-index: 2;
 }
 
@@ -575,6 +575,12 @@
   font-weight: 600;
 }
 
+/* Small variant — a quieter headline for closing beats (e.g. a thank-you
+   slide), where the line should read as a sign-off rather than a thesis. */
+.wipu-tpl-emojihead.is-small .wipu-tpl-emojihead-title {
+  font-size: var(--wipu-fs-h3);
+}
+
 /* Small secondary line below the headline. Hidden until typing completes,
    then fades up. data-visible is toggled by the template once revealed
    reaches the total character count. */
@@ -586,8 +592,8 @@
   color: var(--wipu-ink-faint);
   opacity: 0;
   transform: translateY(6px);
-  transition: opacity 520ms ease-out, transform 520ms ease-out;
-  transition-delay: 220ms;
+  transition: opacity var(--wipu-dur-slower) ease-out, transform var(--wipu-dur-slower) ease-out;
+  transition-delay: var(--wipu-dur-base);
 }
 .wipu-tpl-emojihead-note[data-visible] {
   opacity: 1;
@@ -699,7 +705,7 @@
   margin-top: var(--wipu-sp-lg);
   font-size: var(--wipu-fs-meta);
   font-style: normal;
-  letter-spacing: 0.14em;
+  letter-spacing: var(--wipu-track-tight);
   text-transform: uppercase;
   color: var(--wipu-ink-dim);
 }
@@ -764,7 +770,7 @@
 .wipu-tpl-chapter-eyebrow {
   font-family: var(--wipu-mono);
   font-size: var(--wipu-fs-eyebrow);
-  letter-spacing: 0.28em;
+  letter-spacing: var(--wipu-track-wide);
   color: var(--wipu-ink-faint);
 }
 .wipu-tpl-chapter-title {
@@ -778,7 +784,7 @@
 .wipu-tpl-chapter-date {
   font-family: var(--wipu-mono);
   font-size: var(--wipu-fs-eyebrow);
-  letter-spacing: 0.18em;
+  letter-spacing: var(--wipu-track-eyebrow);
   color: var(--wipu-ink-dim);
 }
 
@@ -810,7 +816,7 @@
   align-items: baseline;
   column-gap: clamp(20px, 2.4vw, 32px);
   color: var(--wipu-ink-faint);
-  transition: color 280ms ease;
+  transition: color var(--wipu-dur-slow) ease;
 }
 .wipu-tpl-section-item[data-active="true"] {
   color: var(--wipu-ink);
@@ -818,7 +824,7 @@
 .wipu-tpl-section-num {
   font-family: var(--wipu-mono);
   font-size: var(--wipu-fs-eyebrow);
-  letter-spacing: 0.22em;
+  letter-spacing: var(--wipu-track-eyebrow);
   font-variant-numeric: tabular-nums;
   color: var(--wipu-ink-faint);
   padding-top: 0.55em;
@@ -845,7 +851,7 @@
 .wipu-tpl-section-meta {
   font-family: var(--wipu-mono);
   font-size: var(--wipu-fs-eyebrow);
-  letter-spacing: 0.22em;
+  letter-spacing: var(--wipu-track-eyebrow);
   text-transform: uppercase;
   color: var(--wipu-ink-dim);
   margin-top: 2px;
@@ -995,7 +1001,7 @@
 .wipu-tpl-glance-eyebrow {
   font-family: var(--wipu-mono);
   font-size: var(--wipu-fs-eyebrow);
-  letter-spacing: 0.24em;
+  letter-spacing: var(--wipu-track-wide);
   text-transform: uppercase;
   font-weight: 500;
   color: var(--wipu-ink-faint);
@@ -1037,7 +1043,7 @@
 .wipu-tpl-glance-label {
   font-family: var(--wipu-mono);
   font-size: var(--wipu-fs-eyebrow);
-  letter-spacing: 0.22em;
+  letter-spacing: var(--wipu-track-eyebrow);
   text-transform: uppercase;
   font-weight: 500;
   color: var(--wipu-ink-faint);
@@ -1164,7 +1170,7 @@
 .wipu-tpl-sticky-head-eyebrow {
   font-family: var(--wipu-mono);
   font-size: var(--wipu-fs-eyebrow);
-  letter-spacing: 0.16em;
+  letter-spacing: var(--wipu-track-tight);
   text-transform: uppercase;
   color: var(--wipu-ink-dim);
 }
@@ -1192,7 +1198,7 @@
 }
 .wipu-tpl-sticky-card {
   position: relative;
-  border-radius: 4px;
+  border-radius: var(--wipu-r-sm);
   padding: var(--wipu-sp-lg);
   font-family: var(--wipu-mono);
   box-shadow:
@@ -1202,8 +1208,8 @@
   transform: scale(0.92) translateY(14px) rotate(0deg);
   transform-origin: 50% 0%;
   transition:
-    opacity 460ms cubic-bezier(0.22, 0.8, 0.2, 1),
-    transform 540ms cubic-bezier(0.22, 0.8, 0.2, 1);
+    opacity 460ms var(--wipu-ease),
+    transform 540ms var(--wipu-ease);
   will-change: opacity, transform;
 }
 
@@ -1228,9 +1234,9 @@
   color: inherit;
   cursor: pointer;
   transition:
-    opacity 460ms cubic-bezier(0.22, 0.8, 0.2, 1),
-    transform 540ms cubic-bezier(0.22, 0.8, 0.2, 1),
-    box-shadow 220ms ease-out;
+    opacity 460ms var(--wipu-ease),
+    transform 540ms var(--wipu-ease),
+    box-shadow var(--wipu-dur-base) ease-out;
 }
 .wipu-tpl-sticky-card[data-link="true"][data-revealed="true"]:hover,
 .wipu-tpl-sticky-card[data-link="true"][data-revealed="true"]:focus-visible {
@@ -1287,7 +1293,7 @@
 
 .wipu-tpl-sticky-eyebrow {
   font-size: var(--wipu-fs-eyebrow);
-  letter-spacing: 0.24em;
+  letter-spacing: var(--wipu-track-wide);
   text-transform: uppercase;
   font-weight: 500;
   opacity: 0.72;
@@ -1327,13 +1333,13 @@
   font-weight: 500;
   letter-spacing: 0.04em;
   padding: 6px 10px 6px 12px;
-  border-radius: 999px;
+  border-radius: var(--wipu-r-pill);
   background: color-mix(in srgb, currentColor 14%, transparent);
   border: 1px solid color-mix(in srgb, currentColor 32%, transparent);
   transition:
-    transform 220ms cubic-bezier(0.22, 0.8, 0.2, 1),
-    background 220ms ease-out,
-    border-color 220ms ease-out;
+    transform var(--wipu-dur-base) var(--wipu-ease),
+    background var(--wipu-dur-base) ease-out,
+    border-color var(--wipu-dur-base) ease-out;
   pointer-events: none;
 }
 .wipu-tpl-sticky-card[data-link="true"][data-revealed="true"]:hover::after,
@@ -1389,7 +1395,7 @@
    state too, so cards just fade in. */
 @media (prefers-reduced-motion: reduce) {
   .wipu-tpl-sticky-card {
-    transition: opacity 200ms ease;
+    transition: opacity var(--wipu-dur-base) ease;
     transform: none;
   }
   .wipu-tpl-sticky-card[data-card-idx="0"][data-revealed="true"],

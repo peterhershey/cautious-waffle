@@ -1,0 +1,324 @@
+/* Peter's Principles slide — /anthropic deck only.
+   Left-aligned header over a three-up of principle icons + copy. */
+
+.wipu-principles {
+  width: 100%;
+  max-width: min(1120px, 88vw);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(36px, 6vh, 72px);
+  color: var(--wipu-ink);
+}
+
+.wipu-principles-head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wipu-sp-xs);
+}
+.wipu-principles-eyebrow {
+  margin: 0;
+  font-family: var(--wipu-mono);
+  font-size: var(--wipu-fs-eyebrow);
+  letter-spacing: var(--wipu-track-eyebrow);
+  text-transform: uppercase;
+  color: var(--wipu-ink-dim);
+}
+.wipu-principles-title {
+  margin: 0;
+  font-family: var(--wipu-mono);
+  font-weight: 600;
+  font-size: clamp(32px, 3vw + 18px, 52px);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--wipu-ink);
+}
+
+.wipu-principles-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(28px, 4vw, 64px);
+}
+.wipu-principles-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--wipu-sp-md);
+  min-width: 0;
+  transition: opacity var(--wipu-dur-base) ease;
+}
+
+/* Hovering one principle dims the other two so the focus is clear. */
+@media (hover: hover) {
+  .wipu-principles-grid:hover .wipu-principles-item:not(:hover) {
+    opacity: 0.32;
+  }
+}
+
+.wipu-principles-icon {
+  width: clamp(72px, 7vw, 96px);
+  height: clamp(72px, 7vw, 96px);
+}
+.wipu-principles-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+
+.wipu-principles-item-title {
+  margin: var(--wipu-sp-2xs) 0 0;
+  font-family: var(--wipu-mono);
+  font-weight: 600;
+  font-size: var(--wipu-fs-h3);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--wipu-ink);
+}
+.wipu-principles-item-body {
+  margin: 0;
+  font-family: var(--wipu-mono);
+  font-size: var(--wipu-fs-meta);
+  line-height: 1.6;
+  color: var(--wipu-ink-dim);
+}
+
+@media (max-width: 768px) {
+  .wipu-principles-grid {
+    grid-template-columns: 1fr;
+    gap: clamp(28px, 5vh, 40px);
+  }
+}
+
+/* ───────── Hover animations ─────────
+   Each icon reacts when its column is hovered. Scoped to hover-capable
+   pointers so touch devices keep a static (already-smiling) face, and
+   fully disabled under prefers-reduced-motion. */
+
+/* Be prolific — a little deck of note cards.
+   The three cards sit in a hand-stacked pile (front card smiling). On
+   hover they cycle: each card draws a smile, deals itself up and over to
+   the back, and the next card takes the front — looping endlessly. The
+   cards are HTML so they can genuinely restack via z-index. */
+.wipu-principles-cards {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.wipu-principles-card {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 58%;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--wipu-r-md);
+  transform-origin: 50% 60%;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.28);
+}
+.wipu-principles-card svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.wipu-principles-card svg g {
+  stroke: currentColor;
+}
+.wipu-principles-card[data-tone="mint"] {
+  background: var(--wipu-mint);
+  color: var(--wipu-mint-ink);
+}
+.wipu-principles-card[data-tone="mustard"] {
+  background: var(--wipu-mustard);
+  color: var(--wipu-mustard-ink);
+}
+.wipu-principles-card[data-tone="rose"] {
+  background: var(--wipu-rose);
+  color: var(--wipu-rose-ink);
+}
+
+/* Resting pile — mint front, rose mid-right, mustard back-left. */
+.wipu-principles-card[data-card="0"] {
+  transform: rotate(-3deg) translateY(3%);
+  z-index: 3;
+}
+.wipu-principles-card[data-card="1"] {
+  transform: rotate(-12deg) translate(-15%, -9%);
+  z-index: 1;
+}
+.wipu-principles-card[data-card="2"] {
+  transform: rotate(10deg) translate(15%, -11%);
+  z-index: 2;
+}
+
+/* Smileys: hidden by default, shown only on the resting front card. */
+.wipu-principles-eye {
+  opacity: 0;
+  transform: scale(0);
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.wipu-principles-mouth {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+}
+.wipu-principles-card[data-card="0"] .wipu-principles-eye {
+  opacity: 1;
+  transform: scale(1);
+}
+.wipu-principles-card[data-card="0"] .wipu-principles-mouth {
+  stroke-dashoffset: 0;
+}
+
+/* On hover-capable pointers, the resting front face is cleared so the
+   cycle can draw it on; touch devices keep the static smile above. */
+@media (hover: hover) {
+  .wipu-principles-card[data-card="0"] .wipu-principles-eye {
+    opacity: 0;
+    transform: scale(0);
+  }
+  .wipu-principles-card[data-card="0"] .wipu-principles-mouth {
+    stroke-dashoffset: 100;
+  }
+  /* Even thirds of the 7.8s cycle (2.6s apart), so exactly one card is
+     at the front at a time — no overlap, no z-index fight. */
+  .wipu-principles-card[data-card="0"] { --d: 0s; }
+  .wipu-principles-card[data-card="1"] { --d: -2.6s; }
+  .wipu-principles-card[data-card="2"] { --d: -5.2s; }
+
+  .wipu-principles-item:hover .wipu-principles-card {
+    animation: wipu-principles-deal 7.8s ease-in-out infinite;
+    animation-delay: var(--d);
+  }
+  /* Marker draws the face: the smile arc first, then a dot, then a dot. */
+  .wipu-principles-item:hover .wipu-principles-mouth {
+    animation: wipu-principles-mouth 7.8s ease-in-out infinite;
+    animation-delay: var(--d);
+  }
+  .wipu-principles-item:hover .wipu-principles-eye:nth-of-type(1) {
+    animation: wipu-principles-eye-1 7.8s ease infinite;
+    animation-delay: var(--d);
+  }
+  .wipu-principles-item:hover .wipu-principles-eye:nth-of-type(2) {
+    animation: wipu-principles-eye-2 7.8s ease infinite;
+    animation-delay: var(--d);
+  }
+}
+
+@keyframes wipu-principles-deal {
+  0% { transform: rotate(-3deg) translateY(3%) scale(1); z-index: 3; }
+  /* front, holding the finished face (zone narrower than the 33% stagger
+     so two cards are never at the front together) */
+  31% { transform: rotate(-3deg) translateY(3%) scale(1); z-index: 3; }
+  /* lift up and over the top of the pile */
+  33% { transform: rotate(-4deg) translateY(-34%) scale(1.07); z-index: 4; }
+  /* land at the back */
+  42% { transform: rotate(-12deg) translate(-15%, -9%) scale(0.9); z-index: 1; }
+  60% { transform: rotate(-12deg) translate(-15%, -9%) scale(0.9); z-index: 1; }
+  /* advance to the middle */
+  70% { transform: rotate(10deg) translate(15%, -11%) scale(0.95); z-index: 2; }
+  92% { transform: rotate(10deg) translate(15%, -11%) scale(0.95); z-index: 2; }
+  /* return to the front */
+  100% { transform: rotate(-3deg) translateY(3%) scale(1); z-index: 3; }
+}
+/* The face is drawn at the front, held through the rest AND the deal to
+   the back (so the card carries its smile up and over), then blanked in a
+   single frame at 51% while it's parked behind the stack — unseen, so the
+   card reads as blank again by the time it cycles back to the front.
+
+   Same 7.8s tempo as before — the change is WHERE the time goes: the
+   marker draws quickly, then the finished face just sits and rests before
+   a quick flip. Timeline (deal lifts at 31%, lands at back ~42%):
+     0–4%   blank beat after the card fronts up
+     4–20%  marker draws the face: smile arc, then left dot, then right dot
+     20–31% the finished face RESTS at the front (the held beat)
+     31–42% quick flip — carried to the back, still smiling
+     51%    face blanks behind the stack (hidden)            */
+@keyframes wipu-principles-mouth {
+  0%, 4% { stroke-dashoffset: 100; }
+  16% { stroke-dashoffset: 0; }
+  50% { stroke-dashoffset: 0; }
+  51%, 100% { stroke-dashoffset: 100; }
+}
+/* 2) Left eye — a deliberate dot with a little press. */
+@keyframes wipu-principles-eye-1 {
+  0%, 12% { opacity: 0; transform: scale(0); }
+  15% { opacity: 1; transform: scale(1.3); }
+  17% { opacity: 1; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1); }
+  51%, 100% { opacity: 0; transform: scale(0); }
+}
+/* 3) Right eye — the second dot. */
+@keyframes wipu-principles-eye-2 {
+  0%, 15% { opacity: 0; transform: scale(0); }
+  18% { opacity: 1; transform: scale(1.3); }
+  20% { opacity: 1; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1); }
+  51%, 100% { opacity: 0; transform: scale(0); }
+}
+
+/* We are all flying blind — the needle keeps its resting tilt, then
+   thrashes wildly while hovered (origin shared via fill-box center). */
+.wipu-principles-needle {
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: rotate(34deg);
+}
+@media (hover: hover) {
+  .wipu-principles-item:hover .wipu-principles-needle {
+    animation: wipu-needle-wild 0.8s ease-in-out infinite;
+  }
+}
+@keyframes wipu-needle-wild {
+  0% { transform: rotate(18deg); }
+  12% { transform: rotate(-42deg); }
+  24% { transform: rotate(76deg); }
+  36% { transform: rotate(-28deg); }
+  48% { transform: rotate(58deg); }
+  60% { transform: rotate(-52deg); }
+  72% { transform: rotate(44deg); }
+  84% { transform: rotate(-16deg); }
+  100% { transform: rotate(30deg); }
+}
+
+/* Build for change — the cattail reed bends hard in a gust and springs
+   back, pivoting from its base in the ground line. The skew makes the
+   top whip over further than the base, so it reads as a real bend. */
+.wipu-principles-reed {
+  transform-box: view-box;
+  transform-origin: 61px 97px;
+}
+@media (hover: hover) {
+  .wipu-principles-item:hover .wipu-principles-reed {
+    animation: wipu-reed-bend 2.8s ease-in-out infinite;
+  }
+}
+@keyframes wipu-reed-bend {
+  0% { transform: rotate(-3deg) skewX(-2deg); }
+  28% { transform: rotate(18deg) skewX(-12deg); }
+  45% { transform: rotate(25deg) skewX(-16deg); }
+  62% { transform: rotate(7deg) skewX(-5deg); }
+  82% { transform: rotate(-8deg) skewX(4deg); }
+  100% { transform: rotate(-3deg) skewX(-2deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wipu-principles-item:hover .wipu-principles-card,
+  .wipu-principles-item:hover .wipu-principles-eye,
+  .wipu-principles-item:hover .wipu-principles-mouth,
+  .wipu-principles-item:hover .wipu-principles-needle,
+  .wipu-principles-item:hover .wipu-principles-reed {
+    animation: none;
+  }
+  /* Keep a calm, static smile on the front card. */
+  .wipu-principles-card[data-card="0"] .wipu-principles-eye {
+    opacity: 1;
+    transform: scale(1);
+  }
+  .wipu-principles-card[data-card="0"] .wipu-principles-mouth {
+    stroke-dashoffset: 0;
+  }
+}

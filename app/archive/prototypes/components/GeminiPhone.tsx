@@ -8,6 +8,10 @@ type GeminiPhoneProps = {
   children: ReactNode;
   platform?: Platform;
   onLabelClick?: () => void;
+  /** Drop the Gemini app header (menu / Peter Labs / new chat) so the body
+      content runs full-bleed right under the status bar. Used by the image
+      editor, whose canvas owns the whole screen. */
+  headerless?: boolean;
 };
 
 export const PhoneScreenContext = createContext<HTMLDivElement | null>(null);
@@ -17,6 +21,7 @@ export function GeminiPhone({
   children,
   platform = "ios",
   onLabelClick,
+  headerless = false,
 }: GeminiPhoneProps) {
   const [screenEl, setScreenEl] = useState<HTMLDivElement | null>(null);
 
@@ -43,30 +48,32 @@ export function GeminiPhone({
           ) : (
             <div className="gemini-device-punch" aria-hidden />
           )}
-          <header className="gemini-header">
-            <button type="button" aria-label="Menu" className="gemini-icon-btn">
-              <span className="proto-icon" style={{ fontSize: "calc(22 * var(--u, 1px))" }} aria-hidden>
-                menu
-              </span>
-            </button>
-            {onLabelClick ? (
-              <button
-                type="button"
-                className="proto-phone-header-chip"
-                onClick={onLabelClick}
-                aria-label="Open prototype controls"
-              >
-                Peter Labs
+          {headerless ? null : (
+            <header className="gemini-header">
+              <button type="button" aria-label="Menu" className="gemini-icon-btn">
+                <span className="proto-icon" style={{ fontSize: "calc(22 * var(--u, 1px))" }} aria-hidden>
+                  menu
+                </span>
               </button>
-            ) : (
-              <span className="proto-phone-header-chip">Peter Labs</span>
-            )}
-            <button type="button" aria-label="New chat" className="gemini-icon-btn">
-              <span className="proto-icon" style={{ fontSize: "calc(22 * var(--u, 1px))" }} aria-hidden>
-                edit_square
-              </span>
-            </button>
-          </header>
+              {onLabelClick ? (
+                <button
+                  type="button"
+                  className="proto-phone-header-chip"
+                  onClick={onLabelClick}
+                  aria-label="Open prototype controls"
+                >
+                  Peter Labs
+                </button>
+              ) : (
+                <span className="proto-phone-header-chip">Peter Labs</span>
+              )}
+              <button type="button" aria-label="New chat" className="gemini-icon-btn">
+                <span className="proto-icon" style={{ fontSize: "calc(22 * var(--u, 1px))" }} aria-hidden>
+                  edit_square
+                </span>
+              </button>
+            </header>
+          )}
           <div className="gemini-body">{children}</div>
           <div className="gemini-home-indicator" aria-hidden />
         </PhoneScreenContext.Provider>

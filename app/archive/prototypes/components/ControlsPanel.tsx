@@ -16,6 +16,11 @@ type ControlsPanelProps = {
   children?: ReactNode;
   mobileOpen?: boolean;
   onMobileClose?: () => void;
+  /** Drop the built-in Scenario / Playback sections for prototypes that drive
+      themselves through direct interaction rather than a scripted playback
+      (e.g. the image editor). The header and any children still render. */
+  hideScenario?: boolean;
+  hidePlayback?: boolean;
 };
 
 export function ControlsPanel({
@@ -30,6 +35,8 @@ export function ControlsPanel({
   children,
   mobileOpen,
   onMobileClose,
+  hideScenario,
+  hidePlayback,
 }: ControlsPanelProps) {
   const scenarioList = scenarios ?? prototype.scenarios;
   const isPlaying = status === "playing";
@@ -39,6 +46,9 @@ export function ControlsPanel({
     <aside
       className="proto-panel"
       data-mobile-open={mobileOpen ? "true" : undefined}
+      /* Exempts the panel from the case-study deck's wheel/touch hijack so
+         the scenario list scrolls natively when embedded. Inert standalone. */
+      data-allow-scroll="true"
     >
       {onMobileClose ? (
         <button
@@ -71,6 +81,7 @@ export function ControlsPanel({
         ) : null}
       </div>
 
+      {hideScenario ? null : (
       <div className="proto-panel-section">
         <span className="proto-panel-kicker">Scenario</span>
         <div className="proto-scenario-list" role="radiogroup" aria-label="Scenario">
@@ -93,7 +104,9 @@ export function ControlsPanel({
           })}
         </div>
       </div>
+      )}
 
+      {hidePlayback ? null : (
       <div className="proto-panel-section">
         <span className="proto-panel-kicker">Playback</span>
         <div className="proto-transport">
@@ -126,6 +139,7 @@ export function ControlsPanel({
           </button>
         </div>
       </div>
+      )}
 
       {children}
     </aside>

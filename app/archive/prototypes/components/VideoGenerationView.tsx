@@ -18,7 +18,7 @@ const EASE = [0.2, 0.7, 0.2, 1] as const;
 const SPARKLE_SRC = "/prototypes/video-generation/gemini-sparkle.svg";
 const VIDEO_SRC = "/prototypes/video-generation/generated-video.mp4";
 const VIDEO_SRC_CAR = "/prototypes/video-generation/veo/car-becomes-spaceship.mp4";
-const CAR_IMAGE_SRC = "/assets/samples/camera-roll-car.jpg";
+const CAR_IMAGE_SRC = "/assets/samples/thumbs/camera-roll-car.jpg";
 
 function Icon({
   name,
@@ -366,6 +366,11 @@ export function VideoGenerationView({
         >
           <div className="gemini-screen-stack">
             <div className="gemini-content-area" onClick={dismissInput}>
+              {/* mode="wait" renders exactly one child at a time: the outgoing
+                  view animates out fully before the next mounts. Both branches
+                  are flex:1, so any overlap (sync/popLayout) stacks the greeting,
+                  loader, and player on top of each other — the "broken" overlap
+                  seen mid-flow. The brief crossfade gap here is intentional. */}
               <AnimatePresence mode="wait">
                 {step === "sent" || step === "ready" || step === "planning" ? (
                   <ChatState
@@ -583,6 +588,9 @@ function ChatState({
         data-state={step}
         transition={{ layout: { duration: 0.6, ease: EASE } }}
       >
+        {/* mode="wait" so the loader fully exits before the player mounts —
+            otherwise both stack inside the media card (stale loader behind the
+            video at "ready"). */}
         <AnimatePresence mode="wait">
           {step === "planning" ? (
             <VideoPlanCard
@@ -674,11 +682,31 @@ function Player({
   const hideTimerRef = useRef<number | null>(null);
   const [controlsVisible, setControlsVisible] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(true);
+  // Start false — only flip to true once the element actually reports playback.
+  // Defaulting to true made the pause icon show even when autoplay was blocked
+  // or the source stalled, so a non-playing video read as "playing".
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [failed, setFailed] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const portalTarget = useContext(PhoneScreenContext);
   const platform = useContext(PhonePlatformContext);
+
+  // Explicitly kick playback once the source can play. Browsers permit muted
+  // autoplay, but under load (many tabs, throttled timers) the implicit
+  // `autoPlay` attribute can be skipped — this retry guarantees the first frame
+  // animates instead of sitting frozen. If it's genuinely blocked, the catch
+  // leaves isPlaying=false so the play affordance shows.
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    const tryPlay = () => {
+      v.play().catch(() => {});
+    };
+    if (v.readyState >= 2) tryPlay();
+    v.addEventListener("canplay", tryPlay);
+    return () => v.removeEventListener("canplay", tryPlay);
+  }, [src]);
 
   const showControls = useCallback(() => {
     setControlsVisible(true);
@@ -789,12 +817,26 @@ function Player({
         loop
         playsInline
         preload="auto"
-        onPlay={() => setIsPlaying(true)}
+        onPlaying={() => {
+          setIsPlaying(true);
+          setFailed(false);
+        }}
         onPause={() => setIsPlaying(false)}
+        onWaiting={() => setIsPlaying(false)}
+        onError={() => {
+          setIsPlaying(false);
+          setFailed(true);
+        }}
         onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
         onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
         onDurationChange={(e) => setDuration(e.currentTarget.duration)}
       />
+      {failed ? (
+        <div className="gemini-player-fallback" role="status">
+          <Icon name="movie" size={28} />
+          <span>Preview unavailable</span>
+        </div>
+      ) : null}
       <div className="gemini-player-topright">
         <button
           type="button"
@@ -1650,14 +1692,18 @@ function ToolSheet({
     },
   ];
 
+  // Small 512px JPEG thumbnails (~50-90KB each) instead of the 2.5-3.6MB
+  // full-res source PNGs. The tiles render at ~104px, so the originals were
+  // ~18MB of decode work blocking the main thread every time the sheet opened
+  // — the source of the multi-second "tap registered but nothing renders" lag.
   const media = [
-    "/assets/samples/camera-roll-car.jpg",
-    "/assets/samples/hongkong-slideshow_0000_Layer-3.png",
-    "/assets/samples/hongkong-slideshow_0003_PH_464_P400_008941-R1-071-34.png",
-    "/assets/samples/hongkong-slideshow_0005_000005080003.png",
-    "/assets/samples/hongkong-slideshow_0009_000005080021.png",
-    "/assets/samples/hongkong-slideshow_0002_Layer-1.png",
-    "/assets/samples/hongkong-slideshow_0007_000005080013.png",
+    CAR_IMAGE_SRC,
+    "/assets/samples/thumbs/hongkong-slideshow_0000_Layer-3.jpg",
+    "/assets/samples/thumbs/hongkong-slideshow_0003_PH_464_P400_008941-R1-071-34.jpg",
+    "/assets/samples/thumbs/hongkong-slideshow_0005_000005080003.jpg",
+    "/assets/samples/thumbs/hongkong-slideshow_0009_000005080021.jpg",
+    "/assets/samples/thumbs/hongkong-slideshow_0002_Layer-1.jpg",
+    "/assets/samples/thumbs/hongkong-slideshow_0007_000005080013.jpg",
   ];
 
   return (
@@ -1903,17 +1949,17 @@ const LOADING_TUTORIALS: TutorialVignette[] = [
   {
     title: "Set a camera angle",
     body: "“Low-angle tracking shot, slow motion moving forward ending with a close up.”",
-    image: "/assets/samples/hongkong-slideshow_0003_PH_464_P400_008941-R1-071-34.png",
+    image: "/assets/samples/thumbs/hongkong-slideshow_0003_PH_464_P400_008941-R1-071-34.jpg",
   },
   {
     title: "Choose a scene",
     body: "“Neon street at night, reflective wet pavement, tight framing on the lead.”",
-    image: "/assets/samples/hongkong-slideshow_0005_000005080003.png",
+    image: "/assets/samples/thumbs/hongkong-slideshow_0005_000005080003.jpg",
   },
   {
     title: "Add atmosphere",
     body: "“Golden hour, soft diffused light, dust motes drifting through the frame.”",
-    image: "/assets/samples/hongkong-slideshow_0000_Layer-3.png",
+    image: "/assets/samples/thumbs/hongkong-slideshow_0000_Layer-3.jpg",
   },
 ];
 

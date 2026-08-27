@@ -12,6 +12,8 @@ import "../_deck/slides/invitation.css";
 import "../_deck/styles/board.css";
 import "../_deck/styles/annotations.css";
 import "../_deck/chrome/chrome.css";
+import "../_deck/cursor/cursor-field.css";
+import { CursorField } from "../_deck/cursor/CursorField";
 
 const plexMono = IBM_Plex_Mono({
   variable: "--font-mono",
@@ -33,6 +35,7 @@ export default function DeckLayout({ children }: { children: React.ReactNode }) 
       suppressHydrationWarning
     >
       {children}
+      <CursorField />
     </div>
   );
 }

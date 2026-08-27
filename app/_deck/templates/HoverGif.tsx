@@ -13,7 +13,62 @@ export type HoverGifProps = {
    On touch devices there's no hover, so we render the live GIF by default
    — and we honor `prefers-reduced-motion` by sticking on the static frame
    regardless of pointer type. */
-export function HoverGif({ src, alt = "", className }: HoverGifProps) {
+const VIDEO_RE = /\.(mp4|webm|mov)$/i;
+
+/* Inline emoji video — replaces the old multi-MB animated GIFs. Sized at
+   1em like the gif <img> it stands in for. Autoplays muted+looped; honors
+   reduced-motion by holding on the first frame instead of playing. */
+function EmojiVideo({ src, alt = "", className }: HoverGifProps) {
+  const ref = useRef<HTMLVideoElement | null>(null);
+  const [reduceMotion, setReduceMotion] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const sync = () => setReduceMotion(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+  useEffect(() => {
+    const v = ref.current;
+    if (!v) return;
+    if (reduceMotion) v.pause();
+    else void v.play().catch(() => {});
+  }, [reduceMotion]);
+  return (
+    <span
+      className={className}
+      aria-label={alt || undefined}
+      role={alt ? "img" : undefined}
+      style={{
+        display: "inline-block",
+        lineHeight: 0,
+        padding: "0.4em",
+        margin: "-0.4em",
+      }}
+    >
+      <video
+        ref={ref}
+        src={src}
+        autoPlay={!reduceMotion}
+        loop
+        muted
+        playsInline
+        draggable={false}
+        style={{ height: "1em", width: "auto", display: "block" }}
+      />
+    </span>
+  );
+}
+
+export function HoverGif(props: HoverGifProps) {
+  /* Branch in a hookless wrapper so each leaf component's hooks stay
+     unconditional (rules of hooks). Video srcs use the lightweight
+     <video> path; legacy .gif srcs keep the hover-frame behavior. */
+  if (VIDEO_RE.test(props.src)) return <EmojiVideo {...props} />;
+  return <HoverGifImage {...props} />;
+}
+
+function HoverGifImage({ src, alt = "", className }: HoverGifProps) {
   const [hovered, setHovered] = useState(false);
   const [frameUrl, setFrameUrl] = useState<string | null>(null);
   /* `null` until the effect runs (SSR has no `window`); a boolean once

@@ -91,22 +91,6 @@ export const veoInGemini: CaseStudyDeckEntry = {
       ),
     },
     {
-      slug: "incident",
-      name: "Image-gen incident",
-      content: (
-        <figure className="wipu-veo-imageOnly">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/portfolio%20transfer/veo/gemini-imagegen-feb2024-debacle.jpg"
-            alt="Gemini image generation returning historically inaccurate, over-diversified depictions — the February 2024 controversy"
-            loading="lazy"
-            decoding="async"
-          />
-          <figcaption className="wipu-veo-imageOnly-cap">Feb 2024</figcaption>
-        </figure>
-      ),
-    },
-    {
       slug: "crpa-intro",
       name: "Creative partner · Framing",
       content: (

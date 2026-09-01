@@ -308,7 +308,8 @@
   box-shadow: 0 0 0 4px rgba(242, 239, 230, 0.14);
 }
 
-/* Experimental feature toggles */
+/* Experimental features. Each row is a one-tap jump: it arms the experiment
+   and drops the prototype on the screen that shows it off. */
 .proto-experiments {
   display: flex;
   flex-direction: column;
@@ -348,6 +349,30 @@
   color: var(--proto-ink);
   opacity: 0.55;
 }
+.proto-experiment-go {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  margin-top: 1px;
+  border-radius: 50%;
+  font-size: 13px;
+  line-height: 1;
+  color: var(--proto-ink);
+  background: rgba(242, 239, 230, 0.1);
+  transition: background 160ms ease, transform 180ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.proto-experiment:hover .proto-experiment-go {
+  background: rgba(242, 239, 230, 0.2);
+  transform: translateX(2px);
+}
+.proto-experiment[data-on="true"] .proto-experiment-go {
+  background: var(--proto-ink);
+  color: var(--proto-bg);
+}
+
 .proto-experiment-switch {
   flex-shrink: 0;
   width: 28px;
@@ -1250,6 +1275,7 @@ button.proto-pill {
   --gem-key-wide: #aeb2ba;
   --gem-tile: #f1f1f2;
   --gem-tile-hover: #e8e8ea;
+  --gem-chip-bg-hover: #d7e6fd;
   --gem-chip-bg: #e8f0fe;
   --gem-highlight: #f3efff;
 }
@@ -1268,6 +1294,7 @@ button.proto-pill {
   --gem-key-wide: #5a5c60;
   --gem-tile: #2a2b2e;
   --gem-tile-hover: #33343a;
+  --gem-chip-bg-hover: #2c3f5c;
   --gem-chip-bg: #233249;
   --gem-highlight: #2d2740;
 }
@@ -1349,10 +1376,16 @@ button.proto-pill {
   justify-content: center;
   border: none;
   background: transparent;
-  color: var(--gem-ink);
+  /* Header chrome matches the other chrome icons (input bar, action row):
+     dimmed ink at wght 300. These spans set only font-size inline, so the
+     weight has to come from here. */
+  color: var(--gem-ink-dim);
   cursor: pointer;
   border-radius: 999px;
   padding: 0;
+}
+.gemini-icon-btn .proto-icon {
+  font-variation-settings: "FILL" 0, "wght" 300;
 }
 .gemini-icon-btn:hover {
   background: var(--gem-subtle);
@@ -1391,7 +1424,7 @@ button.proto-pill {
 
 .gemini-bottom-dock {
   position: relative;
-  padding: calc(16 * var(--u)) calc(14 * var(--u)) calc(28 * var(--u));
+  padding: calc(16 * var(--u)) calc(14 * var(--u)) calc(40 * var(--u));
   flex-shrink: 0;
   min-width: 0;
   display: flex;
@@ -1413,8 +1446,8 @@ button.proto-pill {
    center keeps the greeting roughly vertically centered in the remaining
    visible space above the input, instead of jumping to the very top. */
 .gemini-sparkle-large {
-  width: calc(56 * var(--u));
-  height: calc(56 * var(--u));
+  width: calc(40 * var(--u));
+  height: calc(40 * var(--u));
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1915,9 +1948,9 @@ button.proto-pill {
   border-bottom-color: rgba(255, 255, 255, 0.06);
 }
 
-/* Download toast — Gemini-style snackbar. Pebble background, dark text,
-   inline dismiss button on the right. Rests above the input pill and
-   spans the input's exact width (dock padding 14u + input margin 6u). */
+/* Download toast — Gemini-style snackbar. Pebble background, dark text.
+   Times itself out rather than carrying a dismiss control. Rests above the
+   input pill and spans the input's exact width (dock 14u + input 6u). */
 .gemini-download-toast {
   position: absolute;
   bottom: 100%;
@@ -1926,11 +1959,10 @@ button.proto-pill {
   margin-bottom: calc(8 * var(--u));
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: calc(12 * var(--u));
   padding: calc(14 * var(--u)) calc(20 * var(--u));
   border-radius: calc(14 * var(--u));
-  background: #c5c2bd;
+  background: #ffffff;
   color: #1c1c1e;
   font-size: calc(15 * var(--u));
   font-weight: 400;
@@ -1950,34 +1982,6 @@ button.proto-pill {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.gemini-download-toast-close {
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: calc(28 * var(--u));
-  height: calc(28 * var(--u));
-  margin: calc(-6 * var(--u)) 0;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: inherit;
-  border-radius: 50%;
-  cursor: pointer;
-  opacity: 0.78;
-  transition: opacity 140ms ease, background-color 140ms ease;
-}
-.gemini-download-toast-close:hover,
-.gemini-download-toast-close:focus-visible {
-  opacity: 1;
-  background: rgba(0, 0, 0, 0.06);
-  outline: none;
-}
-.proto-gemini[data-theme="dark"] .gemini-download-toast-close:hover,
-.proto-gemini[data-theme="dark"] .gemini-download-toast-close:focus-visible {
-  background: rgba(255, 255, 255, 0.08);
-}
-
 /* Gemini spinner — incomplete gradient ring around static filled icon */
 .gemini-spinner {
   width: calc(44 * var(--u));
@@ -2122,6 +2126,7 @@ button.proto-pill {
   width: 30px;
   height: 30px;
   border-radius: 999px;
+  cursor: pointer;
   background: rgba(255, 255, 255, 0.18);
   -webkit-backdrop-filter: blur(24px) saturate(1.8);
   backdrop-filter: blur(24px) saturate(1.8);
@@ -2427,7 +2432,10 @@ button.gemini-preview-chip:hover {
 .gemini-input-attachments {
   display: flex;
   align-items: stretch;
-  gap: calc(10 * var(--u));
+  /* Matches .gemini-input-suggest's gap so the thumbnail sits the same
+     distance from the first chip as the chips sit from each other — and
+     both match the tool sheet's carousel. */
+  gap: calc(4 * var(--u));
   padding: calc(14 * var(--u)) calc(14 * var(--u)) 0;
   min-width: 0;
   overflow: hidden;
@@ -2435,11 +2443,11 @@ button.gemini-preview-chip:hover {
 .gemini-input-image {
   position: relative;
   flex-shrink: 0;
-  width: calc(74 * var(--u));
-  height: calc(74 * var(--u));
-  border-radius: calc(14 * var(--u));
+  width: calc(100 * var(--u));
+  height: calc(62 * var(--u));
+  border-radius: calc(18 * var(--u));
   overflow: hidden;
-  background: var(--gem-subtle);
+  background: var(--gem-chip-bg);
 }
 .gemini-input-image img {
   width: 100%;
@@ -2464,12 +2472,17 @@ button.gemini-preview-chip:hover {
   cursor: pointer;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
+@property --wipu-suggest-fade-left {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
 .gemini-input-suggest {
   flex: 1;
   min-width: 0;
   display: flex;
   align-items: stretch;
-  gap: calc(6 * var(--u));
+  gap: calc(4 * var(--u));
   overflow-x: auto;
   overflow-y: hidden;
   scrollbar-width: none;
@@ -2478,6 +2491,32 @@ button.gemini-preview-chip:hover {
   margin-right: calc(-14 * var(--u));
   padding-right: calc(14 * var(--u));
   scroll-padding-right: calc(14 * var(--u));
+  /* The right edge always fades. The left one only appears while the row is
+     being scrolled, then eases back out — at rest there's nothing off to the
+     left, so a permanent ramp would just sit on the focused card. At 0 the
+     two stops collapse and the ramp has no width. */
+  --wipu-suggest-fade-left: 0px;
+  transition: --wipu-suggest-fade-left 260ms ease;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 var(--wipu-suggest-fade-left),
+    #000 calc(100% - 64 * var(--u)),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 var(--wipu-suggest-fade-left),
+    #000 calc(100% - 64 * var(--u)),
+    transparent 100%
+  );
+  /* One card per gesture. */
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+}
+.gemini-input-suggest[data-scrolling="true"] {
+  --wipu-suggest-fade-left: calc(16 * var(--u));
 }
 .gemini-input-suggest::-webkit-scrollbar { display: none; }
 .gemini-suggest-chip {
@@ -2485,8 +2524,8 @@ button.gemini-preview-chip:hover {
   flex-shrink: 0;
   max-width: calc(160 * var(--u));
   padding: calc(8 * var(--u)) calc(12 * var(--u));
-  border-radius: calc(14 * var(--u));
-  background: var(--gem-subtle);
+  border-radius: calc(18 * var(--u));
+  background: var(--gem-chip-bg);
   color: var(--gem-ink);
   font-size: calc(12.5 * var(--u));
   line-height: 1.3;
@@ -2495,6 +2534,19 @@ button.gemini-preview-chip:hover {
   display: flex;
   align-items: center;
   overflow: hidden;
+}
+/* Only the snapped card is "in focus" — the ones either side are held back
+   so the row reads as a single suggestion with more available. The focused
+   index is set from scroll position, so it follows the snap. */
+.gemini-suggest-chip {
+  opacity: 0.55;
+}
+.gemini-suggest-chip[data-focus="true"] {
+  opacity: 1;
+}
+.gemini-suggest-chip {
+  transition: opacity 220ms ease;
+  scroll-snap-align: start;
 }
 .gemini-suggest-chip-text {
   position: relative;
@@ -2653,7 +2705,7 @@ button.gemini-input-btn:hover { background: var(--gem-subtle); }
   bottom: 0;
   height: 100%;
   background: var(--gem-surface);
-  border-radius: calc(28 * var(--u)) calc(28 * var(--u)) 0 0;
+  border-radius: calc(36 * var(--u)) calc(36 * var(--u)) 0 0;
   box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.12);
   display: flex;
   flex-direction: column;
@@ -2823,7 +2875,7 @@ button.gemini-input-btn:hover { background: var(--gem-subtle); }
 .gemini-tool-tiles {
   display: flex;
   align-items: stretch;
-  gap: calc(10 * var(--u));
+  gap: calc(4 * var(--u));
   overflow-x: auto;
   overflow-y: hidden;
   scrollbar-width: none;
@@ -2839,8 +2891,8 @@ button.gemini-input-btn:hover { background: var(--gem-subtle); }
   width: calc(104 * var(--u));
   height: calc(104 * var(--u));
   border: none;
-  border-radius: calc(22 * var(--u));
-  background: var(--gem-tile);
+  border-radius: calc(28 * var(--u));
+  background: var(--gem-chip-bg);
   color: var(--gem-ink);
   display: flex;
   flex-direction: column;
@@ -2852,17 +2904,19 @@ button.gemini-input-btn:hover { background: var(--gem-subtle); }
   cursor: pointer;
   padding: 0;
 }
-.gemini-tool-tile:hover { background: var(--gem-tile-hover); }
+.gemini-tool-tile:hover { background: var(--gem-chip-bg-hover); }
 .gemini-tool-media {
   display: flex;
-  gap: calc(8 * var(--u));
+  gap: calc(4 * var(--u));
   flex-shrink: 0;
 }
 .gemini-tool-media-item {
   width: calc(104 * var(--u));
   height: calc(104 * var(--u));
-  border-radius: calc(22 * var(--u));
+  border-radius: calc(28 * var(--u));
   flex-shrink: 0;
+  /* Pale blue sits under the photo so an unloaded tile matches its neighbours. */
+  background-color: var(--gem-chip-bg);
   background-size: cover;
   background-position: center;
   border: none;
@@ -2938,23 +2992,23 @@ button.gemini-tool-media-item:hover {
 /* Keyboard (decorative) */
 .gemini-keyboard {
   background: var(--gem-keyboard);
-  padding: calc(8 * var(--u)) calc(4 * var(--u)) calc(24 * var(--u));
+  padding: calc(8 * var(--u)) calc(3 * var(--u)) calc(24 * var(--u));
   display: flex;
   flex-direction: column;
   gap: calc(8 * var(--u));
   box-shadow: 0 -8px 20px rgba(0, 0, 0, 0.06);
-  margin: calc(10 * var(--u)) calc(-14 * var(--u)) calc(-28 * var(--u));
+  margin: calc(10 * var(--u)) calc(-14 * var(--u)) calc(-40 * var(--u));
   border-radius: 0;
   cursor: pointer;
 }
 .gemini-keyboard-row {
   display: flex;
   justify-content: center;
-  gap: calc(5 * var(--u));
+  gap: calc(6 * var(--u));
 }
 .gemini-key {
   min-width: 0;
-  height: calc(36 * var(--u));
+  height: calc(42 * var(--u));
   background: var(--gem-key);
   border-radius: calc(5 * var(--u));
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
@@ -2964,10 +3018,10 @@ button.gemini-tool-media-item:hover {
   font-size: calc(14 * var(--u));
   color: var(--gem-ink);
   flex: 1;
-  max-width: calc(30 * var(--u));
+  max-width: calc(33 * var(--u));
 }
 .gemini-key-wide {
-  max-width: calc(36 * var(--u));
+  max-width: calc(42 * var(--u));
   background: var(--gem-key-wide);
 }
 .gemini-key-xs {
@@ -2980,7 +3034,13 @@ button.gemini-tool-media-item:hover {
   flex: 4;
   max-width: none;
 }
-.gemini-keyboard-bottom .gemini-key { height: calc(38 * var(--u)); }
+.gemini-keyboard-bottom .gemini-key { height: calc(42 * var(--u)); }
+
+/* Row spacing is the one metric Android overrides nothing for, so scope it:
+   iPhone sits rows ~11pt apart, Gboard ~8pt. */
+.gemini-keyboard[data-platform="ios"] {
+  gap: calc(11 * var(--u));
+}
 
 /* ---- Android (Gboard-style) keyboard variant ---- */
 .gemini-keyboard[data-platform="android"] {

@@ -24,17 +24,19 @@ function Icon({
   name,
   size = 24,
   filled = false,
+  weight = 300,
 }: {
   name: string;
   size?: number;
   filled?: boolean;
+  weight?: number;
 }) {
   return (
     <span
       className="proto-icon"
       style={{
         fontSize: `calc(${size} * var(--u, 1px))`,
-        fontVariationSettings: filled ? "'FILL' 1" : "'FILL' 0",
+        fontVariationSettings: `'FILL' ${filled ? 1 : 0}, 'wght' ${weight}`,
       }}
       aria-hidden
     >
@@ -76,19 +78,26 @@ export function VideoGenerationView({
     submitStep: experiments.videoPlan ? "planning" : "sent",
   });
 
-  // imageIn <-> imageInAdvanced are mutex (alternative image modes).
-  // videoPlan and loadingTutorials are additive — they compose with the
-  // image experiments so a Video-Plan flow can also have an image attached.
-  const toggleExperiment = useCallback((key: keyof Experiments) => {
-    setExperiments((prev) => {
-      const turningOn = !prev[key];
-      const next = { ...prev, [key]: !prev[key] };
-      if (turningOn) {
-        if (key === "imageIn") next.imageInAdvanced = false;
-        if (key === "imageInAdvanced") next.imageIn = false;
-      }
-      return next;
+  // One tap on an experiment arms exactly that experiment and drops the
+  // prototype on the screen where it's visible. Activation is exclusive so
+  // a tap always lands on the same demo regardless of what ran before.
+  //
+  // The jump can't happen in the same tick as setExperiments: the playback
+  // hook reads loadingMs/submitStep from refs it assigns during render, so
+  // jumping immediately would schedule the loader with the previous value
+  // (10s instead of the 20s the tutorials need). Park the request and let
+  // the effect below fire it once the new experiment state has committed.
+  const [pendingDemo, setPendingDemo] = useState<keyof Experiments | null>(
+    null,
+  );
+  const showExperiment = useCallback((key: keyof Experiments) => {
+    setExperiments({
+      imageIn: key === "imageIn",
+      imageInAdvanced: key === "imageInAdvanced",
+      loadingTutorials: key === "loadingTutorials",
+      videoPlan: key === "videoPlan",
     });
+    setPendingDemo(key);
   }, []);
 
   const [attachedImage, setAttachedImage] = useState<string | null>(null);
@@ -103,16 +112,16 @@ export function VideoGenerationView({
 
   const imageSuggestions = experiments.imageInAdvanced
     ? [
-        "Epic space battle",
-        "Gentle falling snow",
-        "Golden hour drift",
-        "Neon rain",
+        "Slow roll forward",
+        "Golden hour drive",
+        "Rain on the windshield",
+        "Headlights at dusk",
       ]
     : [
-        "A subtle breeze moves through the frame",
-        "Morning light shifts across the scene",
-        "Neon signs flicker awake at dusk",
-        "Rain begins to fall lightly",
+        "The car rolls slowly out of frame",
+        "Sunlight sweeps across the hood",
+        "Rain beads and runs down the windshield",
+        "Headlights flick on as the sky dims",
       ];
   const inputPlaceholder = attachedImage
     ? experiments.imageInAdvanced
@@ -176,10 +185,6 @@ export function VideoGenerationView({
     downloadTimersRef.current.forEach((id) => window.clearTimeout(id));
     downloadTimersRef.current = [];
   }, []);
-  const dismissDownloadToast = useCallback(() => {
-    clearDownloadTimers();
-    setDownloadStatus(null);
-  }, [clearDownloadTimers]);
   const triggerDownload = useCallback(() => {
     clearDownloadTimers();
     setDownloadStatus("downloading");
@@ -231,6 +236,30 @@ export function VideoGenerationView({
       setAttachedImage(null);
     }
   }, [experiments.imageIn, experiments.imageInAdvanced, attachedImage]);
+
+  // Fires one commit after showExperiment, so the playback hook has already
+  // re-read loadingMs / submitStep for the newly-armed experiment.
+  useEffect(() => {
+    if (!pendingDemo) return;
+    setPendingDemo(null);
+    switch (pendingDemo) {
+      case "imageIn":
+      case "imageInAdvanced":
+        // Land on the composer with the image already attached — that's the
+        // screen where the starter suggestions animate.
+        setChipActive(true);
+        setSheetOpen(false);
+        setAttachedImage(CAR_IMAGE_SRC);
+        jumpTo("tool-selected", "");
+        break;
+      case "videoPlan":
+        jumpTo("planning", fullPrompt);
+        break;
+      case "loadingTutorials":
+        jumpTo("sent", fullPrompt);
+        break;
+    }
+  }, [pendingDemo, jumpTo, fullPrompt]);
 
   const prevStepRef = useRef<VideoGenStep>(step);
   useEffect(() => {
@@ -350,10 +379,7 @@ export function VideoGenerationView({
         onMobileClose={closeControls}
       >
         <FlowTimeline currentStep={step} onJump={jumpToPhase} />
-        <ExperimentsPanel
-          experiments={experiments}
-          onToggle={toggleExperiment}
-        />
+        <ExperimentsPanel experiments={experiments} onShow={showExperiment} />
       </ControlsPanel>
       <section
         className="proto-phone-stage proto-gemini"
@@ -396,11 +422,7 @@ export function VideoGenerationView({
             <div className="gemini-bottom-dock">
               <AnimatePresence>
                 {downloadStatus ? (
-                  <DownloadToast
-                    key="download-toast"
-                    status={downloadStatus}
-                    onDismiss={dismissDownloadToast}
-                  />
+                  <DownloadToast key="download-toast" status={downloadStatus} />
                 ) : null}
               </AnimatePresence>
               <InputPill
@@ -970,6 +992,43 @@ function InputPill({
   }, [showChip]);
   const isExpanded = chipPresent || showAdvancedPreview || showSimpleAttachments;
 
+  // Which snapped card currently reads as "in focus". Driven by scroll
+  // position rather than DOM order, so the leading card stays lit as the
+  // carousel snaps through the set.
+  const suggestScrollRef = useRef<HTMLDivElement | null>(null);
+  const [focusedSuggestion, setFocusedSuggestion] = useState(0);
+  // The left mask ramp is a scroll affordance, not permanent chrome: it shows
+  // while the row is moving and eases out once it settles.
+  const [suggestScrolling, setSuggestScrolling] = useState(false);
+  const suggestIdleRef = useRef<number | null>(null);
+  const handleSuggestScroll = useCallback(() => {
+    const el = suggestScrollRef.current;
+    if (!el) return;
+    const kids = Array.from(el.children) as HTMLElement[];
+    let best = 0;
+    let bestDist = Infinity;
+    kids.forEach((kid, i) => {
+      const dist = Math.abs(kid.offsetLeft - el.offsetLeft - el.scrollLeft);
+      if (dist < bestDist) {
+        bestDist = dist;
+        best = i;
+      }
+    });
+    setFocusedSuggestion(best);
+    setSuggestScrolling(true);
+    if (suggestIdleRef.current) window.clearTimeout(suggestIdleRef.current);
+    suggestIdleRef.current = window.setTimeout(
+      () => setSuggestScrolling(false),
+      380,
+    );
+  }, []);
+  useEffect(
+    () => () => {
+      if (suggestIdleRef.current) window.clearTimeout(suggestIdleRef.current);
+    },
+    [],
+  );
+
   // Staggered suggestion reveal: each chip keeps its natural size but shows
   // a diagonal shimmer until its turn to resolve into the real text.
   const [revealedCount, setRevealedCount] = useState(0);
@@ -994,6 +1053,10 @@ function InputPill({
       timers.forEach((t) => window.clearTimeout(t));
     };
   }, [imageSrc, imageSuggestions.length]);
+  useEffect(() => {
+    setFocusedSuggestion(0);
+    if (suggestScrollRef.current) suggestScrollRef.current.scrollLeft = 0;
+  }, [imageSrc]);
   return (
     <motion.div
       layout
@@ -1114,7 +1177,12 @@ function InputPill({
               </button>
             </div>
             {imageSuggestions.length > 0 ? (
-              <div className="gemini-input-suggest">
+              <div
+                className="gemini-input-suggest"
+                ref={suggestScrollRef}
+                onScroll={handleSuggestScroll}
+                data-scrolling={suggestScrolling ? "true" : undefined}
+              >
                 {imageSuggestions.map((s, i) => {
                   const ready = i < revealedCount;
                   return (
@@ -1122,6 +1190,7 @@ function InputPill({
                       key={i}
                       className="gemini-suggest-chip"
                       data-state={ready ? "ready" : "loading"}
+                      data-focus={i === focusedSuggestion ? "true" : undefined}
                     >
                       <motion.span
                         className="gemini-suggest-chip-text"
@@ -1153,7 +1222,10 @@ function InputPill({
           type="button"
           className="gemini-input-btn"
           aria-label="Add"
-          onClick={onOpenTools}
+          onClick={(e) => {
+            e.stopPropagation();
+            onOpenTools();
+          }}
         >
           <Icon name="add" size={22} />
         </button>
@@ -1296,10 +1368,8 @@ function SharePortalHost({ children }: { children: ReactNode }) {
 
 function DownloadToast({
   status,
-  onDismiss,
 }: {
   status: "downloading" | "downloaded";
-  onDismiss?: () => void;
 }) {
   const done = status === "downloaded";
   return (
@@ -1316,14 +1386,6 @@ function DownloadToast({
       <span className="gemini-download-toast-text">
         {done ? "Downloaded." : "Downloading full size…"}
       </span>
-      <button
-        type="button"
-        className="gemini-download-toast-close"
-        aria-label="Dismiss"
-        onClick={onDismiss}
-      >
-        <Icon name="close" size={18} />
-      </button>
     </motion.div>
   );
 }
@@ -1740,11 +1802,11 @@ function ToolSheet({
       <div className="gemini-tool-sheet-scroll">
         <div className="gemini-tool-tiles">
           <button type="button" className="gemini-tool-tile">
-            <Icon name="photo_library" size={32} />
+            <Icon name="photo_library" size={32} weight={200} />
             <span>Photos</span>
           </button>
           <button type="button" className="gemini-tool-tile">
-            <Icon name="photo_camera" size={32} />
+            <Icon name="photo_camera" size={32} weight={200} />
             <span>Camera</span>
           </button>
           <div className="gemini-tool-media">
@@ -1972,12 +2034,12 @@ type ExperimentDef = {
 const EXPERIMENTS: ExperimentDef[] = [
   {
     key: "imageIn",
-    label: "Image-to-image starters",
+    label: "Contextual suggestions",
     description: "Attach an image to kick off with animated prompt suggestions.",
   },
   {
     key: "imageInAdvanced",
-    label: "Advanced image-to-image settings",
+    label: "Advanced settings",
     description:
       "Bigger preview, inline starter chips, and a video-settings sheet.",
   },
@@ -1989,7 +2051,7 @@ const EXPERIMENTS: ExperimentDef[] = [
   },
   {
     key: "videoPlan",
-    label: "Video plan",
+    label: "Pre-planning",
     description:
       "Review an editable proposal — title, description, settings — before generating.",
   },
@@ -2201,10 +2263,10 @@ function LoadingTutorialCard({
 
 function ExperimentsPanel({
   experiments,
-  onToggle,
+  onShow,
 }: {
   experiments: Experiments;
-  onToggle: (key: keyof Experiments) => void;
+  onShow: (key: keyof Experiments) => void;
 }) {
   return (
     <div className="proto-panel-section">
@@ -2218,17 +2280,15 @@ function ExperimentsPanel({
               type="button"
               className="proto-experiment"
               data-on={on ? "true" : undefined}
-              onClick={() => onToggle(e.key)}
+              onClick={() => onShow(e.key)}
             >
               <span className="proto-experiment-copy">
                 <span className="proto-experiment-label">{e.label}</span>
                 <span className="proto-experiment-sub">{e.description}</span>
               </span>
-              <span
-                className="proto-experiment-switch"
-                data-on={on ? "true" : undefined}
-                aria-hidden
-              />
+              <span className="proto-experiment-go" aria-hidden>
+                →
+              </span>
             </button>
           );
         })}

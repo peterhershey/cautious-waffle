@@ -8,7 +8,9 @@
 @font-face {
   font-family: "Material Symbols Rounded";
   font-style: normal;
-  font-weight: 400;
+  /* A range, not a single value — this is a variable face, and declaring
+     one weight lets the browser clamp the wght axis instead of varying it. */
+  font-weight: 200 700;
   font-display: block;
   src: url(/fonts/material-symbols-rounded.woff2) format("woff2");
 }

@@ -151,11 +151,11 @@
   justify-content: center;
   padding: 10px 18px;
   border: 2px solid currentColor;
-  border-radius: 6px;
+  border-radius: var(--wipu-r-md);
   font-family: var(--wipu-mono);
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.28em;
+  letter-spacing: var(--wipu-track-wide);
   text-transform: uppercase;
   color: var(--wipu-terracotta);
   transform: rotate(-8deg);
@@ -168,7 +168,7 @@
 .wipu-anno-stamp[data-tone="navy"]    { color: var(--wipu-navy); }
 .wipu-anno-stamp[data-tone="ink"]     { color: var(--wipu-ink); }
 
-.wipu-anno-stamp.is-round { border-radius: 999px; }
+.wipu-anno-stamp.is-round { border-radius: var(--wipu-r-pill); }
 
 /* ═══════════════════════════════════════════════════════════════════
    6. SCRIBBLE — hand-drawn asterisk / star (SVG). Styling only;

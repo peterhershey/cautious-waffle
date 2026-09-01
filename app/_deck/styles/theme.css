@@ -30,8 +30,38 @@
   --wipu-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI",
     system-ui, sans-serif;
 
-  --wipu-frame-radius: 10px;
-  --wipu-note-radius: 3px;
+  /* Corner radius scale. Snap to these; pill (999px) + circle (50%) stay
+     as literals. --frame/--note kept as semantic aliases. */
+  --wipu-r-xs: 2px;
+  --wipu-r-sm: 4px;
+  --wipu-r-md: 6px;
+  --wipu-r-lg: 10px;
+  --wipu-r-xl: 14px;
+  --wipu-r-2xl: 22px;
+  --wipu-r-pill: 999px;
+  --wipu-frame-radius: var(--wipu-r-lg); /* card/frame corners */
+  --wipu-note-radius: 3px; /* sticky-note corners (off-scale on purpose) */
+
+  /* Motion. One house easing (decelerate) + a small duration scale —
+     reach for these instead of ad-hoc ms/curves. */
+  --wipu-ease: cubic-bezier(0.22, 0.8, 0.2, 1);
+  --wipu-dur-xfast: 80ms;
+  --wipu-dur-fast: 120ms;
+  --wipu-dur-base: 200ms;
+  --wipu-dur-slow: 320ms;
+  --wipu-dur-slower: 520ms;
+  --wipu-dur-fade: 900ms;
+
+  /* Dashed-rule motif. Two weights: strong (boxes/dividers) + soft
+     (subtle bottom borders). Use as e.g. `border-top: var(--wipu-dash)`. */
+  --wipu-dash: 1px dashed var(--wipu-rule-strong);
+  --wipu-dash-soft: 1px dashed var(--wipu-rule);
+
+  /* Uppercase mono label tracking — three tiers: tight (small labels /
+     quote attrs), eyebrow (standard kickers/labels), wide (airy stamps). */
+  --wipu-track-tight: 0.14em;
+  --wipu-track-eyebrow: 0.2em;
+  --wipu-track-wide: 0.28em;
 
   /* Mobile-first type scale — clamp from ~375px to ~1440px viewport.
      Use these tokens instead of hand-rolled clamp() in slide CSS. */
@@ -67,7 +97,8 @@
   font-weight: 400;
   letter-spacing: 0;
   min-height: 100svh;
-  transition: background-color 240ms ease, color 240ms ease;
+  transition: background-color var(--wipu-dur-base) ease,
+    color var(--wipu-dur-base) ease;
 }
 
 .wipu-root * { box-sizing: border-box; }

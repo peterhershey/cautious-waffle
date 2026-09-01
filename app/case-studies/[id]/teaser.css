@@ -58,7 +58,7 @@
 .wpd-cs-paywall-eyebrow {
   font-family: var(--wipu-mono);
   font-size: 11px;
-  letter-spacing: 0.18em;
+  letter-spacing: var(--wipu-track-eyebrow);
   text-transform: uppercase;
   color: var(--wipu-ink-dim);
 }

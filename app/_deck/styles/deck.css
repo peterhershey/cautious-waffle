@@ -74,7 +74,7 @@
   font-family: var(--wipu-mono);
   font-size: var(--wipu-fs-meta);
   color: var(--wipu-ink-faint);
-  letter-spacing: 0.24em;
+  letter-spacing: var(--wipu-track-wide);
 }
 .wipu-slide-placeholder-title {
   font-family: var(--wipu-mono);
@@ -88,7 +88,7 @@
   font-family: var(--wipu-mono);
   font-size: var(--wipu-fs-eyebrow);
   color: var(--wipu-ink-dim);
-  letter-spacing: 0.18em;
+  letter-spacing: var(--wipu-track-eyebrow);
   text-transform: uppercase;
 }
 .wipu-slide-placeholder-links {
@@ -102,9 +102,9 @@
   color: var(--wipu-ink);
   padding: var(--wipu-sp-sm) var(--wipu-sp-md);
   border: 1px solid var(--wipu-rule-strong);
-  border-radius: 8px;
+  border-radius: var(--wipu-r-md);
   text-decoration: none;
-  transition: background-color 180ms ease, border-color 180ms ease;
+  transition: background-color var(--wipu-dur-base) ease, border-color var(--wipu-dur-base) ease;
 }
 .wipu-slide-placeholder-link:hover {
   background: var(--wipu-bg-elev);
@@ -140,7 +140,7 @@
 }
 .wipu-quals-eyebrow {
   font-size: var(--wipu-fs-eyebrow);
-  letter-spacing: 0.24em;
+  letter-spacing: var(--wipu-track-wide);
   text-transform: uppercase;
   color: var(--wipu-ink-faint);
   font-weight: 500;
@@ -204,7 +204,7 @@
 
 .wipu-ainative-eyebrow {
   font-size: var(--wipu-fs-eyebrow);
-  letter-spacing: 0.24em;
+  letter-spacing: var(--wipu-track-wide);
   text-transform: uppercase;
   color: var(--wipu-ink-faint);
   font-weight: 500;

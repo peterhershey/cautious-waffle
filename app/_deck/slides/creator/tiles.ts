@@ -26,7 +26,7 @@ export const TILES: Tile[] = [
   // ── Hero wapo + kin ────────────────────────────────────────────────
   {
     kind: "image",
-    src: `${PT}/washington-post-homepage.gif`,
+    src: `${PT}/field%20notes/product/washington-post-homepage.mp4`,
     alt: "Washington Post homepage redesign",
     size: "2x2",
     rate: 0,
@@ -49,14 +49,14 @@ export const TILES: Tile[] = [
   },
   {
     kind: "image",
-    src: `${PT}/me/IMG_0077.jpeg`,
+    src: `${PT}/field%20notes/me/IMG_0077.jpeg`,
     alt: "Peter",
     size: "1x1",
     rate: 0.07,
   },
   {
     kind: "image",
-    src: `${PT}/cooking.gif`,
+    src: `${PT}/cooking.mp4`,
     alt: "Cooking",
     size: "1x1",
     rate: 0.06,
@@ -92,7 +92,7 @@ export const TILES: Tile[] = [
   },
   {
     kind: "image",
-    src: `${PT}/me/IMG_7593.jpeg`,
+    src: `${PT}/field%20notes/me/IMG_7593.jpeg`,
     alt: "Peter",
     size: "1x2",
     rate: 0.06,
@@ -115,7 +115,7 @@ export const TILES: Tile[] = [
   // ── beingbecoming + kin ────────────────────────────────────────────
   {
     kind: "image",
-    src: `${PT}/beingbecoming.gif`,
+    src: `${PT}/field%20notes/cine/beingbecoming.mp4`,
     alt: "Being / Becoming — generative piece",
     size: "2x2",
     rate: 0,
@@ -123,7 +123,7 @@ export const TILES: Tile[] = [
   },
   {
     kind: "image",
-    src: `${PT}/me/IMG_1630.jpeg`,
+    src: `${PT}/field%20notes/me/IMG_1630.jpeg`,
     alt: "Peter",
     size: "1x1",
     rate: 0.08,
@@ -137,7 +137,7 @@ export const TILES: Tile[] = [
   },
   {
     kind: "image",
-    src: `${PT}/screen_context.gif`,
+    src: `${PT}/screen_context.mp4`,
     alt: "Screen context demo",
     size: "2x1",
     rate: 0.04,
@@ -174,7 +174,7 @@ export const TILES: Tile[] = [
   },
   {
     kind: "image",
-    src: `${PT}/me/IMG_3476.JPG`,
+    src: `${PT}/field%20notes/me/IMG_3476.JPG`,
     alt: "Peter",
     size: "1x2",
     rate: 0.06,
@@ -197,7 +197,7 @@ export const TILES: Tile[] = [
   // ── Papercut + variety ─────────────────────────────────────────────
   {
     kind: "image",
-    src: `${PT}/papercut.gif`,
+    src: `${PT}/field%20notes/cine/papercut_compressed.mp4`,
     alt: "Papercut",
     size: "2x2",
     rate: 0,
@@ -220,14 +220,14 @@ export const TILES: Tile[] = [
   },
   {
     kind: "image",
-    src: `${PT}/me/IMG_1917.jpeg`,
+    src: `${PT}/field%20notes/me/IMG_1917.jpeg`,
     alt: "Peter",
     size: "1x1",
     rate: 0.06,
   },
   {
     kind: "image",
-    src: `${PT}/gemini_visualoverlays_commercial_2.gif`,
+    src: `${PT}/gemini_visualoverlays_commercial_2.mp4`,
     alt: "Gemini visual overlays commercial",
     size: "3x2",
     rate: 0.03,
@@ -263,13 +263,6 @@ export const TILES: Tile[] = [
   },
   {
     kind: "image",
-    src: `${PT}/using-google-gemini.webp`,
-    alt: "Using Google Gemini",
-    size: "1x2",
-    rate: 0.04,
-  },
-  {
-    kind: "image",
     src: `${PT}/Europalette/IMG_9325.jpeg`,
     alt: "Europe",
     size: "2x1",
@@ -277,24 +270,10 @@ export const TILES: Tile[] = [
   },
   {
     kind: "image",
-    src: `${PT}/me/IMG_4841.JPG`,
-    alt: "Peter",
-    size: "1x2",
-    rate: 0.06,
-  },
-  {
-    kind: "image",
     src: `${PT}/Europalette/IMG_1613.jpeg`,
     alt: "Europe",
     size: "2x1",
     rate: 0.05,
-  },
-  {
-    kind: "image",
-    src: `${PT}/2D22465D-A2E1-4847-9AE5-144DF669B8C0.jpg`,
-    alt: "A photograph",
-    size: "1x1",
-    rate: 0.06,
   },
   {
     kind: "image",
@@ -307,7 +286,7 @@ export const TILES: Tile[] = [
   // ── TNP + tail ─────────────────────────────────────────────────────
   {
     kind: "image",
-    src: `${PT}/TNP.gif`,
+    src: `${PT}/field%20notes/cine/TNP.mp4`,
     alt: "The Noted Project",
     size: "2x2",
     rate: 0,
@@ -322,7 +301,7 @@ export const TILES: Tile[] = [
   },
   {
     kind: "image",
-    src: `${PT}/gemini_VSS_samsung.gif`,
+    src: `${PT}/gemini_VSS_samsung.mp4`,
     alt: "Gemini VSS commercial — Samsung",
     size: "2x2",
     rate: 0.02,
@@ -341,13 +320,6 @@ export const TILES: Tile[] = [
     tone: "mustard",
     size: "1x1",
     rate: 0,
-  },
-  {
-    kind: "image",
-    src: `${PT}/B20EF5BD-A355-4D1A-9607-9BF2CBC95F9C.jpg`,
-    alt: "A photograph",
-    size: "1x1",
-    rate: 0.08,
   },
   {
     kind: "card",
@@ -381,7 +353,7 @@ export const TILES: Tile[] = [
   },
   {
     kind: "image",
-    src: `${PT}/me/IMG_7918.jpeg`,
+    src: `${PT}/field%20notes/me/IMG_7918.jpeg`,
     alt: "Peter",
     size: "1x2",
     rate: 0.06,
@@ -395,7 +367,7 @@ export const TILES: Tile[] = [
   },
   {
     kind: "image",
-    src: `${PT}/me/IMG_7950.JPG`,
+    src: `${PT}/field%20notes/me/IMG_7950.JPG`,
     alt: "Peter",
     size: "1x1",
     rate: 0.08,
@@ -423,7 +395,7 @@ export const TILES: Tile[] = [
   },
   {
     kind: "image",
-    src: `${PT}/me/IMG_6646.jpeg`,
+    src: `${PT}/field%20notes/me/IMG_6646.jpeg`,
     alt: "Peter",
     size: "1x1",
     rate: 0.06,
@@ -444,14 +416,7 @@ export const TILES: Tile[] = [
   },
   {
     kind: "image",
-    src: `${PT}/me/IMG_1959.jpeg`,
-    alt: "Peter",
-    size: "1x2",
-    rate: 0.06,
-  },
-  {
-    kind: "image",
-    src: `${PT}/IMG_2083.JPG`,
+    src: `${PT}/travel/IMG_2083.JPG`,
     alt: "A photograph",
     size: "1x1",
     rate: 0.06,
@@ -465,7 +430,7 @@ export const TILES: Tile[] = [
   },
   {
     kind: "image",
-    src: `${PT}/me/IMG_8141.jpeg`,
+    src: `${PT}/field%20notes/me/IMG_8141.jpeg`,
     alt: "Peter",
     size: "1x1",
     rate: 0.07,

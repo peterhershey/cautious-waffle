@@ -1,8 +1,6 @@
-import { IntroTemplate } from "../../../_deck/templates/IntroTemplate";
-import { HoverGif } from "../../../_deck/templates/HoverGif";
+import { CasesSlide } from "../../../_deck/slides";
 import { QuoteTemplate } from "../../../_deck/templates/QuoteTemplate";
 import { ThreeUpTemplate } from "../../../_deck/templates/ThreeUpTemplate";
-import { StickyCardsTemplate } from "../../../_deck/templates/StickyCardsTemplate";
 import { StrokeHeroMetric } from "../../../_deck/templates/StrokeHeroMetric";
 import { MetricQuoteSplit } from "../../../_deck/templates/MetricQuoteSplit";
 import { MediaTextTemplate } from "../../../_deck/templates/MediaTextTemplate";
@@ -20,13 +18,13 @@ import {
   TimelineSample,
   type TimelineStop,
 } from "../../_shared/TimelineSample";
-import { Gel } from "../../_shared/Gel";
+import { VideoEmbed } from "../../_shared/VideoEmbed";
+import { PrototypeEmbed } from "../../_shared/PrototypeEmbed";
 import {
   MultimodalCarousel,
   type MultimodalCase,
 } from "../../_shared/MultimodalCarousel";
 import type { CaseStudyDeckEntry } from "../CaseStudyDeck";
-import { EyeAscii } from "./EyeAscii";
 import {
   FortranCodingSheet,
   FortranShippedSheet,
@@ -68,30 +66,16 @@ const TIMELINE_STOPS: TimelineStop[] = [
   {
     tint: "navy",
     title: "Assistant",
-    date: "PRE-2024",
+    date: "2016–2024",
     media: (
-      <div className="wpd-tl-video-stage">
-        <div
-          className="wpd-tl-video-glow"
-          aria-hidden
-          style={{
-            backgroundImage:
-              "url(https://i.ytimg.com/vi/ARA0AxrnHdM/hqdefault.jpg)",
-          }}
-        />
-        <div
-          className="wpd-tl-video-frame"
-          role="img"
-          aria-label="Google Assistant launch — the era before Gemini"
-        >
-          <iframe
-            src="https://www.youtube-nocookie.com/embed/ARA0AxrnHdM?autoplay=1&mute=1&loop=1&playlist=ARA0AxrnHdM&controls=0&rel=0&playsinline=1&modestbranding=1&showinfo=0"
-            title="Google Assistant launch — the era before Gemini"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
-          />
-        </div>
-      </div>
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        className="wipu-sample-tl-image"
+        src="/gemini-timeline/google-assistant.jpg"
+        alt="Google Assistant — “Hi, how can I help?”"
+        style={{ maxWidth: "min(720px, 56vw)" }}
+        draggable={false}
+      />
     ),
   },
   {
@@ -125,7 +109,7 @@ const TIMELINE_STOPS: TimelineStop[] = [
     title: "Screen Context",
     date: "MAY 2024",
     image: {
-      src: "/gemini-timeline/stop-2.gif",
+      src: "/gemini-timeline/stop-2.mp4",
       alt: "Gemini Screen Context — sharing the current phone screen with Gemini",
     },
     annotations: [
@@ -151,8 +135,18 @@ const TIMELINE_STOPS: TimelineStop[] = [
   },
   {
     tint: "rose",
-    title: "Next?",
-    media: <Gel />,
+    title: "The Future of Human-Computer Interaction?",
+    media: (
+      <VideoEmbed
+        id="3uGLjmrPorg"
+        title="Westworld — conversation as the interface"
+        params="autoplay=1&mute=1&loop=1&playlist=3uGLjmrPorg&controls=0&rel=0&playsinline=1&modestbranding=1"
+        thumb="https://i.ytimg.com/vi/3uGLjmrPorg/hqdefault.jpg"
+        stageClassName="wpd-tl-video-stage"
+        glowClassName="wpd-tl-video-glow"
+        frameClassName="wpd-tl-video-frame"
+      />
+    ),
   },
 ];
 
@@ -252,21 +246,10 @@ export const teachingGeminiToSee: CaseStudyDeckEntry = {
   },
   slides: [
     {
-      slug: "01",
-      name: "Hero",
-      content: (
-        <IntroTemplate
-          emoji={<EyeAscii />}
-          greeting={<>CASE STUDY · 2025</>}
-          name={<>Teaching Gemini to See.</>}
-          note="Evolving Gemini Live into a multimodal conversational product."
-        />
-      ),
-    },
-    {
       slug: "01b",
       name: "Hero · Coding Form",
       selfContained: true,
+      hideSiteFrame: true,
       content: (
         <section className="wipu-sample-slide wpd-fortran-slide" data-cs-slide-content="fortran">
           <FortranCodingSheet />
@@ -277,6 +260,7 @@ export const teachingGeminiToSee: CaseStudyDeckEntry = {
       slug: "03",
       name: "What I shipped · Coding Form",
       selfContained: true,
+      hideSiteFrame: true,
       content: (
         <section className="wipu-sample-slide wpd-fortran-slide" data-cs-slide-content="fortran">
           <FortranShippedSheet />
@@ -289,25 +273,13 @@ export const teachingGeminiToSee: CaseStudyDeckEntry = {
       content: (
         <div className="wipu-tpl-mediatext wpd-talkhumans" data-media-side="left">
           <figure className="wipu-sample-video">
-            <div className="wipu-sample-video-stage">
-              <div
-                className="wipu-sample-video-glow"
-                style={{
-                  backgroundImage:
-                    "url(https://i.ytimg.com/vi/YnnGbcM-H8c/hqdefault.jpg)",
-                }}
-                aria-hidden
-              />
-              <div className="wipu-sample-video-frame">
-                <iframe
-                  src="https://www.youtube-nocookie.com/embed/YnnGbcM-H8c?rel=0&playsinline=1&start=127&autoplay=1&mute=1"
-                  title="Early computing — historical footage"
-                  className="wipu-sample-video-iframe"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                />
-              </div>
-            </div>
+            <VideoEmbed
+              id="YnnGbcM-H8c"
+              title="Early computing — historical footage"
+              params="rel=0&playsinline=1&start=127&autoplay=1&mute=1"
+              thumb="https://i.ytimg.com/vi/YnnGbcM-H8c/hqdefault.jpg"
+              iframeClassName="wipu-sample-video-iframe"
+            />
           </figure>
           <div className="wipu-tpl-mediatext-text">
             <div className="wipu-tpl-mediatext-eyebrow">EARLY COMPUTING</div>
@@ -414,10 +386,9 @@ export const teachingGeminiToSee: CaseStudyDeckEntry = {
       name: "NYC · Multimodal use cases",
       content: (
         <div className="wpd-multimodal-uc-board">
-          <div className="wpd-multimodal-uc-board-label" aria-hidden>
-            <span>USE CASES · NYC</span>
-            <span>Where users wanted multimodal help.</span>
-          </div>
+          <h2 className="wpd-multimodal-uc-title">
+            Where do users want multimodal assistance?
+          </h2>
           <MultimodalCarousel cases={MULTIMODAL_USE_CASES} />
         </div>
       ),
@@ -497,17 +468,7 @@ export const teachingGeminiToSee: CaseStudyDeckEntry = {
       name: "ZRH · Prototype (Dashi)",
       selfContained: true,
       hideChrome: true,
-      content: (
-        <section className="wipu-sample-proto">
-          <iframe
-            src="/archive/prototypes/voice-chat?embed=1&doshi=1"
-            title="Voice chat prototype — Dashi"
-            className="wipu-sample-proto-iframe"
-            loading="lazy"
-            allow="autoplay; encrypted-media"
-          />
-        </section>
-      ),
+      content: <PrototypeEmbed slug="voice-chat" doshi />,
     },
     {
       slug: "sec",
@@ -530,8 +491,8 @@ export const teachingGeminiToSee: CaseStudyDeckEntry = {
           <MediaTextTemplate
             mediaSide="left"
             eyebrow="MULTIMODAL LAUNCHER"
-            title={<>Initial integration attempt.</>}
-            body="The first effort to bring camera input and image upload into the Gemini Live flow."
+            title={<>First attempt at multimodality.</>}
+            body="An early pass at folding camera capture and image upload into the Gemini Live flow."
             media={{
               src: "/portfolio%20transfer/case%20study%20live%20video/multimodal-launcher-initial-integration.png",
               alt: "Three-screen flow showing the first attempt to bring camera capture and image upload into Gemini Live",
@@ -580,26 +541,13 @@ export const teachingGeminiToSee: CaseStudyDeckEntry = {
       name: "Multimodal Launcher · Samsung Unpacked",
       content: (
         <figure className="wipu-sample-video">
-          <div className="wipu-sample-video-stage">
-            <div
-              className="wipu-sample-video-glow"
-              style={{
-                backgroundImage:
-                  "url(https://i.ytimg.com/vi/SAWOLJRjBt0/hqdefault.jpg)",
-              }}
-              aria-hidden
-            />
-            <div className="wipu-sample-video-frame">
-              <iframe
-                src="https://www.youtube-nocookie.com/embed/SAWOLJRjBt0?rel=0&playsinline=1&start=291&autoplay=1&mute=1"
-                title="Multimodal Launcher at Samsung Galaxy Unpacked 2025"
-                className="wipu-sample-video-iframe"
-                loading="lazy"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-              />
-            </div>
-          </div>
+          <VideoEmbed
+            id="SAWOLJRjBt0"
+            title="Multimodal Launcher at Samsung Galaxy Unpacked 2025"
+            params="rel=0&playsinline=1&start=291&autoplay=1&mute=1"
+            thumb="https://i.ytimg.com/vi/SAWOLJRjBt0/hqdefault.jpg"
+            iframeClassName="wipu-sample-video-iframe"
+          />
           <figcaption className="wipu-sample-video-title">
             Multimodal Launcher @ Samsung Galaxy Unpacked 2025
           </figcaption>
@@ -691,50 +639,11 @@ export const teachingGeminiToSee: CaseStudyDeckEntry = {
       ),
     },
     {
-      slug: "zrh-socks-demo",
-      name: "ZRH · Socks demo",
-      content: (
-        <figure
-          style={{
-            margin: 0,
-            width: "100%",
-            height: "100%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/portfolio%20transfer/case%20study%20live%20video/zrh-socks-demo.png"
-            alt="Hand holding a phone running Gemini Live, pointed at a pile of patterned socks"
-            style={{
-              maxWidth: "100%",
-              maxHeight: "100%",
-              objectFit: "contain",
-              borderRadius: 44,
-              display: "block",
-            }}
-          />
-        </figure>
-      ),
-    },
-    {
       slug: "11",
       name: "ZRH · Prototype",
       selfContained: true,
       hideChrome: true,
-      content: (
-        <section className="wipu-sample-proto">
-          <iframe
-            src="/archive/prototypes/voice-chat?embed=1"
-            title="Voice chat prototype"
-            className="wipu-sample-proto-iframe"
-            loading="lazy"
-            allow="autoplay; encrypted-media"
-          />
-        </section>
-      ),
+      content: <PrototypeEmbed slug="voice-chat" defaultVideoOn={false} />,
     },
     {
       slug: "results",
@@ -778,8 +687,8 @@ export const teachingGeminiToSee: CaseStudyDeckEntry = {
               eyebrow: "Q2 2025",
               title: "Samsung campaign refresh",
               body: "Hero feature of Samsung's Q2 2025 multimillion-dollar campaign refresh.",
-              image: {
-                src: "/portfolio%20transfer/gemini_vss_commercial_lindsaylohan.gif",
+              video: {
+                src: "/portfolio%20transfer/gemini_vss_commercial_lindsaylohan.mp4",
                 alt: "Samsung Q2 2025 campaign — Gemini Visual Cues commercial featuring Lindsay Lohan",
               },
             },
@@ -809,26 +718,13 @@ export const teachingGeminiToSee: CaseStudyDeckEntry = {
       content: (
         <div className="wipu-cs-numbers-awards">
           <figure className="wipu-sample-video is-vertical wipu-cs-numbers-awards-video">
-            <div className="wipu-sample-video-stage">
-              <div
-                className="wipu-sample-video-glow"
-                style={{
-                  backgroundImage:
-                    "url(https://i.ytimg.com/vi/2qT9EDkLfC0/hqdefault.jpg)",
-                }}
-                aria-hidden
-              />
-              <div className="wipu-sample-video-frame">
-                <iframe
-                  src="https://www.youtube-nocookie.com/embed/2qT9EDkLfC0?rel=0&playsinline=1"
-                  title="Mexico City — YouTube short"
-                  className="wipu-sample-video-iframe"
-                  loading="lazy"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                />
-              </div>
-            </div>
+            <VideoEmbed
+              id="2qT9EDkLfC0"
+              title="Mexico City — YouTube short"
+              params="rel=0&playsinline=1&mute=1"
+              thumb="https://i.ytimg.com/vi/2qT9EDkLfC0/hqdefault.jpg"
+              iframeClassName="wipu-sample-video-iframe"
+            />
           </figure>
           <div className="wipu-cs-numbers-awards-text">
             <div className="wipu-sample-metrics wipu-cs-numbers-awards-metrics">
@@ -901,47 +797,9 @@ export const teachingGeminiToSee: CaseStudyDeckEntry = {
       ),
     },
     {
-      slug: "17",
-      name: "Reflections",
-      content: (
-        <StickyCardsTemplate
-          blocks={[
-            {
-              eyebrow: "01",
-              title: "Design with the grain of the model.",
-              body: "Good design here starts with a deep understanding of what the model can actually do. That understanding is what makes real restraint possible.",
-              tone: "terracotta",
-            },
-            {
-              eyebrow: "02",
-              title: "Discoverability in conversational AI is unsolved.",
-              body: "Invisible features need a surface to live on, but every solution on the shelf violates the minimalism that makes these products work. The tension I most want to keep pulling on.",
-              tone: "mint",
-            },
-          ]}
-        />
-      ),
-    },
-    {
-      slug: "peace",
-      name: "Peace",
-      content: (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            width: "100%",
-            fontSize: "clamp(88px, 11vw, 160px)",
-            lineHeight: 1,
-          }}
-        >
-          <HoverGif
-            src="/portfolio%20transfer/peace%20emoji%20.gif"
-            alt="Peace"
-          />
-        </div>
-      ),
+      slug: "more",
+      name: "More work",
+      content: <CasesSlide eyebrow="CASE STUDIES" title="More work." />,
     },
   ],
 };

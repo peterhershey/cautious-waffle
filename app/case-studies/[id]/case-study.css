@@ -22,7 +22,7 @@
   font-family: var(--wipu-mono);
   font-size: 10px;
   font-weight: 500;
-  letter-spacing: 0.22em;
+  letter-spacing: var(--wipu-track-eyebrow);
   text-transform: uppercase;
   color: var(--wipu-ink-faint);
 }
@@ -129,7 +129,7 @@
 .wipu-veo-mediaMetrics-media {
   position: relative;
   aspect-ratio: 16 / 9;
-  border-radius: 14px;
+  border-radius: var(--wipu-r-xl);
   overflow: hidden;
   box-shadow: 0 18px 48px rgba(0, 0, 0, 0.35);
 }
@@ -170,6 +170,64 @@
   .wipu-veo-mediaMetrics[data-side="left"] .wipu-veo-mediaMetrics-text,
   .wipu-veo-mediaMetrics[data-side="left"] .wipu-veo-mediaMetrics-media {
     order: initial;
+  }
+}
+
+/* Veo case study — standalone centered image, no text. Sized by the
+   slide's usable height so portrait shots never clip; same frame
+   treatment as the rest of the deck's media. */
+.wipu-veo-imageOnly {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(14px, 1.8vh, 22px);
+}
+.wipu-veo-imageOnly img {
+  display: block;
+  /* Wide 8-up grid — give it room so the faces stay legible, but keep it
+     bounded so it always fits the slide between the 64px paddings + caption. */
+  max-width: min(960px, 92vw);
+  max-height: calc(100svh - 220px);
+  width: auto;
+  height: auto;
+  border-radius: var(--wipu-r-xl);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.35);
+}
+.wipu-veo-imageOnly-cap {
+  font-family: var(--wipu-mono);
+  font-size: 12px;
+  letter-spacing: var(--wipu-track-wide);
+  text-transform: uppercase;
+  color: var(--wipu-ink-dim);
+}
+
+/* Landscape & model — 2-up columns, each an image well with its
+   eyebrow/title/body stacked beneath (reuses the MediaText text tokens).
+   Replaces the two former side-by-side MediaText slides. */
+.wipu-veo-twoup {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(28px, 4vw, 64px);
+  width: 100%;
+  max-width: min(1080px, 92vw);
+  margin: 0 auto;
+  align-items: start;
+}
+.wipu-veo-twoup-col {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 2.4vh, 26px);
+}
+/* Shorter than the MediaText 4:3 well so two stacked image+text columns
+   still fit a single slide on laptop-height viewports. */
+.wipu-veo-twoup-well {
+  aspect-ratio: 16 / 10;
+}
+@media (max-width: 768px) {
+  .wipu-veo-twoup {
+    grid-template-columns: 1fr;
+    gap: clamp(24px, 4vh, 40px);
   }
 }
 
@@ -326,7 +384,7 @@
 .wipu-veo-tile {
   position: absolute;
   aspect-ratio: 16 / 9;
-  border-radius: 14px;
+  border-radius: var(--wipu-r-xl);
   overflow: hidden;
   background: var(--tile-color);
   filter: blur(calc(var(--tile-blur, 0px) + var(--blur-pulse, 0px)));
@@ -399,6 +457,24 @@
 .wipu-veo-tile--blur-mr { top: 42%;    right: 1%; }
 .wipu-veo-tile--blur-bl { bottom: 16%; left: 24%; }
 .wipu-veo-tile--blur-br { bottom: 12%; right: 26%; }
+
+/* Sparse echo — slide two ("Project at a glance") reuses this field at half
+   the tile count (curated in VeoHero) and lower presence so it reads as a
+   quiet backdrop connecting back to the hero, not a second hero. Drop the
+   foreground shadow and dim every tile; push the blurred drifters down
+   further so the centered metadata stays clearly legible over them. */
+.wipu-veo-hero--sparse .wipu-veo-tile {
+  opacity: 0.34;
+  box-shadow: none;
+}
+.wipu-veo-hero--sparse .wipu-veo-tile--blur-tl,
+.wipu-veo-hero--sparse .wipu-veo-tile--blur-tr,
+.wipu-veo-hero--sparse .wipu-veo-tile--blur-ml,
+.wipu-veo-hero--sparse .wipu-veo-tile--blur-mr,
+.wipu-veo-hero--sparse .wipu-veo-tile--blur-bl,
+.wipu-veo-hero--sparse .wipu-veo-tile--blur-br {
+  opacity: 0.22;
+}
 
 /* Two-track animation: drift drives transform (xy float), focus drives scale
    + --blur-pulse (depth/focus). Each track has 4 / 2 keyframe variants; tiles
@@ -542,7 +618,7 @@
 /* ── Re-skin the glance template inside .wpd-dossier ── */
 .wpd-dossier .wipu-tpl-glance-eyebrow {
   color: var(--dossier-ink);
-  letter-spacing: 0.32em;
+  letter-spacing: var(--wipu-track-wide);
   opacity: 0.7;
 }
 
@@ -595,7 +671,7 @@
   gap: 2px;
   padding: 10px 18px;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--wipu-r-md);
   font-family: var(--wipu-mono);
   color: var(--dossier-stamp-ink);
   background: var(--dossier-stamp-bg);
@@ -609,7 +685,7 @@
 .wpd-dossier-stamp-line {
   font-size: 9px;
   font-weight: 500;
-  letter-spacing: 0.32em;
+  letter-spacing: var(--wipu-track-wide);
   text-transform: uppercase;
 }
 
@@ -633,7 +709,7 @@
   }
   .wpd-dossier-stamp-line {
     font-size: 8px;
-    letter-spacing: 0.24em;
+    letter-spacing: var(--wipu-track-wide);
   }
 }
 
@@ -760,7 +836,7 @@
 .wpd-multimodality-twoup-attr {
   font-family: var(--wipu-mono);
   font-size: 11px;
-  letter-spacing: 0.22em;
+  letter-spacing: var(--wipu-track-eyebrow);
   text-transform: uppercase;
   color: var(--wipu-ink-faint);
   font-style: normal;
@@ -780,29 +856,27 @@
   width: 100%;
   align-self: stretch;
   margin: 0;
+  /* Fill the slide so the title pins to the top and the carousel
+     (flex:1 below) owns the rest — otherwise the board collapses to
+     content height and the centered title overlaps the cards. */
+  min-height: calc(100svh - 128px);
   display: flex;
   flex-direction: column;
   align-items: stretch;
 }
-.wpd-multimodal-uc-board-label {
-  align-self: flex-start;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+.wpd-multimodal-uc-title {
+  margin: 0 0 clamp(12px, 2vh, 24px);
+  text-align: center;
+  align-self: center;
+  max-width: 28ch;
   z-index: 5;
-  max-width: 40ch;
   font-family: var(--wipu-mono);
-  font-size: 12px;
+  font-size: var(--wipu-fs-h2);
   font-weight: 500;
-  line-height: 1.45;
-  letter-spacing: 0.02em;
-  color: var(--wipu-ink-dim);
-}
-.wpd-multimodal-uc-board-label > :first-child {
-  font-size: 11px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--wipu-ink-faint);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--wipu-ink);
+  text-wrap: balance;
 }
 .wpd-multimodal-uc-board .wpd-multimodal-uc-stage {
   flex: 1;
@@ -906,7 +980,7 @@
 .wpd-flow-eyebrow {
   font-family: var(--wipu-mono);
   font-size: 11px;
-  letter-spacing: 0.24em;
+  letter-spacing: var(--wipu-track-wide);
   text-transform: uppercase;
   color: var(--wipu-ink-faint);
   font-weight: 500;
@@ -928,6 +1002,38 @@
   color: var(--wipu-ink-faint);
 }
 
+/* ── Scroll-pinned "overview → zoom → pan" choreography ──
+   The flowchart is too dense to read at fit-to-slide size, so its slide is
+   a tall (N_STOPS × 100svh) scroll region. A sticky pin holds one viewport
+   while VeoFlowchart translates scroll progress into a scale + vertical pan:
+   you land on the whole chart, it auto-zooms into the top, you scroll down
+   through the rest, then the next arrow-step releases to the next slide.
+   Snap markers reuse `.wipu-sample-tl-snap` so the deck nav steps through
+   them. Keep N_STOPS (JS) and the inline section height in sync. */
+.wpd-flow-scroll {
+  position: relative;
+  width: 100%;
+  border-bottom: var(--wipu-dash-soft);
+}
+.wpd-flow-pin {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  width: 100%;
+  overflow: hidden;
+  background: var(--wipu-bg);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+.wpd-flow-track {
+  width: 100%;
+  /* Zoom anchors at the top-center so reading starts at "Discovery" and
+     the pan then carries downward through the chart. */
+  transform-origin: 50% 0;
+  will-change: transform;
+}
+
 .wpd-flow-svg {
   width: 100%;
   height: auto;
@@ -943,6 +1049,37 @@
   --tone-text: var(--wipu-ink-dim);
 }
 
+/* Zoom variant fills the pin width at scale 1 (its readable size); the JS
+   transform scales it down for the overview and pans it for the rest. The
+   aspect-ratio (matching the 1440×1160 viewBox) keeps height in sync with
+   the JS math without a measure-and-set round-trip. */
+.wpd-flow-svg--zoom {
+  max-height: none;
+  aspect-ratio: 1440 / 1160;
+}
+
+/* Plain scrollable fallback (reduced motion / narrow). The container owns a
+   single viewport's worth of scroll; the chart renders large and the viewer
+   scrolls it freely. */
+.wpd-flow-fallback {
+  height: 100svh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px;
+  box-sizing: border-box;
+}
+.wpd-flow-fallback::-webkit-scrollbar { display: none; }
+.wpd-flow-svg--fallback {
+  max-height: none;
+  width: 100%;
+  aspect-ratio: 1440 / 1160;
+  flex: none;
+}
+
 /* ── Edges ──
    Default state is dim gray. Loop edges render dashed so backward
    flow reads as recovery rather than primary motion. On the active
@@ -950,7 +1087,7 @@
 .wpd-flow-edge {
   color: var(--wipu-ink-faint);
   opacity: 0.55;
-  transition: color 220ms ease, opacity 220ms ease;
+  transition: color var(--wipu-dur-base) ease, opacity var(--wipu-dur-base) ease;
 }
 .wpd-flow-edge > path {
   fill: none;
@@ -1022,7 +1159,7 @@
   fill: var(--tone-fill, transparent);
   stroke: var(--tone-line, var(--wipu-ink-faint));
   stroke-width: 1.6;
-  transition: fill 220ms ease, stroke 220ms ease, stroke-width 220ms ease;
+  transition: fill var(--wipu-dur-base) ease, stroke var(--wipu-dur-base) ease, stroke-width var(--wipu-dur-base) ease;
 }
 .wpd-flow-node[data-kind="terminal"] .wpd-flow-shape {
   /* Pill — slightly heavier border so start/end read as anchors. */
@@ -1044,7 +1181,7 @@
   letter-spacing: -0.005em;
   color: var(--tone-text, var(--wipu-ink-dim));
   pointer-events: none;
-  transition: color 220ms ease;
+  transition: color var(--wipu-dur-base) ease;
 }
 
 /* Hover — the active node lifts to its tone. Decision diamonds and
@@ -1106,7 +1243,7 @@
   position: relative;
   width: 100%;
   height: 100%;
-  border-radius: 14px;
+  border-radius: var(--wipu-r-xl);
   overflow: hidden;
   isolation: isolate;
   background:
@@ -1161,6 +1298,57 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .wpd-flow-gel-blob { animation: none; }
+}
+
+/* ── Latency cue (generation step) ──
+   The generate node carries real wait time. Instead of a literal
+   "(latency)" label, a slow indeterminate highlight sweeps through the
+   node — the universal "working / this takes a moment" signal, and
+   visually distinct from the disambiguate cycle's marching dash. The
+   overlay is clipped to the node's rounded rect and painted behind the
+   stroke + label (the transparent node fill lets it show through). */
+.wpd-flow-gen {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--wipu-r-md);
+  overflow: hidden;
+  pointer-events: none;
+}
+/* Generate node carries a two-line label: the action + a quieter duration
+   subtitle. Stack them; the subtitle inherits the label's tone colour and
+   just dims via opacity so it stays legible at rest and on hover. */
+.wpd-flow-node[data-node="generate"] .wpd-flow-label {
+  flex-direction: column;
+  gap: 2px;
+  line-height: 1.18;
+}
+.wpd-flow-sub {
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  opacity: 0.62;
+}
+.wpd-flow-gen-sweep {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-image: linear-gradient(
+    100deg,
+    transparent 30%,
+    rgba(242, 239, 230, 0.16) 50%,
+    transparent 70%
+  );
+  background-size: 220% 100%;
+  background-repeat: no-repeat;
+  animation: wpd-flow-gen-sweep 2.6s ease-in-out infinite;
+  will-change: background-position;
+}
+@keyframes wpd-flow-gen-sweep {
+  0%   { background-position: 120% 0; }
+  100% { background-position: -20% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wpd-flow-gen-sweep { animation: none; }
 }
 
 /* When NOTHING is hovered, surface a faint hint of tone on the
@@ -1236,7 +1424,7 @@
 .wpd-multimodal-uc-quote-attr {
   font-family: var(--wipu-mono);
   font-size: 11px;
-  letter-spacing: 0.22em;
+  letter-spacing: var(--wipu-track-eyebrow);
   text-transform: uppercase;
   color: var(--wipu-ink-faint);
   font-style: normal;
@@ -1256,9 +1444,7 @@
   -webkit-tap-highlight-color: transparent;
 }
 .wpd-multimodal-uc-stage:focus-visible {
-  outline: 1px dashed var(--wipu-rule-strong);
-  outline-offset: 16px;
-  border-radius: 12px;
+  outline: none;
 }
 
 .wpd-multimodal-uc-card {
@@ -1281,7 +1467,7 @@
   left: 50%;
   width: min(560px, 56vw);
   transition:
-    transform 600ms cubic-bezier(0.2, 0.6, 0.2, 1),
+    transform 600ms var(--wipu-ease),
     filter 600ms ease,
     opacity 600ms ease;
   will-change: transform, filter, opacity;
@@ -1334,7 +1520,7 @@
    on hover so the response feels immediate; the slow 600ms eases stay on
    the advance flip. */
 .wpd-multimodal-uc-stage:hover .wpd-multimodal-uc-card {
-  transition-duration: 280ms;
+  transition-duration: var(--wipu-dur-slow);
 }
 .wpd-multimodal-uc-stage:hover .wpd-multimodal-uc-card[data-position="active"] {
   transform:
@@ -1401,7 +1587,7 @@
 }
 .wpd-multimodal-uc-bubble {
   padding: 11px 16px;
-  border-radius: 20px;
+  border-radius: var(--wipu-r-2xl);
   max-width: 92%;
   font-size: clamp(13px, 1.05vw, 15px);
   line-height: 1.5;
@@ -1411,7 +1597,7 @@
   align-self: flex-end;
   background: var(--wpd-tone);
   color: var(--wpd-tone-ink);
-  border-bottom-right-radius: 6px;
+  border-bottom-right-radius: var(--wipu-r-md);
   font-family: var(--font-serif), Georgia, serif;
   font-style: italic;
   font-weight: 400;
@@ -1421,13 +1607,13 @@
   background: var(--wipu-bg-elev);
   color: var(--wipu-ink-dim);
   border: 1px solid var(--wipu-rule);
-  border-bottom-left-radius: 6px;
+  border-bottom-left-radius: var(--wipu-r-md);
   font-family: var(--wipu-mono);
 }
 .wpd-multimodal-uc-ai-label {
   font-family: var(--wipu-mono);
   font-size: 10px;
-  letter-spacing: 0.22em;
+  letter-spacing: var(--wipu-track-eyebrow);
   text-transform: uppercase;
   color: var(--wipu-ink-faint);
   align-self: flex-start;
@@ -1653,14 +1839,14 @@
   border-right: 1.5px solid var(--fortran-ink);
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--wipu-sp-2xs);
   min-height: 44px;
 }
 .wpd-fortran-cell:last-child { border-right: none; }
 
 .wpd-fortran-cell-label {
   font-size: clamp(9px, 0.75vw, 12px);
-  letter-spacing: 0.12em;
+  letter-spacing: var(--wipu-track-tight);
   text-transform: uppercase;
   color: var(--fortran-ink);
   font-weight: 600;
@@ -1757,7 +1943,7 @@
 .wpd-fortran-col:last-child { border-right: none; }
 .wpd-fortran-col-label {
   font-size: clamp(8px, 0.65vw, 10px);
-  letter-spacing: 0.14em;
+  letter-spacing: var(--wipu-track-tight);
   text-transform: uppercase;
   color: var(--fortran-ink);
   font-weight: 600;
@@ -1770,7 +1956,7 @@
 .wpd-fortran-col-label--vertical {
   writing-mode: vertical-rl;
   transform: rotate(180deg);
-  letter-spacing: 0.18em;
+  letter-spacing: var(--wipu-track-eyebrow);
   font-size: clamp(7px, 0.55vw, 9px);
 }
 
@@ -1895,7 +2081,7 @@
 .wpd-fortran-mark--ident {
   font-size: clamp(11px, 0.9vw, 14px);
   color: var(--fortran-type-soft);
-  letter-spacing: 0.1em;
+  letter-spacing: var(--wipu-track-tight);
 }
 
 /* Typing caret — blinks while a line is being typed. The block-shaped
@@ -1931,7 +2117,7 @@
 .wpd-fortran-footer-stamp {
   font-weight: 700;
   color: var(--fortran-ink);
-  letter-spacing: 0.12em;
+  letter-spacing: var(--wipu-track-tight);
 }
 
 /* Smaller viewports: relax internal grid + minimum heights. */

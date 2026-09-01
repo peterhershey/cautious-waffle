@@ -78,9 +78,9 @@
     var(--hud-s-grip);
 
   transition:
-    box-shadow 240ms ease-out,
-    -webkit-backdrop-filter 240ms ease-out,
-    backdrop-filter 240ms ease-out;
+    box-shadow var(--wipu-dur-base) ease-out,
+    -webkit-backdrop-filter var(--wipu-dur-base) ease-out,
+    backdrop-filter var(--wipu-dur-base) ease-out;
 
   animation: hud-edge-drift 22s linear infinite;
 }
@@ -103,7 +103,7 @@
   filter: blur(10px) saturate(130%);
   mix-blend-mode: screen;
   opacity: calc(0.5 + 0.25 * var(--hud-intensity));
-  transition: opacity 240ms ease-out;
+  transition: opacity var(--wipu-dur-base) ease-out;
   animation:
     hud-blob-1 14s ease-in-out infinite,
     hud-blob-2 19s ease-in-out infinite,
@@ -129,7 +129,7 @@
     transparent 70%
   );
   mix-blend-mode: screen;
-  transition: background 140ms ease-out;
+  transition: background var(--wipu-dur-fast) ease-out;
 }
 
 /* Children sit above the iridescent layers */

@@ -19,7 +19,7 @@
   align-items: center;
   gap: var(--wipu-sp-lg);
   text-align: center;
-  transition: opacity 260ms ease, transform 320ms cubic-bezier(0.22, 0.8, 0.2, 1);
+  transition: opacity 260ms ease, transform var(--wipu-dur-slow) var(--wipu-ease);
 }
 .creator-intro[aria-hidden="true"] {
   opacity: 0;
@@ -30,7 +30,7 @@
 .creator-eyebrow {
   font-family: var(--wipu-mono);
   font-size: var(--wipu-fs-eyebrow);
-  letter-spacing: 0.24em;
+  letter-spacing: var(--wipu-track-wide);
   color: var(--wipu-ink-faint);
 }
 
@@ -53,8 +53,8 @@
   margin-top: var(--wipu-sp-sm);
   cursor: pointer;
   color: var(--wipu-ink);
-  transition: transform 220ms cubic-bezier(0.22, 0.8, 0.2, 1),
-    opacity 200ms ease;
+  transition: transform var(--wipu-dur-base) var(--wipu-ease),
+    opacity var(--wipu-dur-base) ease;
 }
 .creator-folder-btn:hover {
   transform: translateY(-2px);
@@ -75,32 +75,32 @@
 .creator-folder-path {
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
-  transition: stroke-dashoffset 1100ms cubic-bezier(0.22, 0.8, 0.2, 1);
+  transition: stroke-dashoffset 1100ms var(--wipu-ease);
 }
 .creator-folder-svg[data-drawn="true"] .creator-folder-outline {
   stroke-dashoffset: 0;
-  transition-delay: 120ms;
+  transition-delay: var(--wipu-dur-fast);
 }
 .creator-folder-svg[data-drawn="true"] .creator-folder-crease {
   stroke-dashoffset: 0;
-  transition-delay: 900ms;
+  transition-delay: var(--wipu-dur-fade);
   transition-duration: 500ms;
 }
 
 /* Folder flap lifts slightly on hover */
 .creator-folder-btn:hover .creator-folder-crease {
   transform: translateY(-2px);
-  transition: transform 220ms cubic-bezier(0.22, 0.8, 0.2, 1);
+  transition: transform var(--wipu-dur-base) var(--wipu-ease);
 }
 .creator-folder-crease {
   transform-origin: center;
-  transition: transform 220ms cubic-bezier(0.22, 0.8, 0.2, 1);
+  transition: transform var(--wipu-dur-base) var(--wipu-ease);
 }
 
 .creator-hint {
   font-family: var(--wipu-mono);
   font-size: var(--wipu-fs-eyebrow);
-  letter-spacing: 0.14em;
+  letter-spacing: var(--wipu-track-tight);
   color: var(--wipu-ink-dim);
 }
 
@@ -122,7 +122,7 @@
 .creator-overlay::-webkit-scrollbar { display: none; }
 .creator-overlay[data-state="opening"] { opacity: 0; }
 .creator-overlay[data-state="open"] { opacity: 1; }
-.creator-overlay[data-state="closing"] { opacity: 0; transition-duration: 360ms; }
+.creator-overlay[data-state="closing"] { opacity: 0; transition-duration: var(--wipu-dur-slow); }
 
 .creator-grid {
   display: grid;
@@ -191,8 +191,8 @@
   transform: scale(0.42);
   transform-origin: center;
   transition-property: opacity, transform;
-  transition-duration: 320ms;
-  transition-timing-function: cubic-bezier(0.22, 0.8, 0.2, 1);
+  transition-duration: var(--wipu-dur-slow);
+  transition-timing-function: var(--wipu-ease);
   transition-delay: calc(var(--i, 0) * 8ms);
   will-change: opacity, transform;
 }
@@ -232,7 +232,7 @@
   object-fit: cover;
   display: block;
   user-select: none;
-  transition: filter 220ms ease;
+  transition: filter var(--wipu-dur-base) ease;
   animation: wipu-idle-zoom 11s ease-in-out infinite alternate;
   /* Each tile gets a different phase so the grid doesn't breathe in unison */
   animation-delay: calc(var(--i, 0) * -0.7s);
@@ -244,7 +244,7 @@
   border-radius: inherit;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
   pointer-events: none;
-  transition: box-shadow 220ms ease;
+  transition: box-shadow var(--wipu-dur-base) ease;
 }
 .creator-tile-image:hover img,
 .creator-tile-image:hover video {
@@ -329,7 +329,7 @@
   border: 1px solid var(--wipu-rule);
   width: 52px;
   height: 52px;
-  border-radius: 999px;
+  border-radius: var(--wipu-r-pill);
   font-size: 28px;
   line-height: 1;
   display: inline-flex;
@@ -338,8 +338,8 @@
   cursor: pointer;
   opacity: 0;
   transform: translateX(-50%) translateY(10px);
-  transition: opacity 240ms ease 180ms, transform 280ms cubic-bezier(0.22, 0.8, 0.2, 1) 180ms,
-    background-color 160ms ease, border-color 160ms ease;
+  transition: opacity var(--wipu-dur-base) ease var(--wipu-dur-base), transform var(--wipu-dur-slow) var(--wipu-ease) var(--wipu-dur-base),
+    background-color var(--wipu-dur-base) ease, border-color var(--wipu-dur-base) ease;
 }
 .creator-overlay[data-state="open"] .creator-x {
   opacity: 1;
@@ -368,7 +368,7 @@
   clip-path: inset(0 0 0 0);
   opacity: 1;
   transform: scale(1);
-  transition: clip-path 900ms cubic-bezier(0.22, 0.8, 0.2, 1),
+  transition: clip-path var(--wipu-dur-fade) var(--wipu-ease),
     opacity 600ms ease;
   transition-delay: calc(var(--reveal-delay, 0) * 1ms);
 }
@@ -380,8 +380,8 @@
 .creator-tile[data-revealed="true"]:not(.creator-tile-1x2):not(.creator-tile-2x2) {
   opacity: 1;
   transform: scale(1) translateY(0);
-  transition: opacity 520ms ease,
-    transform 620ms cubic-bezier(0.22, 0.8, 0.2, 1);
+  transition: opacity var(--wipu-dur-slower) ease,
+    transform 620ms var(--wipu-ease);
   transition-delay: calc(var(--reveal-delay, 0) * 1ms);
 }
 

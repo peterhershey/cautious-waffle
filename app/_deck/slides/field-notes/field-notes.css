@@ -18,7 +18,7 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  transition: opacity 260ms ease, transform 320ms cubic-bezier(0.22, 0.8, 0.2, 1);
+  transition: opacity 260ms ease, transform var(--wipu-dur-slow) var(--wipu-ease);
 }
 .field-notes-intro[aria-hidden="true"] {
   opacity: 0;
@@ -64,7 +64,7 @@
   content: "";
   position: absolute;
   inset: -6px;
-  border-radius: 999px;
+  border-radius: var(--wipu-r-pill);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--wipu-mustard) 60%, transparent);
 }
 
@@ -75,7 +75,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 999px;
+  border-radius: var(--wipu-r-pill);
   transform: scale(calc(1 + var(--dwell) * 0.06));
   /* No transition — JS rAF writes --dwell at 60fps; transitioning would
      chase its own tail (esp. with non-linear ease, where per-frame
@@ -85,7 +85,7 @@
 .field-notes-portal-aura {
   position: absolute;
   inset: -18%;
-  border-radius: 999px;
+  border-radius: var(--wipu-r-pill);
   background:
     radial-gradient(closest-side,
       color-mix(in srgb, var(--wipu-mustard) 70%, transparent) 0%,
@@ -134,7 +134,7 @@
 .field-notes-portal-lbl {
   font-family: var(--wipu-mono);
   font-size: var(--wipu-fs-eyebrow);
-  letter-spacing: 0.22em;
+  letter-spacing: var(--wipu-track-eyebrow);
   text-transform: uppercase;
   color: var(--wipu-ink-dim);
   opacity: calc(1 - var(--dwell) * 0.7);
@@ -182,12 +182,12 @@
   clip-path: circle(150vmax at 50% 50%);
   transition:
     opacity 260ms ease,
-    clip-path 540ms cubic-bezier(0.22, 0.8, 0.2, 1);
+    clip-path 540ms var(--wipu-ease);
 }
 .field-notes-overlay::-webkit-scrollbar { display: none; }
 .field-notes-overlay[data-state="opening"] { opacity: 0; }
 .field-notes-overlay[data-state="open"] { opacity: 1; }
-.field-notes-overlay[data-state="closing"] { opacity: 0; transition-duration: 360ms; }
+.field-notes-overlay[data-state="closing"] { opacity: 0; transition-duration: var(--wipu-dur-slow); }
 /* Closed but mounted: the overlay is pre-painted while the slide is
    active so the first open is paint-free. It sits position:fixed at
    z-index 200, so without this it silently captures wheel/click —
@@ -211,7 +211,7 @@
   clip-path: circle(
     calc(var(--dwell, 0) * 70vmax) at 50% 50%
   );
-  transition: opacity 200ms ease;
+  transition: opacity var(--wipu-dur-base) ease;
   pointer-events: none;
 }
 /* During preview the bento tiles must already be in their resting state
@@ -374,10 +374,10 @@
   transform: scale(0.42);
   transform-origin: center;
   transition-property: opacity, transform, box-shadow;
-  transition-duration: 320ms, 320ms, 1500ms;
+  transition-duration: var(--wipu-dur-slow), var(--wipu-dur-slow), 1500ms;
   transition-timing-function:
-    cubic-bezier(0.22, 0.8, 0.2, 1),
-    cubic-bezier(0.22, 0.8, 0.2, 1),
+    var(--wipu-ease),
+    var(--wipu-ease),
     cubic-bezier(0.4, 0, 0.2, 1);
   transition-delay: calc(var(--i, 0) * 8ms), calc(var(--i, 0) * 8ms), 0ms;
   will-change: opacity, transform;
@@ -436,7 +436,7 @@
      events to viewport entry, so the reveals cascade as the user
      scrolls. */
   opacity: 0;
-  transition: filter 220ms ease, opacity 620ms ease;
+  transition: filter var(--wipu-dur-base) ease, opacity 620ms ease;
   animation: wipu-idle-zoom 11s ease-in-out infinite alternate;
   /* Each tile gets a different phase so the grid doesn't breathe in unison */
   animation-delay: calc(var(--i, 0) * -0.7s);
@@ -501,7 +501,7 @@
   top: -12%;
   left: -10%;
   animation: wipu-fn-gel-a 9.4s ease-in-out infinite;
-  animation-delay: calc(var(--i, 0) * -200ms);
+  animation-delay: calc(var(--i, 0) * -var(--wipu-dur-base));
 }
 .field-notes-tile-gel::after {
   width: 60%;
@@ -533,7 +533,7 @@
   border-radius: inherit;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
   pointer-events: none;
-  transition: box-shadow 220ms ease;
+  transition: box-shadow var(--wipu-dur-base) ease;
 }
 .field-notes-tile-image:hover img,
 .field-notes-tile-image:hover video {
@@ -647,8 +647,8 @@
   opacity: 0;
   transform: translateY(-6px);
   transition:
-    opacity 320ms ease 200ms,
-    transform 360ms cubic-bezier(0.22, 0.8, 0.2, 1) 200ms;
+    opacity var(--wipu-dur-slow) ease var(--wipu-dur-base),
+    transform var(--wipu-dur-slow) var(--wipu-ease) var(--wipu-dur-base);
   pointer-events: none;
 }
 .field-notes-overlay[data-state="open"] .field-notes-header {
@@ -671,10 +671,10 @@
 }
 /* Stagger the lines on entry so the question lands one beat at a time. */
 .field-notes-overlay[data-state="open"] .field-notes-header-title > span {
-  animation: field-notes-headline-rise 700ms cubic-bezier(0.22, 0.8, 0.2, 1) both;
+  animation: field-notes-headline-rise 700ms var(--wipu-ease) both;
 }
-.field-notes-overlay[data-state="open"] .field-notes-header-title > span:nth-child(1) { animation-delay: 240ms; }
-.field-notes-overlay[data-state="open"] .field-notes-header-title > span:nth-child(2) { animation-delay: 360ms; }
+.field-notes-overlay[data-state="open"] .field-notes-header-title > span:nth-child(1) { animation-delay: var(--wipu-dur-base); }
+.field-notes-overlay[data-state="open"] .field-notes-header-title > span:nth-child(2) { animation-delay: var(--wipu-dur-slow); }
 .field-notes-overlay[data-state="open"] .field-notes-header-title > span:nth-child(3) { animation-delay: 480ms; }
 
 @keyframes field-notes-headline-rise {
@@ -692,7 +692,7 @@
   color: var(--wipu-ink-dim);
   max-width: 56ch;
   opacity: 0;
-  animation: field-notes-headline-rise 600ms cubic-bezier(0.22, 0.8, 0.2, 1) 640ms forwards;
+  animation: field-notes-headline-rise 600ms var(--wipu-ease) 640ms forwards;
 }
 .field-notes-overlay:not([data-state="open"]) .field-notes-header-sub {
   animation: none;
@@ -722,8 +722,8 @@
   gap: var(--wipu-sp-md);
   opacity: 0;
   transition:
-    opacity 320ms ease 200ms,
-    transform 360ms cubic-bezier(0.22, 0.8, 0.2, 1) 200ms;
+    opacity var(--wipu-dur-slow) ease var(--wipu-dur-base),
+    transform var(--wipu-dur-slow) var(--wipu-ease) var(--wipu-dur-base);
 }
 .field-notes-overlay[data-state="open"] .field-notes-dock {
   opacity: 1;
@@ -735,7 +735,7 @@
   border: 0;
   width: 84px;
   height: 84px;
-  border-radius: 999px;
+  border-radius: var(--wipu-r-pill);
   color: #fff;
   background: linear-gradient(180deg, #1f1f1f 0%, #050505 100%);
   cursor: pointer;
@@ -747,8 +747,8 @@
     0 1px 0 rgba(255, 255, 255, 0.06) inset,
     0 10px 24px rgba(0, 0, 0, 0.35);
   transition:
-    transform 220ms cubic-bezier(0.22, 0.8, 0.2, 1),
-    box-shadow 220ms ease;
+    transform var(--wipu-dur-base) var(--wipu-ease),
+    box-shadow var(--wipu-dur-base) ease;
 }
 .field-notes-dock-btn:hover {
   transform: translateY(-2px) scale(1.04);
@@ -797,7 +797,7 @@
   clip-path: inset(0 0 0 0);
   opacity: 1;
   transform: scale(1);
-  transition: clip-path 900ms cubic-bezier(0.22, 0.8, 0.2, 1),
+  transition: clip-path var(--wipu-dur-fade) var(--wipu-ease),
     opacity 600ms ease;
   transition-delay: calc(var(--reveal-delay, 0) * 1ms);
 }
@@ -809,8 +809,8 @@
 .field-notes-tile[data-revealed="true"]:not(.field-notes-tile-1x2):not(.field-notes-tile-2x2) {
   opacity: 1;
   transform: scale(1) translateY(0);
-  transition: opacity 520ms ease,
-    transform 620ms cubic-bezier(0.22, 0.8, 0.2, 1);
+  transition: opacity var(--wipu-dur-slower) ease,
+    transform 620ms var(--wipu-ease);
   transition-delay: calc(var(--reveal-delay, 0) * 1ms);
 }
 

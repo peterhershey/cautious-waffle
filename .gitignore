@@ -42,3 +42,6 @@ next-env.d.ts
 
 # claude code local state
 .claude/
+
+# Original GIF/MOV masters, replaced by web-optimized mp4 (not deployed)
+.media-originals/

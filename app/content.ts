@@ -169,6 +169,32 @@ export const closer = {
   title: "Let’s keep in touch.",
 } as const;
 
+// ── Anthropic cut only ────────────────────────────────────────────────
+// Drives the dedicated /anthropic deck's Peter's Principles slide.
+
+export const principles = {
+  label: "PRINCIPLES · 04",
+  eyebrow: "PETER HERSHEY",
+  title: "Peter’s principles",
+  items: [
+    {
+      key: "prolific",
+      title: "Be prolific",
+      body: "Creativity is a numbers game. If you have a lot of ideas, more of them will be good.",
+    },
+    {
+      key: "blind",
+      title: "We are all flying blind",
+      body: "The best way to be right all the time is to change your mind as soon as you’re wrong.",
+    },
+    {
+      key: "change",
+      title: "Build for change",
+      body: "Ship lightweight systems that adapt easily, so your energy is spent where it matters.",
+    },
+  ],
+} as const;
+
 export const cases = {
   label: "CASE STUDIES · 09",
   title: "Selected work.",

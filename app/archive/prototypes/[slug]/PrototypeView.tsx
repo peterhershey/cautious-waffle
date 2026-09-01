@@ -13,21 +13,32 @@ import { GelFilter } from "../components/GelFilter";
 import { StreamControls } from "../components/StreamControls";
 import { usePlayback } from "../components/usePlayback";
 import { VideoGenerationView } from "../components/VideoGenerationView";
+import { ImageEditingView } from "../components/ImageEditingView";
 
 export function PrototypeView({
   prototype,
   embed = false,
   doshi = false,
+  defaultVideoOn = true,
 }: {
   prototype: Prototype;
   embed?: boolean;
   doshi?: boolean;
+  defaultVideoOn?: boolean;
 }) {
   if (prototype.kind === "video-generation") {
     return <VideoGenerationView prototype={prototype} embed={embed} />;
   }
+  if (prototype.kind === "image-editing") {
+    return <ImageEditingView prototype={prototype} embed={embed} />;
+  }
   return (
-    <VoiceChatView prototype={prototype} embed={embed} initialDoshi={doshi} />
+    <VoiceChatView
+      prototype={prototype}
+      embed={embed}
+      initialDoshi={doshi}
+      defaultVideoOn={defaultVideoOn}
+    />
   );
 }
 
@@ -38,10 +49,12 @@ function VoiceChatView({
   prototype,
   embed,
   initialDoshi = false,
+  defaultVideoOn = true,
 }: {
   prototype: Prototype;
   embed: boolean;
   initialDoshi?: boolean;
+  defaultVideoOn?: boolean;
 }) {
   const [doshiEnabled, setDoshiEnabled] = useState(initialDoshi);
   const initialScenarios =
@@ -170,6 +183,7 @@ function VoiceChatView({
             streamStatus={streamStatus}
             backgroundVideo={scenario?.backgroundVideo ?? prototype.backgroundVideo}
             toast={toast}
+            defaultVideoOn={defaultVideoOn}
           >
             <CaptionBar words={words} />
           </PhoneFrame>

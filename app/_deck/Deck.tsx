@@ -9,12 +9,18 @@ import {
   useRef,
   useState,
 } from "react";
-import { SLIDES } from "./slides";
+import { SLIDES, type SlideDef } from "./slides";
 import { DeckChrome } from "./chrome/DeckChrome";
 import { useDeckScroll } from "./scroll/useDeckScroll";
 import { isCoarsePointer } from "./scroll/touchDetect";
 
-export type DeckContextSlide = { id: string; label: string };
+export type DeckContextSlide = {
+  id: string;
+  label: string;
+  /** Structural role for nav chrome: "section" rows divide chapters,
+      "prototype" rows get a badge. Defaults to a regular slide. */
+  kind?: "section" | "prototype" | "slide";
+};
 
 export type DeckContextValue = {
   activeIndex: number;
@@ -41,16 +47,19 @@ export function useDeck() {
 
 const HASH_PREFIX = "#s/";
 
-function readHashIndex(): number {
+function readHashIndex(slides: SlideDef[]): number {
   if (typeof window === "undefined") return 0;
   const hash = window.location.hash;
   if (!hash.startsWith(HASH_PREFIX)) return 0;
   const id = hash.slice(HASH_PREFIX.length);
-  const i = SLIDES.findIndex((s) => s.id === id);
+  const i = slides.findIndex((s) => s.id === id);
   return i >= 0 ? i : 0;
 }
 
-export function Deck() {
+/** The deck renders whatever slide list it's handed; defaults to the
+    home-page SLIDES. Pass a custom array (e.g. the /anthropic cut) to
+    drive a different deck through the same engine + chrome. */
+export function Deck({ slides = SLIDES }: { slides?: SlideDef[] } = {}) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const slideRefs = useRef<(HTMLElement | null)[]>([]);
   // Always start at 0 on first render so SSR and the client's first paint
@@ -65,7 +74,7 @@ export function Deck() {
 
   const { goTo, isAnimatingRef } = useDeckScroll({
     containerRef,
-    total: SLIDES.length,
+    total: slides.length,
     activeIndex,
     setActiveIndex,
     bumpNavKey,
@@ -79,7 +88,7 @@ export function Deck() {
   // in useState) keeps SSR and the client's first render in sync so the
   // data-active markers don't trigger a hydration mismatch.
   useLayoutEffect(() => {
-    const idx = readHashIndex();
+    const idx = readHashIndex(slides);
     if (idx === 0) return;
     setActiveIndex(idx);
     const container = containerRef.current;
@@ -125,7 +134,7 @@ export function Deck() {
   }, []);
 
   useEffect(() => {
-    const id = SLIDES[activeIndex]?.id;
+    const id = slides[activeIndex]?.id;
     if (!id) return;
     const nextHash = `${HASH_PREFIX}${id}`;
     if (window.location.hash !== nextHash) {
@@ -188,12 +197,12 @@ export function Deck() {
         case "End":
           e.preventDefault();
           bumpNavKey();
-          goTo(SLIDES.length - 1);
+          goTo(slides.length - 1);
           break;
         default: {
           if (/^[1-9]$/.test(e.key)) {
             const n = Number(e.key) - 1;
-            if (n < SLIDES.length) {
+            if (n < slides.length) {
               e.preventDefault();
               bumpNavKey();
               goTo(n);
@@ -242,8 +251,8 @@ export function Deck() {
 
   const ctxValue: DeckContextValue = {
     activeIndex,
-    total: SLIDES.length,
-    slides: SLIDES.map((s) => ({ id: s.id, label: s.label })),
+    total: slides.length,
+    slides: slides.map((s) => ({ id: s.id, label: s.label })),
     goTo,
     next,
     prev,
@@ -261,7 +270,7 @@ export function Deck() {
         role="region"
         aria-label="Portfolio presentation"
       >
-        {SLIDES.map((slide, i) => (
+        {slides.map((slide, i) => (
           <section
             key={slide.id}
             ref={(el) => {

@@ -22,6 +22,7 @@ type PhoneFrameProps = {
   streamEnabled?: boolean;
   streamStatus?: "good" | "poor";
   toast?: ToastPayload | null;
+  defaultVideoOn?: boolean;
   children?: ReactNode;
 };
 
@@ -41,13 +42,14 @@ export function PhoneFrame({
   streamEnabled = true,
   streamStatus = "good",
   toast = null,
+  defaultVideoOn = true,
   children,
 }: PhoneFrameProps) {
   const [zoom, setZoom] = useState(1);
   const [zoomExpanded, setZoomExpanded] = useState(false);
   const [captionsEnabled, setCaptionsEnabled] = useState(true);
   const [captionAnchor, setCaptionAnchor] = useState<"top" | "bottom">("top");
-  const [videoOn, setVideoOn] = useState(true);
+  const [videoOn, setVideoOn] = useState(defaultVideoOn);
   const [vo, setVo] = useState<{
     id: number;
     x: number;
